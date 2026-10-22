@@ -1,0 +1,4 @@
+id = "1"
+title = "Define the outcome metric: applications per running hour"
+kind = "feature"
+scope = ["doctrine.toml", ".gitignore", "src/hunter/domain/outcome.py", "src/hunter/adapters/outcome.py"]
