@@ -1,0 +1,5 @@
+# Every text file is stored with LF endings, whatever the editor wrote, so an edit never turns a
+# whole file into a diff. Windows batch files need CRLF to run.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf

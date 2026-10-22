@@ -1,0 +1,21 @@
+# This project's contract. Making anything here looser needs the approver's approval on the pull request.
+
+[project]
+name = "Hunter"
+doctrine_version = "0.3.1"
+approver = "OmarAbdo"
+
+[outcome]
+# The one number this project exists to move, computed from real data. Agree it with the approver
+# before the first feature: the first work item defines it.
+metric = "not defined yet"
+command = ["python", "-m", "hunter.adapters.outcome"]
+baseline = 1
+stop_below = 0.8
+
+[[services]]
+name = "hunter"
+path = "src/hunter"
+profile = "python"
+architecture = "hexagonal"
+tests = "tests"

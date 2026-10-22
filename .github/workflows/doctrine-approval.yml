@@ -1,0 +1,33 @@
+# Installed by doctrine init. An approval re-runs the failed doctrine check of the approved commit,
+# so each commit keeps one check: the goalposts gate failed it while the approval was missing and
+# passes on the re-run. (A review that started a second run left the first one red, and branch
+# protection counts both.) doctrine-merge.yml merges once the re-run passes.
+name: approval
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  rerun:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Re-run the failed check of the approved commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          run=$(gh run list -R "$GITHUB_REPOSITORY" --workflow doctrine.yml --commit "$HEAD_SHA" \
+            --event pull_request --limit 1 --json databaseId,conclusion \
+            -q '.[] | select(.conclusion == "failure") | .databaseId')
+          if [ -z "$run" ]; then
+            echo "No failed check on $HEAD_SHA to re-run."
+            exit 0
+          fi
+          gh run rerun "$run" -R "$GITHUB_REPOSITORY" --failed

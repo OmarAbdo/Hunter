@@ -1,0 +1,39 @@
+# Installed by doctrine init. Claude never merges. When a pull request from an item branch passes every gate (and, where the
+# branch protection asks for it, Omar approved it), this workflow merges it with the repository's
+# own token. It runs from main's copy of this file and never runs the pull request's code.
+name: merge
+
+on:
+  workflow_run:
+    workflows: [doctrine]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merge the pull request whose gates passed on this exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          case "$HEAD_BRANCH" in
+            item/*) ;;
+            *) echo "Only item branches merge by themselves."; exit 0 ;;
+          esac
+          number=$(gh pr list -R "$GITHUB_REPOSITORY" --head "$HEAD_BRANCH" --state open \
+            --json number,headRefOid -q ".[] | select(.headRefOid == \"$HEAD_SHA\") | .number")
+          if [ -z "$number" ]; then
+            echo "No open pull request at $HEAD_SHA."
+            exit 0
+          fi
+          gh pr merge "$number" -R "$GITHUB_REPOSITORY" --squash --delete-branch \
+            --match-head-commit "$HEAD_SHA" ||
+            echo "Not mergeable yet: an approval or a check is still missing."
