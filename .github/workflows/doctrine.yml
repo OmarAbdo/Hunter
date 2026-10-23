@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: OmarAbdo/doctrine/.github/workflows/project-gates.yml@v0.3.1
+    uses: OmarAbdo/doctrine/.github/workflows/project-gates.yml@v0.3.2
     with:
-      doctrine_ref: v0.3.1
+      doctrine_ref: v0.3.2
 
