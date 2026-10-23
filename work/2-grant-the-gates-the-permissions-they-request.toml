@@ -1,0 +1,4 @@
+id = "2"
+title = "Grant the gates the permissions they request"
+kind = "chore"
+scope = [".github/workflows/doctrine.yml"]
