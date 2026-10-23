@@ -2,7 +2,7 @@
 
 [project]
 name = "Hunter"
-doctrine_version = "0.3.1"
+doctrine_version = "0.3.2"
 approver = "OmarAbdo"
 
 [outcome]
