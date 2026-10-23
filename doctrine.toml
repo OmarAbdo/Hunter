@@ -6,12 +6,12 @@ doctrine_version = "0.3.2"
 approver = "OmarAbdo"
 
 [outcome]
-# The one number this project exists to move, computed from real data. Agree it with the approver
-# before the first feature: the first work item defines it.
-metric = "not defined yet"
+# The one number this project exists to move, computed from real data (Hunter's run log in var/).
+# Agreed with the approver in item 1: the line arms at 5 an hour and stops below it.
+metric = "Applications submitted with proof per running hour, over the last 3 running hours"
 command = ["python", "-m", "hunter.adapters.outcome"]
-baseline = 1
-stop_below = 0.8
+baseline = 10
+stop_below = 0.5
 
 [[services]]
 name = "hunter"
