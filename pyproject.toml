@@ -2,7 +2,7 @@
 name = "hunter"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["geonamescache==3.0.2"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
