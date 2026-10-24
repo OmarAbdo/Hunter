@@ -2,8 +2,8 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from hunter.adapters.database import open_database
-from hunter.adapters.pool import Pool
+from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.pool import Pool
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
 
