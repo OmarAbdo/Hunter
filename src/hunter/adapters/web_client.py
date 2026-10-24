@@ -1,0 +1,143 @@
+"""Hunter's one way to talk to websites (docs/sources.md):
+- every request waits its turn under its host's pace, and gives up after 30 seconds;
+- a rate limit, a server error or no answer is tried again, three tries in all;
+- web pages are read only where the site's robots.txt allows it."""
+
+import json
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
+from email.message import Message
+from typing import Any
+from urllib.robotparser import RobotFileParser
+
+from hunter.domain.pacing import Pacing
+
+USER_AGENT = "Hunter/0.1 (personal job search)"
+TIMEOUT_SECONDS = 30
+TRIES = 3
+PAUSES_SECONDS = (5.0, 15.0)
+LONGEST_PAUSE_SECONDS = 600.0
+RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
+FORBIDDEN_STATUSES = frozenset({401, 403})
+
+
+class WebError(Exception):
+    """A failed request. `status` is the HTTP status, or None when no answer came."""
+
+    def __init__(
+        self, message: str, status: int | None = None, retry_after: float | None = None
+    ) -> None:
+        super().__init__(message)
+        self.status = status
+        self.retry_after = retry_after
+
+    @property
+    def retryable(self) -> bool:
+        return self.status is None or self.status in RETRY_STATUSES
+
+
+def utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
+def retry_after(headers: Message) -> float | None:
+    """The pause a Retry-After header asks for, in seconds. HTTP dates aren't read."""
+    value = headers.get("Retry-After", "")
+    return min(float(value), LONGEST_PAUSE_SECONDS) if value.isdigit() else None
+
+
+class WebClient:
+    def __init__(
+        self,
+        pacing: Pacing,
+        sleep: Callable[[float], None] = time.sleep,
+        clock: Callable[[], datetime] = utc_now,
+    ) -> None:
+        self.pacing = pacing
+        self.sleep = sleep
+        self.clock = clock
+        self.robots: dict[str, RobotFileParser] = {}
+
+    def get_json(
+        self,
+        url: str,
+        params: Mapping[str, str] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> Any:
+        return json.loads(self.get_text(url, params, headers))
+
+    def post_json(self, url: str, body: object, headers: Mapping[str, str] | None = None) -> Any:
+        sent = {"Content-Type": "application/json", **(headers or {})}
+        return json.loads(self._send(url, sent, json.dumps(body).encode()))
+
+    def get_text(
+        self,
+        url: str,
+        params: Mapping[str, str] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> str:
+        if params:
+            url = f"{url}?{urllib.parse.urlencode(params)}"
+        return self._send(url, headers or {})
+
+    def get_page(self, url: str) -> str:
+        """A public web page, read only where the site's robots.txt allows it."""
+        if not self._robots_of(url).can_fetch(USER_AGENT, url):
+            raise WebError(f"robots.txt disallows {url}")
+        return self.get_text(url)
+
+    def _robots_of(self, url: str) -> RobotFileParser:
+        parts = urllib.parse.urlsplit(url)
+        site = f"{parts.scheme}://{parts.netloc}"
+        if site not in self.robots:
+            self.robots[site] = self._read_robots(site)
+        return self.robots[site]
+
+    def _read_robots(self, site: str) -> RobotFileParser:
+        """Read the standard way: a missing file allows everything, a forbidden one nothing."""
+        rules = RobotFileParser()
+        try:
+            rules.parse(self.get_text(f"{site}/robots.txt").splitlines())
+        except WebError as error:
+            if error.retryable:
+                raise
+            forbidden = error.status in FORBIDDEN_STATUSES
+            rules.parse(["User-agent: *", "Disallow: /"] if forbidden else [])
+        return rules
+
+    def _send(self, url: str, headers: Mapping[str, str], body: bytes | None = None) -> str:
+        request = urllib.request.Request(url, body, {"User-Agent": USER_AGENT, **headers})
+        for attempt in range(1, TRIES):
+            try:
+                return self._read(request)
+            except WebError as error:
+                self._pause_before_retry(error, attempt)
+        return self._read(request)
+
+    def _pause_before_retry(self, error: WebError, attempt: int) -> None:
+        if not error.retryable:
+            raise error
+        pause = error.retry_after if error.retry_after is not None else PAUSES_SECONDS[attempt - 1]
+        self.sleep(pause)
+
+    def _read(self, request: urllib.request.Request) -> str:
+        self._wait_turn(request.host)
+        try:
+            with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+                text: str = response.read().decode(response.headers.get_content_charset("utf-8"))
+                return text
+        except urllib.error.HTTPError as error:
+            message = f"{request.host}: HTTP {error.code} for {request.full_url}"
+            raise WebError(message, error.code, retry_after(error.headers)) from error
+        except (urllib.error.URLError, TimeoutError) as error:
+            raise WebError(f"{request.host}: no answer ({error})") from error
+
+    def _wait_turn(self, host: str) -> None:
+        pause = self.pacing.wait(host, self.clock())
+        if pause:
+            self.sleep(pause.total_seconds())
+        self.pacing.record(host, self.clock())
