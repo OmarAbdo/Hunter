@@ -123,9 +123,13 @@ class Discovery:
                 report.taken[campaign.id] = report.taken.get(campaign.id, 0) + 1
 
     def _register_company(self, posting: Posting) -> None:
-        known = self.stores.companies.get(company_key(posting.company))
+        """A board belongs to one company: a posting joins its board's owner, whatever name the
+        posting gives ("1KOMMA5° Heat GmbH" on 1KOMMA5°'s board); otherwise the company by name."""
+        boards = boards_of(posting)
+        owners = (owner for board in boards if (owner := self.stores.companies.owner_of(board)))
+        known = next(owners, None) or self.stores.companies.get(company_key(posting.company))
         company = known or Company(name=posting.company)
-        for board in boards_of(posting):
+        for board in boards:
             company = company.with_board(board)
         if company != known:
             self.stores.companies.save(company)

@@ -8,7 +8,8 @@ from hunter.adapters.cli.boards_command import add_boards
 from hunter.adapters.cli.discover_command import chosen
 from hunter.adapters.cli.project import Project, stores_of
 from hunter.adapters.cli.report import report_text
-from hunter.adapters.cli.sources import alert_sources_of, feeds_of
+from hunter.adapters.cli.alerts import alert_sources_of
+from hunter.adapters.cli.sources import feeds_of
 from hunter.adapters.storage.matches import Matches
 from hunter.application.discover import SourceReport
 from hunter.domain.discovery.campaign import Campaign, Rejection
