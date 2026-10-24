@@ -1,5 +1,4 @@
 """The pool: every job Hunter has seen, stored once, with a sighting for each source that showed it.
-SQLite in var/, which is personal data and never committed (docs/discovery.md).
 
 A posting is the same job as one in the pool when the employer's own key matches, or else when
 company, title and place match a job that doesn't have a different employer key."""
@@ -9,29 +8,9 @@ import sqlite3
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
-
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS jobs (
-    id INTEGER PRIMARY KEY,
-    exact_key TEXT UNIQUE,
-    fuzzy_key TEXT NOT NULL,
-    posting TEXT NOT NULL,
-    first_seen TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS jobs_by_fuzzy_key ON jobs (fuzzy_key);
-CREATE TABLE IF NOT EXISTS sightings (
-    job_id INTEGER NOT NULL REFERENCES jobs (id),
-    source TEXT NOT NULL,
-    native_id TEXT NOT NULL,
-    first_seen TEXT NOT NULL,
-    last_seen TEXT NOT NULL,
-    PRIMARY KEY (source, native_id)
-);
-"""
 
 
 @dataclass(frozen=True)
@@ -41,9 +20,8 @@ class Added:
 
 
 class Pool:
-    def __init__(self, path: Path) -> None:
-        self.database = sqlite3.connect(path)
-        self.database.executescript(SCHEMA)
+    def __init__(self, database: sqlite3.Connection) -> None:
+        self.database = database
 
     def add(self, posting: Posting, seen_at: datetime) -> Added:
         """The job the posting shows, new or already known, with this sighting recorded."""
