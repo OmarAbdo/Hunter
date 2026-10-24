@@ -1,0 +1,4 @@
+id = "4"
+title = "Discovery domain: postings, locations and job identity"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/**"]
