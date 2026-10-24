@@ -107,8 +107,17 @@ def test_a_new_campaign_judges_jobs_already_in_the_pool() -> None:
 def test_a_source_that_is_down_is_reported_and_the_others_still_run() -> None:
     down, up = Feed("ashby:nextcloud", down=True), Feed("greenhouse:nextcloud", [JOB])
     first, second = discover([down, up], [BERLIN], stores(), NOW)
+    assert (first.fetched, first.new_jobs, first.taken) == (0, 0, {})
     assert first.error == "ashby:nextcloud: HTTP 503"
     assert (second.new_jobs, second.error) == (1, None)
+
+
+def test_only_jobs_new_to_the_pool_count_as_new() -> None:
+    kept = stores()
+    discover([Feed("greenhouse:nextcloud", [JOB])], [BERLIN], kept, NOW)
+    other = replace(JOB, title="Data Engineer", employer=None, source=SourceRef("greenhouse", "2"))
+    [report] = discover([Feed("greenhouse:nextcloud", [JOB, other])], [BERLIN], kept, NOW)
+    assert (report.fetched, report.new_jobs) == (2, 1)
 
 
 def test_the_company_registry_learns_boards_from_postings_and_links() -> None:
