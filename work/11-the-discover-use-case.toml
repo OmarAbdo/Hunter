@@ -1,0 +1,4 @@
+id = "11"
+title = "The discover use case"
+kind = "feature"
+scope = ["src/hunter/application/**", "src/hunter/domain/discovery/**", "src/hunter/adapters/pool.py"]

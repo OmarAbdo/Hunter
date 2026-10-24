@@ -6,12 +6,13 @@ company, title and place match a job that doesn't have a different employer key.
 
 import json
 import sqlite3
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 
 from hunter.domain.discovery.location import Location, Workplace
+from hunter.domain.discovery.pooled import Pooled
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
 
 SCHEMA = """
@@ -34,18 +35,12 @@ CREATE TABLE IF NOT EXISTS sightings (
 """
 
 
-@dataclass(frozen=True)
-class Added:
-    job_id: int
-    is_new: bool
-
-
 class Pool:
     def __init__(self, path: Path) -> None:
         self.database = sqlite3.connect(path)
         self.database.executescript(SCHEMA)
 
-    def add(self, posting: Posting, seen_at: datetime) -> Added:
+    def add(self, posting: Posting, seen_at: datetime) -> Pooled:
         """The job the posting shows, new or already known, with this sighting recorded."""
         with self.database:
             known = self._find(posting)
@@ -55,7 +50,7 @@ class Pool:
                 job_id = known
                 self._learn_employer(job_id, posting)
             self._record_sighting(job_id, posting.source, seen_at)
-        return Added(job_id=job_id, is_new=known is None)
+        return Pooled(job_id=job_id, is_new=known is None)
 
     def posting(self, job_id: int) -> Posting:
         row = self.database.execute("SELECT posting FROM jobs WHERE id = ?", (job_id,)).fetchone()
