@@ -82,7 +82,8 @@ Ports, kept small: `JobSource` (fetch postings), `Pool` (store and find jobs, si
 
 ## Running it
 
-From the project folder (`hunter.cmd` on Windows, `./hunter` in Git Bash):
+From the project folder: `hunter` in cmd, `.\hunter` in PowerShell (which doesn't run programs
+from the current folder without `.\`), `./hunter.sh` in Git Bash.
 
 ```
 hunter boards add https://job-boards.greenhouse.io/n26 --company N26
@@ -90,8 +91,10 @@ hunter discover                          # every campaign in campaigns/
 hunter discover --campaign de-swe-berlin
 ```
 
-The report shows each source's fetched, new and taken counts, then each campaign's rejections
-by reason. The first run needs the project's environment: `doctrine check` builds it once.
+A line for each source is printed as soon as it's read; a full run takes about a minute. Then
+comes the report: each source's fetched, new and taken counts, and each campaign's rejections by
+reason. Ctrl+C stops a run, and what was read until then is kept. The first run needs the
+project's environment: `doctrine check` builds it once.
 
 ## Campaigns
 

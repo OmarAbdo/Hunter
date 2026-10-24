@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 
-from hunter.application.discover import Stores, discover
+from hunter.application.discover import Stores, discover, discover_each
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.campaign import Campaign, Rejection
@@ -73,6 +73,13 @@ class Verdicts:
 
 def stores() -> Stores:
     return Stores(jobs=Jobs(), companies=Companies(), matches=Verdicts())
+
+
+def test_reports_arrive_one_source_at_a_time() -> None:
+    later = Feed("ashby:nextcloud", down=True)
+    reports = discover_each([Feed("greenhouse:nextcloud", [JOB]), later], [BERLIN], stores(), NOW)
+    assert next(reports).source == "greenhouse:nextcloud"
+    assert next(reports).error == "ashby:nextcloud: HTTP 503"
 
 
 def test_each_source_reports_what_it_brought() -> None:
