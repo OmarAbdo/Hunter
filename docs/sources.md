@@ -6,7 +6,10 @@ source before building its adapter, because access rules change.
 ## Rules every source follows
 
 - **No paid sources.** A free API key that needs a sign-up is fine.
-- **No scraping and no bots against a site's terms.** No detection evasion, no logged-in automation.
+- **Automation is judged by risk, not by principle.** Browser automation, computer use and
+  getting past a captcha are fine wherever they work and can't backfire. Where a harsh penalty is
+  likely, they're out: an account ban, or a block on a site Omar depends on, LinkedIn above all.
+  Those sites are read through their own channels: alert mails, and human-paced use.
   `robots.txt` is respected wherever Hunter reads public pages.
 - **Sites without an API come in through their own job-alert emails.** The site sends them to the
   inbox; Hunter reads the inbox.

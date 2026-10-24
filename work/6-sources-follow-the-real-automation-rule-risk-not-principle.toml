@@ -1,0 +1,4 @@
+id = "6"
+title = "Sources follow the real automation rule: risk, not principle"
+kind = "chore"
+scope = ["docs/sources.md"]
