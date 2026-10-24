@@ -40,8 +40,8 @@ def source_api() -> Iterator[Callable[[str, str | None], str]]:
 
     def start(path: str, saved: str | None) -> str:
         body = (SAVED / saved).read_text(encoding="utf-8") if saved else ""
-        Source.path_and_body = (path if saved else "", body)
-        server = ThreadingHTTPServer(("127.0.0.1", 0), Source)
+        answers = type("Saved", (Source,), {"path_and_body": (path if saved else "", body)})
+        server = ThreadingHTTPServer(("127.0.0.1", 0), answers)
         threading.Thread(target=server.serve_forever, daemon=True).start()
         servers.append(server)
         return f"http://127.0.0.1:{server.server_address[1]}"
