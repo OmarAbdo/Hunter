@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import Protocol
 
+from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.campaign import Rejection
 from hunter.domain.discovery.company import Company
 from hunter.domain.discovery.pooled import Pooled
@@ -37,6 +38,8 @@ class CompanyStore(Protocol):
     def get(self, key: str) -> Company | None: ...
 
     def save(self, company: Company) -> None: ...
+
+    def owner_of(self, board: Board) -> Company | None: ...
 
 
 class MatchStore(Protocol):

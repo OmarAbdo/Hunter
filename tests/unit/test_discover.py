@@ -57,6 +57,9 @@ class Companies:
     def save(self, company: Company) -> None:
         self.saved[company.key] = company
 
+    def owner_of(self, board: Board) -> Company | None:
+        return next((company for company in self.saved.values() if board in company.feeds), None)
+
 
 class Verdicts:
     def __init__(self) -> None:
