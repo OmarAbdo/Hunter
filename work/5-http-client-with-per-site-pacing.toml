@@ -1,0 +1,4 @@
+id = "5"
+title = "HTTP client with per-site pacing"
+kind = "feature"
+scope = ["src/hunter/domain/pacing.py", "src/hunter/adapters/web_client.py"]
