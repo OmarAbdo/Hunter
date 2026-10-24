@@ -80,6 +80,19 @@ Ports, kept small: `JobSource` (fetch postings), `Pool` (store and find jobs, si
   facts, mail contents, and the credentials in `var/accounts.toml`.
 - **Command line:** `python -m hunter discover --campaign <id>` prints the yield per source.
 
+## Running it
+
+From the project folder (`hunter.cmd` on Windows, `./hunter` in Git Bash):
+
+```
+hunter boards add https://job-boards.greenhouse.io/n26 --company N26
+hunter discover                          # every campaign in campaigns/
+hunter discover --campaign de-swe-berlin
+```
+
+The report shows each source's fetched, new and taken counts, then each campaign's rejections
+by reason. The first run needs the project's environment: `doctrine check` builds it once.
+
 ## Campaigns
 
 One file each, `campaigns/<id>.toml`, holding criteria and sources, and nothing personal. The pilot

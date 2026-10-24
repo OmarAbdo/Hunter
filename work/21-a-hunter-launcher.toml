@@ -1,0 +1,4 @@
+id = "21"
+title = "A hunter launcher"
+kind = "chore"
+scope = ["hunter.cmd", "hunter", "docs/discovery.md"]
