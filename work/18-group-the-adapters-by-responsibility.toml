@@ -1,0 +1,4 @@
+id = "18"
+title = "Group the adapters by responsibility"
+kind = "refactor"
+scope = ["src/hunter/adapters/**", "tests/**"]

@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from hunter.adapters.sources.ashby import AshbyFeed
-from hunter.adapters.web_client import WebClient
+from hunter.adapters.web.client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting

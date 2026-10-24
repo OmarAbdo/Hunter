@@ -3,10 +3,10 @@ and the employer's own job id, so Hunter can apply on Greenhouse itself."""
 
 from typing import Any
 
-from hunter.adapters.html_text import plain_text
-from hunter.adapters.places import places_from_text
+from hunter.adapters.text.html_text import plain_text
+from hunter.adapters.text.places import places_from_text
 from hunter.adapters.sources.reading import parsed_time, read_json
-from hunter.adapters.web_client import WebClient
+from hunter.adapters.web.client import WebClient
 from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef
 
 API = "https://boards-api.greenhouse.io"

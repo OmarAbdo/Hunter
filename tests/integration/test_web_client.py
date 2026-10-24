@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from hunter.adapters.web_client import USER_AGENT, WebClient, WebError
+from hunter.adapters.web.client import USER_AGENT, WebClient, WebError
 from hunter.domain.pacing import Pacing, PaceRule
 
 ROBOTS = "User-agent: *\nDisallow: /private\n"

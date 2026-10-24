@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from hunter.adapters.database import open_database
-from hunter.adapters.registry import Registry
+from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.registry import Registry
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.company import Company, FeedStatus
 

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from hunter.adapters.sources.greenhouse import GreenhouseFeed
-from hunter.adapters.web_client import WebClient
+from hunter.adapters.web.client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef

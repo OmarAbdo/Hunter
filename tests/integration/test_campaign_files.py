@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from hunter.adapters.campaign_files import CampaignFileError, load_campaign, load_campaigns
+from hunter.adapters.config.campaign_files import CampaignFileError, load_campaign, load_campaigns
 from hunter.domain.discovery.campaign import Campaign
 from hunter.domain.discovery.location import Workplace
 from hunter.domain.discovery.posting import Employment

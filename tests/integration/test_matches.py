@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from hunter.adapters.database import open_database
-from hunter.adapters.matches import Matches
+from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.matches import Matches
 from hunter.domain.discovery.campaign import Rejection
 
 DECIDED = datetime(2026, 10, 24, 12, 0, tzinfo=UTC)
