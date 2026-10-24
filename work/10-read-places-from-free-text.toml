@@ -1,0 +1,4 @@
+id = "10"
+title = "Read places from free text"
+kind = "feature"
+scope = ["pyproject.toml", "requirements.lock", "src/hunter/adapters/places.py"]
