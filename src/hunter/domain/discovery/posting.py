@@ -49,6 +49,12 @@ class Posting:
     apply_url: str | None = None
     description: str = ""
     posted_at: datetime | None = None
+    other_locations: tuple[Location, ...] = ()
+
+    @property
+    def locations(self) -> tuple[Location, ...]:
+        """Every place the job is open in, its main one first."""
+        return (self.location, *self.other_locations)
 
     @property
     def exact_key(self) -> str | None:

@@ -1,6 +1,6 @@
 import pytest
 
-from hunter.adapters.places import place_from_text
+from hunter.adapters.places import place_from_text, places_from_text
 from hunter.domain.discovery.location import WORLDWIDE, Location, Workplace
 
 
@@ -65,6 +65,29 @@ def test_the_largest_city_of_a_name_wins_without_a_country() -> None:
 def test_a_source_can_say_which_country_its_places_are_in() -> None:
     home_office = Location(country="DE", workplace=Workplace.REMOTE)
     assert place_from_text("Home Office", default_country="DE") == home_office
+
+
+def test_several_cities_are_several_places() -> None:
+    assert places_from_text("Berlin, Vienna, Barcelona") == (
+        Location(country="DE", city="Berlin"),
+        Location(country="AT", city="Vienna"),
+        Location(country="ES", city="Barcelona"),
+    )
+
+
+def test_a_city_and_its_country_are_one_place() -> None:
+    assert places_from_text("Berlin, Germany") == (Location(country="DE", city="Berlin"),)
+
+
+def test_a_place_without_cities_is_one_place() -> None:
+    assert places_from_text("Remote") == (Location(workplace=Workplace.REMOTE),)
+
+
+def test_several_cities_share_the_workplace() -> None:
+    assert places_from_text("Hybrid: Berlin / Munich") == (
+        Location(country="DE", city="Berlin", workplace=Workplace.HYBRID),
+        Location(country="DE", city="Munich", workplace=Workplace.HYBRID),
+    )
 
 
 def test_text_with_no_place_is_an_unknown_place() -> None:

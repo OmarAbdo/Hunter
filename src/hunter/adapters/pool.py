@@ -8,6 +8,7 @@ import sqlite3
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.pooled import Pooled
@@ -92,18 +93,23 @@ def encoded(posting: Posting) -> str:
     return json.dumps(asdict(posting), default=plain, ensure_ascii=False)
 
 
+def decoded_location(place: dict[str, Any]) -> Location:
+    return Location(
+        country=place["country"],
+        city=place["city"],
+        workplace=Workplace(place["workplace"]) if place["workplace"] else None,
+        remote_scope=frozenset(place["remote_scope"]),
+    )
+
+
 def decoded(text: str) -> Posting:
     record = json.loads(text)
-    place, employer = record["location"], record["employer"]
+    employer = record["employer"]
     return Posting(
         title=record["title"],
         company=record["company"],
-        location=Location(
-            country=place["country"],
-            city=place["city"],
-            workplace=Workplace(place["workplace"]) if place["workplace"] else None,
-            remote_scope=frozenset(place["remote_scope"]),
-        ),
+        location=decoded_location(record["location"]),
+        other_locations=tuple(map(decoded_location, record.get("other_locations", []))),
         source=SourceRef(**record["source"]),
         employer=EmployerRef(**employer) if employer else None,
         employment=Employment(record["employment"]) if record["employment"] else None,

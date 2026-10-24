@@ -31,7 +31,8 @@ class Campaign:
       those countries.
     - `roles` and `excluded_roles`: title patterns; no roles means any title.
     - `employment`: the employment types it takes; none means any.
-    A job with an unknown workplace counts as onsite; an unknown employment type is taken.
+    A job with an unknown workplace counts as onsite; an unknown employment type is taken. A job
+    open in several places is taken when one of them fits.
     """
 
     id: str
@@ -48,9 +49,14 @@ class Campaign:
         """Why the campaign turns the job down, or None when the job is the campaign's own."""
         return (
             self._role_rejection(posting.title)
-            or self._place_rejection(posting.location)
+            or self._places_rejection(posting.locations)
             or self._employment_rejection(posting.employment)
         )
+
+    def _places_rejection(self, locations: tuple[Location, ...]) -> Rejection | None:
+        """One place that fits is enough; when none fits, the main place's reason counts."""
+        rejections = [self._place_rejection(location) for location in locations]
+        return None if None in rejections else rejections[0]
 
     def _role_rejection(self, title: str) -> Rejection | None:
         if self.roles and not mentions_any(title, self.roles):

@@ -1,0 +1,4 @@
+id = "12"
+title = "Jobs open in several places"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/**", "src/hunter/adapters/places.py", "src/hunter/adapters/pool.py"]

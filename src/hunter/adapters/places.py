@@ -17,7 +17,7 @@ from hunter.domain.discovery.location import WORLDWIDE, Location, Workplace
 
 REMOTE = re.compile(r"\b(remote|home ?office|work from home|wfh|distributed|anywhere)\b", re.I)
 HYBRID = re.compile(r"\bhybrid\b", re.I)
-SEPARATORS = re.compile(r"[,/|;()\-–—]+")
+SEPARATORS = re.compile(r"[,/|;:()\-–—]+")
 REGIONS = {
     "emea": {"EUROPE", "GCC"},
     "europe": {"EUROPE"},
@@ -130,15 +130,19 @@ def workplace_in(text: str) -> Workplace | None:
 
 
 def place_from_text(text: str, default_country: str | None = None) -> Location:
-    """`default_country` is for sources whose places are all in one country (de.indeed.com)."""
+    """The one place the text names, or its first city when it names several.
+    `default_country` is for sources whose places are all in one country (de.indeed.com)."""
+    return places_from_text(text, default_country)[0]
+
+
+def places_from_text(text: str, default_country: str | None = None) -> tuple[Location, ...]:
+    """Every place the text names: "Berlin, Vienna" is two places, "Berlin, Germany" one."""
     pieces = [piece for piece in SEPARATORS.split(text) if piece.strip()]
     named = {code for piece in pieces if (code := country_named(piece))}
     country = next(iter(named), None) if len(named) == 1 else None
-    city = next((found for piece in pieces if (found := city_named(piece, country))), None)
+    cities = dict.fromkeys(found for piece in pieces if (found := city_named(piece, country)))
     workplace = workplace_in(text)
-    return Location(
-        country=country or (city.country if city else default_country),
-        city=city.name if city else None,
-        workplace=workplace,
-        remote_scope=remote_scope(text, named) if workplace is Workplace.REMOTE else frozenset(),
-    )
+    scope = remote_scope(text, named) if workplace is Workplace.REMOTE else frozenset()
+    if not cities:
+        return (Location(country or default_country, None, workplace, scope),)
+    return tuple(Location(city.country, city.name, workplace, scope) for city in cities)
