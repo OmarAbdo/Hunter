@@ -1,0 +1,4 @@
+id = "7"
+title = "Discovery domain: companies and campaign matching"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/**"]
