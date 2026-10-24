@@ -1,0 +1,4 @@
+id = "22"
+title = "Show discovery progress, and launchers that work in PowerShell"
+kind = "fix"
+scope = ["src/hunter/application/discover.py", "src/hunter/__main__.py", "src/hunter/adapters/cli/**", "hunter", "hunter.sh", "docs/discovery.md"]

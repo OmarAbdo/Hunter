@@ -2,7 +2,7 @@
 registry up to date, and let every campaign judge each job it hasn't judged yet. A source that
 can't be read is reported, and the others still run."""
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -41,8 +41,16 @@ class SourceReport:
 def discover(
     sources: Iterable[JobSource], campaigns: Sequence[Campaign], stores: Stores, now: datetime
 ) -> list[SourceReport]:
+    return list(discover_each(sources, campaigns, stores, now))
+
+
+def discover_each(
+    sources: Iterable[JobSource], campaigns: Sequence[Campaign], stores: Stores, now: datetime
+) -> Iterator[SourceReport]:
+    """Each source's report as soon as that source is read, so a long run can show progress."""
     discovery = Discovery(campaigns, stores)
-    return [discovery.read(source, now) for source in sources]
+    for source in sources:
+        yield discovery.read(source, now)
 
 
 def boards_of(posting: Posting) -> list[Board]:

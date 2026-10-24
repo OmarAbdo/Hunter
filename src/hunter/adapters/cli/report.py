@@ -21,6 +21,14 @@ def report_text(
     return "\n".join(lines) + "\n"
 
 
+def progress_line(report: SourceReport) -> str:
+    """One source, as soon as it's read."""
+    if report.error:
+        return f"  {report.source}: failed ({report.error})"
+    taken = sum(report.taken.values())
+    return f"  {report.source}: {report.fetched} fetched, {report.new_jobs} new, {taken} taken"
+
+
 def counts(report: SourceReport, ids: Sequence[str]) -> list[str]:
     taken = [report.taken.get(campaign_id, 0) for campaign_id in ids]
     return [str(number) for number in (report.fetched, report.new_jobs, *taken)]
