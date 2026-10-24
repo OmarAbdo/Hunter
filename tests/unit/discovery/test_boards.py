@@ -33,6 +33,8 @@ def test_a_link_names_the_board(link: str, ats: str, slug: str) -> None:
         "https://de.indeed.com/rc/clk/dl?jk=53e2194f9af64745",
         "https://boards-api.greenhouse.io/v1/boards",
         "https://jobs.lever.co/",
+        "https://apply.workable.com/j/2FAA7C0BC6",
+        "https://apply.workable.com/j/2FAA7C0BC6/apply",
         "",
     ],
 )
