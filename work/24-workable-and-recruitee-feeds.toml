@@ -1,0 +1,4 @@
+id = "24"
+title = "Workable and Recruitee feeds"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/workable.py", "src/hunter/adapters/sources/recruitee.py", "src/hunter/adapters/cli/sources.py"]
