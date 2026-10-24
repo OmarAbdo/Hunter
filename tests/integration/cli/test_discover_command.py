@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 
 from hunter.adapters.cli.main import main
-from hunter.adapters.database import open_database
-from hunter.adapters.pool import Pool
-from hunter.adapters.registry import Registry
+from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.pool import Pool
+from hunter.adapters.storage.registry import Registry
 
 REPOSITORY = Path(__file__).resolve().parents[3]
 N26 = (REPOSITORY / "tests" / "fixtures" / "sources" / "greenhouse-n26.json").read_bytes()

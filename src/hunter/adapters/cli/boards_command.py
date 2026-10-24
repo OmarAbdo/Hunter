@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from typing import TextIO
 
 from hunter.adapters.cli.project import Project
-from hunter.adapters.registry import Registry
+from hunter.adapters.storage.registry import Registry
 from hunter.domain.discovery.boards import board_from_link
 from hunter.domain.discovery.company import Company
 from hunter.domain.discovery.identity import company_key

@@ -6,10 +6,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from hunter.adapters.database import open_database
-from hunter.adapters.matches import Matches
-from hunter.adapters.pool import Pool
-from hunter.adapters.registry import Registry
+from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.matches import Matches
+from hunter.adapters.storage.pool import Pool
+from hunter.adapters.storage.registry import Registry
 from hunter.application.discover import Stores
 
 

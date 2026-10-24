@@ -9,7 +9,7 @@ from hunter.adapters.campaign_files import CampaignFileError, load_campaigns
 from hunter.adapters.cli.project import Project, stores_of
 from hunter.adapters.cli.report import report_text
 from hunter.adapters.cli.sources import sources_of
-from hunter.adapters.matches import Matches
+from hunter.adapters.storage.matches import Matches
 from hunter.application.discover import discover
 from hunter.domain.discovery.campaign import Campaign
 

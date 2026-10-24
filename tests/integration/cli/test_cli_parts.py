@@ -9,7 +9,7 @@ from hunter.adapters.cli.discover_command import chosen
 from hunter.adapters.cli.project import Project, stores_of
 from hunter.adapters.cli.report import report_text, table
 from hunter.adapters.cli.sources import alert_sources_of, feeds_of
-from hunter.adapters.matches import Matches
+from hunter.adapters.storage.matches import Matches
 from hunter.application.discover import SourceReport
 from hunter.domain.discovery.campaign import Campaign, Rejection
 

@@ -3,7 +3,7 @@ the campaigns turned the other jobs down."""
 
 from collections.abc import Sequence
 
-from hunter.adapters.matches import Matches
+from hunter.adapters.storage.matches import Matches
 from hunter.application.discover import SourceReport
 from hunter.domain.discovery.campaign import Campaign
 
