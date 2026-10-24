@@ -4,14 +4,20 @@ mail's plain text. Hunter never visits indeed.com for them.
 Each job in the mail is a block of lines: the title, "Company - Place", then optional salary,
 employer-badge and quick-apply lines, a snippet, the age ("Vor 3 Tagen"), and the job's link."""
 
+import imaplib
 import re
+from collections.abc import Sequence
 from dataclasses import replace
 from datetime import datetime, timedelta
+from typing import Protocol
 
+from hunter.adapters.mail.mailbox import Mail
 from hunter.adapters.places import places_from_text
+from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.posting import Posting, SourceRef
 
 SOURCE = "indeed-alert"
+SENDER = "donotreply@jobalert.indeed.com"
 BLOCKS = re.compile(r"\n\s*\n")
 JOB_LINK = re.compile(r"https://(?P<site>[a-z]{2,3})\.indeed\.com/(?:rc|pagead)/clk\S*")
 JOB_KEY = re.compile(r"[?&]jk=(?P<key>[0-9a-f]+)")
@@ -24,6 +30,37 @@ QUICK_APPLY = frozenset({"schnellbewerbung", "easily apply"})
 BADGES = frozenset({"aktiver arbeitgeber", "active employer", "urgently hiring"})
 SALARY = re.compile(r"[€$£]|\bpro (?:jahr|monat|stunde)\b|\ban? (?:year|month|hour)\b", re.I)
 SHORTEST_BLOCK = 3
+
+
+class Inbox(Protocol):
+    def new_mails(self, sender: str) -> list[Mail]: ...
+
+    def remember(self, sender: str, mails: list[Mail]) -> None: ...
+
+
+class IndeedAlerts:
+    """Every inbox's new Indeed alert mails, as one source. Each inbox remembers the mails whose
+    jobs were read, so the next run starts after them."""
+
+    name = SOURCE
+
+    def __init__(self, inboxes: Sequence[Inbox]) -> None:
+        self.inboxes = inboxes
+
+    def fetch(self) -> list[Posting]:
+        postings: list[Posting] = []
+        for inbox in self.inboxes:
+            mails = self._new_mails(inbox)
+            for mail in mails:
+                postings += postings_from_alert(mail.text, mail.received_at)
+            inbox.remember(SENDER, mails)
+        return postings
+
+    def _new_mails(self, inbox: Inbox) -> list[Mail]:
+        try:
+            return inbox.new_mails(SENDER)
+        except (OSError, imaplib.IMAP4.error) as error:
+            raise SourceUnavailableError(f"{self.name}: {error}") from error
 
 
 def postings_from_alert(text: str, received_at: datetime) -> list[Posting]:

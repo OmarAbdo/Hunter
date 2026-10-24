@@ -1,0 +1,4 @@
+id = "20"
+title = "Indeed alerts as a source, and cheap database commits"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/indeed_alerts.py", "src/hunter/adapters/storage/database.py"]

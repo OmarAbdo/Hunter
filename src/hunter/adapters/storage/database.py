@@ -53,6 +53,10 @@ CREATE TABLE IF NOT EXISTS matches (
 
 
 def open_database(path: Path) -> sqlite3.Connection:
+    """In write-ahead-log mode, so the thousands of small commits of a discovery run don't each
+    wait for the disk (one per posting took about a third of a second on Windows)."""
     database = sqlite3.connect(path)
+    database.execute("PRAGMA journal_mode = WAL")
+    database.execute("PRAGMA synchronous = NORMAL")
     database.executescript(SCHEMA)
     return database
