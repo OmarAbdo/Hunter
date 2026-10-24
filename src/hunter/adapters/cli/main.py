@@ -1,7 +1,5 @@
-"""`python -m hunter`, run from the project folder:
-
-python -m hunter boards add <link>... [--company NAME]
-python -m hunter discover [--campaign ID]..."""
+"""`python -m hunter boards add <link>... [--company NAME]` and `python -m hunter discover
+[--campaign ID]...`, run from the project folder."""
 
 import argparse
 import sys
