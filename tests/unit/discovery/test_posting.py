@@ -39,6 +39,12 @@ def test_a_place_without_a_city_keys_on_the_country() -> None:
     assert replace(ALERT, location=remote).fuzzy_key.endswith("|DE:")
 
 
+def test_a_posting_lists_all_its_places_its_main_one_first() -> None:
+    vienna = Location(country="AT", city="Vienna")
+    assert replace(ALERT, other_locations=(vienna,)).locations == (ALERT.location, vienna)
+    assert ALERT.locations == (ALERT.location,)
+
+
 def test_a_posting_has_no_employment_type_until_a_source_says_so() -> None:
     assert ALERT.employment is None
     assert replace(ALERT, employment=Employment.FULL_TIME).employment is Employment.FULL_TIME

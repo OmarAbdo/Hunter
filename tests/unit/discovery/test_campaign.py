@@ -86,6 +86,19 @@ def test_a_campaign_without_cities_takes_the_whole_country() -> None:
     assert germany.rejects(munich) is None
 
 
+def test_a_job_open_in_several_places_is_taken_when_one_of_them_fits() -> None:
+    barcelona = Location(country="ES", city="Barcelona")
+    several = replace(JOB, location=barcelona, other_locations=(JOB.location,))
+    assert PILOT.rejects(several) is None
+
+
+def test_a_job_open_in_several_places_none_of_which_fit_is_rejected_for_the_first() -> None:
+    barcelona, dubai = Location(country="ES", city="Barcelona"), Location(country="AE")
+    assert PILOT.rejects(replace(JOB, location=barcelona, other_locations=(dubai,))) is (
+        Rejection.PLACE
+    )
+
+
 def test_cities_are_compared_by_their_normalised_names() -> None:
     zurich = replace(PILOT, countries=frozenset({"CH"}), cities=frozenset({"Zurich"}))
     assert zurich.rejects(replace(JOB, location=Location(country="CH", city="Zürich"))) is None

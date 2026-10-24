@@ -74,6 +74,12 @@ def test_different_jobs_stay_apart(tmp_path: Path) -> None:
     assert pool.job_count() == 2
 
 
+def test_a_job_keeps_all_its_places(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    several = replace(GREENHOUSE, other_locations=(Location(country="AT", city="Vienna"),))
+    assert pool.posting(pool.add(several, SEEN).job_id) == several
+
+
 def test_the_pool_survives_a_restart(tmp_path: Path) -> None:
     job_id = Pool(open_database(tmp_path / "hunter.db")).add(GREENHOUSE, SEEN).job_id
     assert Pool(open_database(tmp_path / "hunter.db")).posting(job_id) == GREENHOUSE
