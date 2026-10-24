@@ -86,6 +86,11 @@ def test_a_job_keeps_its_quick_apply_mark(tmp_path: Path) -> None:
     assert pool.posting(pool.add(quick, SEEN).job_id).quick_apply
 
 
+def test_the_database_writes_ahead_so_commits_stay_cheap(tmp_path: Path) -> None:
+    database = open_database(tmp_path / "hunter.db")
+    assert database.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
+
+
 def test_the_pool_survives_a_restart(tmp_path: Path) -> None:
     job_id = Pool(open_database(tmp_path / "hunter.db")).add(GREENHOUSE, SEEN).job_id
     assert Pool(open_database(tmp_path / "hunter.db")).posting(job_id) == GREENHOUSE

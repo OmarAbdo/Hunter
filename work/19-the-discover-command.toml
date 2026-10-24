@@ -1,0 +1,4 @@
+id = "19"
+title = "The discover command"
+kind = "feature"
+scope = ["src/hunter/__main__.py", "src/hunter/adapters/cli/**", "src/hunter/adapters/sources/indeed_alerts.py", "src/hunter/adapters/database.py"]

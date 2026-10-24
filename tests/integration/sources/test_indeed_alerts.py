@@ -1,7 +1,11 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from hunter.adapters.sources.indeed_alerts import postings_from_alert
+import pytest
+
+from hunter.adapters.mail.mailbox import Mail
+from hunter.adapters.sources.indeed_alerts import SENDER, IndeedAlerts, postings_from_alert
+from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import SourceRef
 
@@ -69,3 +73,32 @@ def test_home_office_jobs_are_remote_in_the_alerts_country() -> None:
 
 def test_text_without_jobs_gives_none() -> None:
     assert postings_from_alert("Indeed Job Alert\n\nNothing new today.", RECEIVED) == []
+
+
+class StandInMailbox:
+    def __init__(self, mails: list[Mail], *, down: bool = False) -> None:
+        self.mails = mails
+        self.down = down
+        self.remembered: list[Mail] = []
+
+    def new_mails(self, sender: str) -> list[Mail]:
+        if self.down:
+            raise OSError("imap.gmail.com: connection refused")
+        return self.mails if sender == SENDER else []
+
+    def remember(self, sender: str, mails: list[Mail]) -> None:
+        self.remembered = mails
+
+
+def test_the_alert_source_reads_every_inbox_and_remembers_what_it_read() -> None:
+    mail = Mail(uid=3, validity=7, received_at=RECEIVED, text=ALERT)
+    first, second = StandInMailbox([mail]), StandInMailbox([])
+    postings = IndeedAlerts([first, second]).fetch()
+    assert len(postings) == 8
+    assert first.remembered == [mail]
+
+
+def test_an_inbox_that_cannot_be_read_makes_the_source_unavailable() -> None:
+    with pytest.raises(SourceUnavailableError, match="connection refused"):
+        IndeedAlerts([StandInMailbox([], down=True)]).fetch()
+    assert IndeedAlerts([]).name == "indeed-alert"
