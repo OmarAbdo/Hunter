@@ -1,0 +1,4 @@
+id = "8"
+title = "The job pool: postings and sightings in SQLite"
+kind = "feature"
+scope = ["src/hunter/adapters/pool.py"]
