@@ -2,12 +2,10 @@
 registry up to date, and let every campaign judge each job it hasn't judged yet. A source that
 can't be read is reported, and the others still run.
 
-Sources are read several at a time, since most of a run is waiting for websites; each site still
-takes its turns (the web client paces every host). What they bring is taken in one source at a
-time, in their order, so the pool and the report never depend on which site answered first."""
+What sources bring is taken in one source at a time, in their order. How they're read (one after
+another here, several at a time in the command line) is up to the caller of `take_each`."""
 
 from collections.abc import Iterable, Iterator, Sequence
-from concurrent.futures import Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -23,11 +21,6 @@ from hunter.domain.discovery.campaign import Campaign
 from hunter.domain.discovery.company import Company, FeedStatus
 from hunter.domain.discovery.identity import company_key
 from hunter.domain.discovery.posting import Posting
-
-
-READERS = 8  # sources read at the same time
-WAIT_STEP_SECONDS = 0.5
-WAIT_STEPS = 7200  # an hour of steps: far longer than any source takes
 
 
 @dataclass(frozen=True)
@@ -57,36 +50,31 @@ def discover(
 def discover_each(
     sources: Iterable[JobSource], campaigns: Sequence[Campaign], stores: Stores, now: datetime
 ) -> Iterator[SourceReport]:
-    """Each source's report as soon as that source is taken in, so a long run can show progress."""
-    discovery = Discovery(campaigns, stores)
-    readers = ThreadPoolExecutor(max_workers=READERS, thread_name_prefix="source")
-    readings = [(source, readers.submit(fetched, source)) for source in sources]
-    try:
-        for source, reading in readings:
-            yield discovery.take(source, waited(reading), now)
-    finally:
-        readers.shutdown(wait=False, cancel_futures=True)
+    """Each source read and taken in, one after another."""
+    return take_each(((source, fetched(source)) for source in sources), campaigns, stores, now)
 
 
 Fetched = list[Posting] | SourceUnavailableError
 
 
 def fetched(source: JobSource) -> Fetched:
+    """What a source brings, or why it couldn't be read."""
     try:
         return list(source.fetch())
     except SourceUnavailableError as error:
         return error
 
 
-def waited(reading: Future[Fetched]) -> Fetched:
-    """Waits in short steps, so Ctrl+C can still stop a run (on Windows a plain wait can't be).
-    The steps are counted rather than looped on until done, so no change to this code can make
-    it wait forever."""
-    for _ in range(WAIT_STEPS):
-        if reading.done():
-            break
-        wait([reading], timeout=WAIT_STEP_SECONDS)
-    return reading.result()
+def take_each(
+    readings: Iterable[tuple[JobSource, Fetched]],
+    campaigns: Sequence[Campaign],
+    stores: Stores,
+    now: datetime,
+) -> Iterator[SourceReport]:
+    """Each source's report as soon as what it brought is taken in, so a run can show progress."""
+    discovery = Discovery(campaigns, stores)
+    for source, postings in readings:
+        yield discovery.take(source, postings, now)
 
 
 def boards_of(posting: Posting) -> list[Board]:

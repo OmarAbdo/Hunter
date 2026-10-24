@@ -2,7 +2,8 @@ import threading
 from collections.abc import Iterable
 from datetime import UTC, datetime
 
-from hunter.application.discover import Stores, discover_each
+from hunter.adapters.cli.parallel_reading import read_in_parallel
+from hunter.application.discover import Stores, take_each
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.campaign import Rejection
@@ -72,7 +73,8 @@ def test_sources_are_read_at_the_same_time_and_reported_in_their_order() -> None
     meeting = threading.Barrier(2)
     sources = [Meeting("greenhouse:first", meeting), Meeting("ashby:second", meeting)]
     jobs = Jobs()
-    reports = list(discover_each(sources, [], Stores(jobs, Companies(), Verdicts()), NOW))
+    readings = read_in_parallel(sources)
+    reports = list(take_each(readings, [], Stores(jobs, Companies(), Verdicts()), NOW))
     assert [(report.source, report.error) for report in reports] == [
         ("greenhouse:first", None),
         ("ashby:second", None),

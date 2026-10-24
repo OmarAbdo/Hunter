@@ -1,4 +1,4 @@
 id = "29"
 title = "Read different sites at the same time"
 kind = "feature"
-scope = ["src/hunter/application/discover.py", "src/hunter/adapters/web_client.py", "src/hunter/adapters/mail/mailbox.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/project.py", "src/hunter/adapters/storage/mail_marks.py"]
+scope = ["src/hunter/application/discover.py", "src/hunter/adapters/web_client.py", "src/hunter/adapters/mail/mailbox.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/project.py", "src/hunter/adapters/storage/mail_marks.py", "src/hunter/adapters/cli/**"]
