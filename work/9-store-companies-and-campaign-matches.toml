@@ -1,0 +1,4 @@
+id = "9"
+title = "Store companies and campaign matches"
+kind = "feature"
+scope = ["src/hunter/adapters/database.py", "src/hunter/adapters/pool.py", "src/hunter/adapters/registry.py", "src/hunter/adapters/matches.py"]

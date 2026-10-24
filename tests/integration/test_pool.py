@@ -2,6 +2,7 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
+from hunter.adapters.database import open_database
 from hunter.adapters.pool import Pool
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -31,14 +32,14 @@ INDEED = replace(
 
 
 def test_a_new_posting_becomes_a_new_job(tmp_path: Path) -> None:
-    pool = Pool(tmp_path / "hunter.db")
+    pool = Pool(open_database(tmp_path / "hunter.db"))
     added = pool.add(GREENHOUSE, SEEN)
     assert added.is_new
     assert pool.posting(added.job_id) == GREENHOUSE
 
 
 def test_the_same_posting_again_is_the_same_job(tmp_path: Path) -> None:
-    pool = Pool(tmp_path / "hunter.db")
+    pool = Pool(open_database(tmp_path / "hunter.db"))
     first = pool.add(GREENHOUSE, SEEN)
     again = pool.add(GREENHOUSE, SEEN)
     assert (again.job_id, again.is_new) == (first.job_id, False)
@@ -46,7 +47,7 @@ def test_the_same_posting_again_is_the_same_job(tmp_path: Path) -> None:
 
 
 def test_another_source_showing_the_same_job_adds_a_sighting(tmp_path: Path) -> None:
-    pool = Pool(tmp_path / "hunter.db")
+    pool = Pool(open_database(tmp_path / "hunter.db"))
     first = pool.add(GREENHOUSE, SEEN)
     alert = pool.add(INDEED, SEEN)
     assert (alert.job_id, alert.is_new) == (first.job_id, False)
@@ -54,7 +55,7 @@ def test_another_source_showing_the_same_job_adds_a_sighting(tmp_path: Path) -> 
 
 
 def test_a_job_board_posting_learns_its_employer_posting_later(tmp_path: Path) -> None:
-    pool = Pool(tmp_path / "hunter.db")
+    pool = Pool(open_database(tmp_path / "hunter.db"))
     alert = pool.add(INDEED, SEEN)
     employer = pool.add(GREENHOUSE, SEEN)
     assert employer.job_id == alert.job_id
@@ -62,7 +63,7 @@ def test_a_job_board_posting_learns_its_employer_posting_later(tmp_path: Path) -
 
 
 def test_different_jobs_stay_apart(tmp_path: Path) -> None:
-    pool = Pool(tmp_path / "hunter.db")
+    pool = Pool(open_database(tmp_path / "hunter.db"))
     other = replace(
         GREENHOUSE,
         title="Frontend Engineer",
@@ -74,5 +75,5 @@ def test_different_jobs_stay_apart(tmp_path: Path) -> None:
 
 
 def test_the_pool_survives_a_restart(tmp_path: Path) -> None:
-    job_id = Pool(tmp_path / "hunter.db").add(GREENHOUSE, SEEN).job_id
-    assert Pool(tmp_path / "hunter.db").posting(job_id) == GREENHOUSE
+    job_id = Pool(open_database(tmp_path / "hunter.db")).add(GREENHOUSE, SEEN).job_id
+    assert Pool(open_database(tmp_path / "hunter.db")).posting(job_id) == GREENHOUSE
