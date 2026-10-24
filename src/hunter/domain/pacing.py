@@ -25,19 +25,18 @@ class HostUse:
 
 class Pacing:
     def __init__(self, rules: Mapping[str, PaceRule], default: PaceRule) -> None:
-        self.rules, self.default = dict(rules), default
+        self.rules = dict(rules)
+        self.default = default
         self.used: dict[str, HostUse] = {}
-
-    def rule(self, host: str) -> PaceRule:
-        return self.rules.get(host, self.default)
 
     def wait(self, host: str, now: datetime) -> timedelta:
         """How long to wait before the next request to `host`; refuses once today's cap is used."""
-        use, rule = self.used.get(host), self.rule(host)
+        use = self.used.get(host)
         if use is None:
             return timedelta(0)
-        today = use.count if use.day == now.date() else 0
-        if rule.per_day is not None and today >= rule.per_day:
+        rule = self.rules.get(host, self.default)
+        used_today = use.count if use.day == now.date() else 0
+        if rule.per_day is not None and used_today >= rule.per_day:
             raise CapReachedError(f"{host}: {rule.per_day} a day reached")
         return max(timedelta(0), use.last + rule.min_gap - now)
 
