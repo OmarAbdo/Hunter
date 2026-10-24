@@ -9,7 +9,15 @@ from hunter.adapters.cli.project import Project
 from hunter.adapters.credentials import accounts_from
 from hunter.adapters.mail.mailbox import Mailbox, MailMarks
 from hunter.adapters.storage.registry import Registry
-from hunter.adapters.sources import ashby, greenhouse, lever, recruitee, workable
+from hunter.adapters.sources import (
+    ashby,
+    greenhouse,
+    lever,
+    personio,
+    recruitee,
+    smartrecruiters,
+    workable,
+)
 from hunter.adapters.sources.indeed_alerts import IndeedAlerts
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import JobSource
@@ -21,6 +29,8 @@ FEEDS: dict[str, Callable[..., JobSource]] = {
     "lever": lever.LeverFeed,
     "workable": workable.WorkableFeed,
     "recruitee": recruitee.RecruiteeFeed,
+    "personio": personio.PersonioFeed,
+    "smartrecruiters": smartrecruiters.SmartRecruitersFeed,
 }
 APIS: dict[str, str | tuple[str, ...]] = {
     "greenhouse": greenhouse.API,
@@ -28,6 +38,8 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "lever": lever.HOSTS,
     "workable": workable.API,
     "recruitee": recruitee.API,
+    "personio": personio.API,
+    "smartrecruiters": smartrecruiters.API,
 }
 PACE = PaceRule(min_gap=timedelta(seconds=1))
 
