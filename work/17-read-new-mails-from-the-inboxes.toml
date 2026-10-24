@@ -1,0 +1,4 @@
+id = "17"
+title = "Read new mails from the inboxes"
+kind = "feature"
+scope = ["src/hunter/adapters/mailbox.py", "src/hunter/adapters/database.py", "src/hunter/adapters/credentials.py", "src/hunter/adapters/mail/**"]
