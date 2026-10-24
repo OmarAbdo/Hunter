@@ -1,0 +1,4 @@
+id = "16"
+title = "Read Indeed job alerts"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/indeed_alerts.py", "src/hunter/domain/discovery/posting.py", "src/hunter/adapters/pool.py"]

@@ -50,6 +50,9 @@ class Posting:
     description: str = ""
     posted_at: datetime | None = None
     other_locations: tuple[Location, ...] = ()
+    # The source offers its own one-step application: Indeed's "Schnellbewerbung", LinkedIn's
+    # Easy Apply. A later apply route can use it.
+    quick_apply: bool = False
 
     @property
     def locations(self) -> tuple[Location, ...]:

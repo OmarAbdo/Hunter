@@ -45,6 +45,11 @@ def test_a_posting_lists_all_its_places_its_main_one_first() -> None:
     assert ALERT.locations == (ALERT.location,)
 
 
+def test_quick_apply_is_off_until_a_source_offers_it() -> None:
+    assert not ALERT.quick_apply
+    assert replace(ALERT, quick_apply=True).quick_apply
+
+
 def test_a_posting_has_no_employment_type_until_a_source_says_so() -> None:
     assert ALERT.employment is None
     assert replace(ALERT, employment=Employment.FULL_TIME).employment is Employment.FULL_TIME

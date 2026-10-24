@@ -80,6 +80,12 @@ def test_a_job_keeps_all_its_places(tmp_path: Path) -> None:
     assert pool.posting(pool.add(several, SEEN).job_id) == several
 
 
+def test_a_job_keeps_its_quick_apply_mark(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    quick = replace(INDEED, quick_apply=True)
+    assert pool.posting(pool.add(quick, SEEN).job_id).quick_apply
+
+
 def test_the_pool_survives_a_restart(tmp_path: Path) -> None:
     job_id = Pool(open_database(tmp_path / "hunter.db")).add(GREENHOUSE, SEEN).job_id
     assert Pool(open_database(tmp_path / "hunter.db")).posting(job_id) == GREENHOUSE
