@@ -1,0 +1,4 @@
+id = "25"
+title = "Personio and SmartRecruiters feeds"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/personio.py", "src/hunter/adapters/sources/smartrecruiters.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/sources/reading.py"]
