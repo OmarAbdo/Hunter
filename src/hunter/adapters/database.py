@@ -34,6 +34,14 @@ CREATE TABLE IF NOT EXISTS boards (
     company_key TEXT NOT NULL REFERENCES companies (key)
 );
 
+CREATE TABLE IF NOT EXISTS mail_marks (
+    address TEXT NOT NULL,
+    sender TEXT NOT NULL,
+    validity INTEGER NOT NULL,
+    last_uid INTEGER NOT NULL,
+    PRIMARY KEY (address, sender)
+);
+
 CREATE TABLE IF NOT EXISTS matches (
     job_id INTEGER NOT NULL REFERENCES jobs (id),
     campaign_id TEXT NOT NULL,
