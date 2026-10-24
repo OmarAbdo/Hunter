@@ -41,7 +41,8 @@ LINK_PATTERNS = tuple(
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
     )
 )
-NOT_SLUGS = frozenset({"embed", "api", "v1", "jobs", "www", "careers", "app"})
+# Path parts that aren't companies. `j` is Workable's job link (apply.workable.com/j/<shortcode>).
+NOT_SLUGS = frozenset({"embed", "api", "v1", "jobs", "www", "careers", "app", "j"})
 
 
 def board_from_link(link: str) -> Board | None:
