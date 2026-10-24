@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from email.message import EmailMessage
 from pathlib import Path
 
-from hunter.adapters.database import open_database
+from hunter.adapters.storage.database import open_database
 from hunter.adapters.credentials import MailAccount, accounts_from
 from hunter.adapters.mail.mailbox import Mailbox, MailMarks
 
