@@ -1,13 +1,14 @@
 """The mailbox against a stand-in IMAP server that keeps real mail messages. Gmail itself can't run
 in a test; the messages and the IMAP answers have their real shapes."""
 
+import threading
 from datetime import UTC, datetime
 from email.message import EmailMessage
 from pathlib import Path
 
-from hunter.adapters.storage.database import open_database
 from hunter.adapters.credentials import MailAccount, accounts_from
-from hunter.adapters.mail.mailbox import Mailbox, MailMarks
+from hunter.adapters.mail.mailbox import Mailbox
+from hunter.adapters.storage.mail_marks import MailMarks
 
 ACCOUNT = MailAccount(address="jobs@example.com", app_password="secret", host="imap.example.com")
 INDEED = "donotreply@jobalert.indeed.com"
@@ -58,7 +59,7 @@ class StandInImap:
 
 
 def mailbox(tmp_path: Path, server: StandInImap) -> Mailbox:
-    marks = MailMarks(open_database(tmp_path / "hunter.db"))
+    marks = MailMarks(tmp_path / "hunter.db")
     return Mailbox(ACCOUNT, marks, connect=lambda host, timeout: server)
 
 
@@ -75,6 +76,15 @@ def test_a_mail_is_read_once_after_it_is_remembered(tmp_path: Path) -> None:
     box.remember(INDEED, box.new_mails(INDEED))
     server.messages[5] = message(INDEED, "second")
     assert [mail.uid for mail in box.new_mails(INDEED)] == [5]
+
+
+def test_marks_can_be_kept_from_another_thread(tmp_path: Path) -> None:
+    server = StandInImap({3: message(INDEED, "first")})
+    box = mailbox(tmp_path, server)
+    worker = threading.Thread(target=lambda: box.remember(INDEED, box.new_mails(INDEED)))
+    worker.start()
+    worker.join()
+    assert box.new_mails(INDEED) == []
 
 
 def test_marks_survive_a_restart(tmp_path: Path) -> None:

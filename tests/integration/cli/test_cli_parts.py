@@ -65,4 +65,4 @@ def test_every_board_in_the_registry_is_a_feed(tmp_path: Path) -> None:
 
 def test_without_credentials_there_are_no_alert_sources(tmp_path: Path) -> None:
     project = Project(tmp_path)
-    assert alert_sources_of(project, project.database()) == []
+    assert alert_sources_of(project) == []
