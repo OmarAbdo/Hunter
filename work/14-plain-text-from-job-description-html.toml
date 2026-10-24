@@ -1,0 +1,4 @@
+id = "14"
+title = "Plain text from job description HTML"
+kind = "feature"
+scope = ["src/hunter/adapters/html_text.py"]
