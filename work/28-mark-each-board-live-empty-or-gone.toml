@@ -1,0 +1,4 @@
+id = "28"
+title = "Mark each board live, empty or gone"
+kind = "feature"
+scope = ["src/hunter/application/**", "src/hunter/domain/discovery/boards.py"]

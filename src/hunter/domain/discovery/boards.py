@@ -51,3 +51,10 @@ def board_from_link(link: str) -> Board | None:
         if found and found.group(1).lower() not in NOT_SLUGS:
             return Board(ats=ats, slug=slug.format(*found.groups()))
     return None
+
+
+def board_from_key(key: str) -> Board | None:
+    """The board a feed's name (`ats:slug`) stands for, or None for a source that isn't a board."""
+    ats, colon, slug = key.partition(":")
+    known = {known_ats for known_ats, _, _ in LINK_PATTERNS}
+    return Board(ats=ats, slug=slug) if colon and slug and ats in known else None

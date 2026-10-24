@@ -13,9 +13,9 @@ from hunter.application.ports import (
     MatchStore,
     SourceUnavailableError,
 )
-from hunter.domain.discovery.boards import Board, board_from_link
+from hunter.domain.discovery.boards import Board, board_from_key, board_from_link
 from hunter.domain.discovery.campaign import Campaign
-from hunter.domain.discovery.company import Company
+from hunter.domain.discovery.company import Company, FeedStatus
 from hunter.domain.discovery.identity import company_key
 from hunter.domain.discovery.posting import Posting
 
@@ -72,11 +72,21 @@ class Discovery:
             postings = list(source.fetch())
         except SourceUnavailableError as error:
             report.error = str(error)
+            self._record_feed(source.name, FeedStatus.GONE if error.gone else None)
             return report
         report.fetched = len(postings)
         for posting in postings:
             self._take_in(posting, now, report)
+        self._record_feed(source.name, FeedStatus.LIVE if postings else FeedStatus.EMPTY)
         return report
+
+    def _record_feed(self, source_name: str, status: FeedStatus | None) -> None:
+        """A company feed's health, so boards that are gone aren't read again. A board that's only
+        down for now (no status) keeps the one it had."""
+        board = board_from_key(source_name)
+        owner = self.stores.companies.owner_of(board) if board and status else None
+        if owner and board and status:
+            self.stores.companies.save(owner.checked(board, status))
 
     def _take_in(self, posting: Posting, now: datetime, report: SourceReport) -> None:
         pooled = self.stores.jobs.add(posting, now)
