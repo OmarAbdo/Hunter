@@ -1,0 +1,4 @@
+id = "15"
+title = "Greenhouse and Ashby feeds"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/**"]
