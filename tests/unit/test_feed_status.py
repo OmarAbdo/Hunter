@@ -99,3 +99,6 @@ def test_a_board_key_names_its_board() -> None:
         ats="workday", slug="nvidia/wd5/NVIDIAExternalCareerSite"
     )
     assert board_from_key("indeed-alert") is None
+    assert board_from_key("greenhouse:") is None
+    assert board_from_key("indeed-alert:germany") is None
+    assert board_from_key(":nextcloud") is None
