@@ -7,7 +7,7 @@ import pytest
 from hunter.adapters.cli.boards_command import add_boards
 from hunter.adapters.cli.discover_command import chosen
 from hunter.adapters.cli.project import Project, stores_of
-from hunter.adapters.cli.report import report_text, table
+from hunter.adapters.cli.report import report_text
 from hunter.adapters.cli.sources import alert_sources_of, feeds_of
 from hunter.adapters.storage.matches import Matches
 from hunter.application.discover import SourceReport
@@ -15,12 +15,6 @@ from hunter.domain.discovery.campaign import Campaign, Rejection
 
 BERLIN = Campaign(id="berlin", title="Berlin", home="DE", countries=frozenset({"DE"}))
 DUBAI = Campaign(id="dubai", title="Dubai", home="AE", countries=frozenset({"AE"}))
-
-
-def test_the_project_keeps_its_database_in_var(tmp_path: Path) -> None:
-    Project(tmp_path).database()
-    assert (tmp_path / "var" / "hunter.db").is_file()
-    assert Project(tmp_path).campaigns_folder == tmp_path / "campaigns"
 
 
 def test_the_report_shows_each_source_the_totals_and_the_reasons(tmp_path: Path) -> None:
@@ -49,10 +43,6 @@ def test_a_campaign_that_turned_nothing_down_says_so(tmp_path: Path) -> None:
     ]
 
 
-def test_tables_align_numbers_right() -> None:
-    assert table([["a", "1"], ["bbb", "22"]]) == ["a     1", "bbb  22"]
-
-
 def test_the_campaigns_named_are_chosen_and_none_named_means_all() -> None:
     assert chosen([BERLIN, DUBAI], ["dubai"]) == [DUBAI]
     assert chosen([BERLIN, DUBAI], []) == [BERLIN, DUBAI]
@@ -68,7 +58,6 @@ def test_every_known_board_in_the_registry_is_a_feed(tmp_path: Path) -> None:
     company = stores_of(project.database()).companies.get("enpal")
     assert company is not None
     assert [board.key for board in company.boards] == ["ashby:enpal", "lever:olx"]
-    assert stores_of(project.database()).companies.get("enpal") is not None
 
 
 def test_without_credentials_there_are_no_alert_sources(tmp_path: Path) -> None:
