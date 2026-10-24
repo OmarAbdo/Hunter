@@ -1,0 +1,59 @@
+# The pilot: full-time software jobs in Berlin, onsite or hybrid, and remote jobs open to
+# Germany. Roles are case-insensitive regular expressions matched against job titles; the lists
+# start from HQ's de-swe campaign. Nothing personal belongs in this file: the repository is public.
+
+title = "Full-time software jobs in Berlin"
+home = "DE"
+countries = ["DE"]
+cities = ["Berlin"]
+workplaces = ["onsite", "hybrid", "remote"]
+employment = ["full-time"]
+roles = [
+    "engineer",
+    "developer",
+    "entwickler",
+    "programmer",
+    "software",
+    "backend",
+    "back-end",
+    "full.?stack",
+    "platform",
+    "devops",
+    "\\bsre\\b",
+    "architect",
+    "\\bai\\b",
+    "\\bml\\b",
+    "machine learning",
+]
+excluded_roles = [
+    "\\bsales\\b",
+    "account (executive|manager)",
+    "recruit",
+    "marketing",
+    "praktik",
+    "intern\\b",
+    "internship",
+    "werkstudent",
+    "working student",
+    "ausbildung",
+    "azubi",
+    "student",
+    "trainee",
+    "junior",
+    "\\bjr\\b",
+    "product manager",
+    "project manager",
+    "support engineer",
+    "elektro",
+    "electrical",
+    "mechanical",
+    "maschinenbau",
+    "hardware",
+    "\\bsap\\b",
+    "salesforce",
+    "\\bfield\\b",
+    "teamleit",
+    "head of",
+    "\\bvp\\b",
+    "director",
+]
