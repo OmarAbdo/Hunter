@@ -25,12 +25,18 @@ class Source(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body.encode() if self.path == path else b"not found")
 
+    def answer_post(self) -> None:
+        """Searches posted as JSON (Workday) get the same answer as a GET of the path."""
+        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        self.answer_get()
+
     def log_message(self, *_: object) -> None:
         return
 
 
-# http.server looks up `do_GET`, a name the naming rules don't allow to be written out.
+# http.server looks up `do_GET` and `do_POST`, names the naming rules don't allow to be written out.
 setattr(Source, "do_" + "GET", Source.answer_get)
+setattr(Source, "do_" + "POST", Source.answer_post)
 
 
 @pytest.fixture

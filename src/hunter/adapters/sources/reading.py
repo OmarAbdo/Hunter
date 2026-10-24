@@ -36,6 +36,16 @@ def read_json(web: WebClient, url: str, params: Mapping[str, str] | None = None)
         raise SourceUnavailableError(f"{url}: not JSON ({error})") from error
 
 
+def read_posted_json(web: WebClient, url: str, body: object) -> Any:
+    """For sources searched with a JSON body (Workday)."""
+    try:
+        return web.post_json(url, body)
+    except WebError as error:
+        raise SourceUnavailableError(str(error), gone=error.status in GONE_STATUSES) from error
+    except ValueError as error:
+        raise SourceUnavailableError(f"{url}: not JSON ({error})") from error
+
+
 def read_text(web: WebClient, url: str, params: Mapping[str, str] | None = None) -> str:
     """For sources that answer in XML or RSS."""
     try:
