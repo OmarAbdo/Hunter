@@ -1,4 +1,4 @@
-from hunter.adapters.text.html_text import plain_text
+from hunter.adapters.html_text import plain_text
 
 
 def test_paragraphs_and_line_breaks_become_lines() -> None:

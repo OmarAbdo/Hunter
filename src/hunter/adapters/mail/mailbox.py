@@ -13,8 +13,8 @@ from email.parser import BytesParser
 from email.utils import parsedate_to_datetime
 from typing import Any
 
-from hunter.adapters.config.credentials import MailAccount
-from hunter.adapters.text.html_text import plain_text
+from hunter.adapters.credentials import MailAccount
+from hunter.adapters.html_text import plain_text
 
 TIMEOUT_SECONDS = 30
 

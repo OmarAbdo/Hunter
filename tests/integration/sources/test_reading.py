@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from hunter.adapters.sources.reading import parsed_time, read_json
-from hunter.adapters.web.client import WebClient
+from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 
 SourceApi = Callable[[str, str | None], str]

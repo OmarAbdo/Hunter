@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from hunter.adapters.web.client import WebClient
+from hunter.adapters.web_client import WebClient
 from hunter.domain.pacing import Pacing, PaceRule
 
 SAVED = Path(__file__).resolve().parents[2] / "fixtures" / "sources"

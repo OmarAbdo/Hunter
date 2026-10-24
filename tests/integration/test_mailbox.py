@@ -6,7 +6,7 @@ from email.message import EmailMessage
 from pathlib import Path
 
 from hunter.adapters.storage.database import open_database
-from hunter.adapters.config.credentials import MailAccount, accounts_from
+from hunter.adapters.credentials import MailAccount, accounts_from
 from hunter.adapters.mail.mailbox import Mailbox, MailMarks
 
 ACCOUNT = MailAccount(address="jobs@example.com", app_password="secret", host="imap.example.com")

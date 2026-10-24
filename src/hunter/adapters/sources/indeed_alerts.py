@@ -8,7 +8,7 @@ import re
 from dataclasses import replace
 from datetime import datetime, timedelta
 
-from hunter.adapters.text.places import places_from_text
+from hunter.adapters.places import places_from_text
 from hunter.domain.discovery.posting import Posting, SourceRef
 
 SOURCE = "indeed-alert"

@@ -1,6 +1,6 @@
 import pytest
 
-from hunter.adapters.text.places import place_from_text, places_from_text
+from hunter.adapters.places import place_from_text, places_from_text
 from hunter.domain.discovery.location import WORLDWIDE, Location, Workplace
 
 

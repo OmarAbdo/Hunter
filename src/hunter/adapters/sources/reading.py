@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
-from hunter.adapters.web.client import WebClient, WebError
+from hunter.adapters.web_client import WebClient, WebError
 from hunter.application.ports import SourceUnavailableError
 
 
