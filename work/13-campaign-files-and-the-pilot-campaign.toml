@@ -1,0 +1,4 @@
+id = "13"
+title = "Campaign files and the pilot campaign"
+kind = "feature"
+scope = ["campaigns/**", "src/hunter/adapters/campaign_files.py"]
