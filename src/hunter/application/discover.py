@@ -26,6 +26,8 @@ from hunter.domain.discovery.posting import Posting
 
 
 READERS = 8  # sources read at the same time
+WAIT_STEP_SECONDS = 0.5
+WAIT_STEPS = 7200  # an hour of steps: far longer than any source takes
 
 
 @dataclass(frozen=True)
@@ -77,9 +79,13 @@ def fetched(source: JobSource) -> Fetched:
 
 
 def waited(reading: Future[Fetched]) -> Fetched:
-    """Waits in short steps, so Ctrl+C can still stop a run (on Windows a plain wait can't be)."""
-    while not reading.done():
-        wait([reading], timeout=0.5)
+    """Waits in short steps, so Ctrl+C can still stop a run (on Windows a plain wait can't be).
+    The steps are counted rather than looped on until done, so no change to this code can make
+    it wait forever."""
+    for _ in range(WAIT_STEPS):
+        if reading.done():
+            break
+        wait([reading], timeout=WAIT_STEP_SECONDS)
     return reading.result()
 
 
