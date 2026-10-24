@@ -12,7 +12,12 @@ from hunter.domain.discovery.posting import Posting
 
 
 class SourceUnavailableError(Exception):
-    """A source that couldn't be read this time: down, refusing, or answering nonsense."""
+    """A source that couldn't be read this time: down, refusing, or answering nonsense. `gone`
+    says it isn't there at all (HTTP 404 or 410): a board that moved or closed."""
+
+    def __init__(self, message: str, *, gone: bool = False) -> None:
+        super().__init__(message)
+        self.gone = gone
 
 
 class JobSource(Protocol):

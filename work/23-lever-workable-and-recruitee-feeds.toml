@@ -1,0 +1,4 @@
+id = "23"
+title = "Lever, Workable and Recruitee feeds"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/**", "src/hunter/adapters/cli/sources.py", "src/hunter/application/ports.py"]

@@ -75,6 +75,11 @@ def stores() -> Stores:
     return Stores(jobs=Jobs(), companies=Companies(), matches=Verdicts())
 
 
+def test_a_source_that_is_unavailable_is_not_gone_unless_it_says_so() -> None:
+    assert not SourceUnavailableError("HTTP 503").gone
+    assert SourceUnavailableError("HTTP 404", gone=True).gone
+
+
 def test_reports_arrive_one_source_at_a_time() -> None:
     later = Feed("ashby:nextcloud", down=True)
     reports = discover_each([Feed("greenhouse:nextcloud", [JOB]), later], [BERLIN], stores(), NOW)

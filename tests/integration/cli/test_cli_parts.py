@@ -50,11 +50,14 @@ def test_the_campaigns_named_are_chosen_and_none_named_means_all() -> None:
         chosen([BERLIN], ["rome"])
 
 
-def test_every_known_board_in_the_registry_is_a_feed(tmp_path: Path) -> None:
+def test_every_board_in_the_registry_is_a_feed(tmp_path: Path) -> None:
     project = Project(tmp_path)
     links = ["https://jobs.ashbyhq.com/enpal", "https://jobs.lever.co/olx"]
     add_boards(project, links, "Enpal", io.StringIO())
-    assert [source.name for source in feeds_of(project, project.database())] == ["ashby:enpal"]
+    assert [source.name for source in feeds_of(project, project.database())] == [
+        "ashby:enpal",
+        "lever:olx",
+    ]
     company = stores_of(project.database()).companies.get("enpal")
     assert company is not None
     assert [board.key for board in company.boards] == ["ashby:enpal", "lever:olx"]

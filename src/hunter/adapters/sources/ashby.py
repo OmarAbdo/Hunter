@@ -1,11 +1,9 @@
 """One company's Ashby board (docs/sources.md): every listed job, placed by its address and
 workplace type, with the employer's own job id, so Hunter can apply on Ashby itself."""
 
-from dataclasses import replace
 from typing import Any
 
-from hunter.adapters.places import place_from_text
-from hunter.adapters.sources.reading import parsed_time, read_json
+from hunter.adapters.sources.reading import parsed_time, place_at, read_json
 from hunter.adapters.web_client import WebClient
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -66,7 +64,5 @@ def place_of(entry: dict[str, Any], workplace: Workplace | None) -> Location:
     job is open to the country of its address."""
     address = (entry.get("address") or {}).get("postalAddress") or {}
     parts = (address.get("addressLocality"), address.get("addressCountry"))
-    place = place_from_text(", ".join(part for part in parts if part) or entry.get("location", ""))
-    if workplace is Workplace.REMOTE and place.country:
-        return replace(place, workplace=workplace, remote_scope=frozenset({place.country}))
-    return replace(place, workplace=workplace, remote_scope=frozenset())
+    text = ", ".join(part for part in parts if part) or entry.get("location", "")
+    return place_at(text, workplace)
