@@ -1,0 +1,4 @@
+id = "26"
+title = "Workable job links don't name a board"
+kind = "fix"
+scope = ["src/hunter/domain/discovery/boards.py"]
