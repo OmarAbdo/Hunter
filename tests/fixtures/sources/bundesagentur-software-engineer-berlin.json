@@ -1,0 +1,196 @@
+{
+ "ergebnisliste": [
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Senior Solution Engineer (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-28"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "strasse": "Ernst-Reuter-Platz 6",
+      "plz": "10587",
+      "ort": "Berlin",
+      "region": "BERLIN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 52.512201,
+     "laenge": 13.320513
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "ANGABE_IN_PROZENT",
+   "homeofficeprozent": 100,
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-28"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-01",
+   "aenderungsdatum": "2026-09-28T10:08:12.272",
+   "externeURL": "https://www.heyjobs.co/de-de/jobs/8e11200b-5a3a-4079-8ef7-dd8d1c1bf627?utm_content=ad_link&utm_medium=sjm-pr&utm_source=jobboerse",
+   "hauptberuf": "IT-Vertriebsbeauftragte/r",
+   "firma": "Beta Systems Software AG",
+   "referenznummer": "12951-8e11200b-5a3a-4079--S",
+   "entfernung": 7,
+   "alleBerufe": [
+    "IT-Vertriebsbeauftragte/r"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Senior Software Engineer (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-10-16"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "10115",
+      "ort": "Berlin",
+      "region": "BERLIN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 52.5319761,
+     "laenge": 13.3867379
+    }
+   ],
+   "homeofficemoeglich": false,
+   "veroeffentlichungszeitraum": {
+    "von": "2026-10-16"
+   },
+   "datumErsteVeroeffentlichung": "2026-10-16",
+   "aenderungsdatum": "2026-10-16T09:12:13.636",
+   "externeURL": "https://gute-jobs.de/viewjob-awc7w?utm_source=jsba-premium&utm_medium=n-a&utm_campaign=jsba-premium&utm_term=senior-software-engineer-m-w-d",
+   "hauptberuf": "DevOps Engineer",
+   "firma": "BWI GmbH",
+   "referenznummer": "12336-a26f539j0456360-S",
+   "entfernung": 3,
+   "alleBerufe": [
+    "DevOps Engineer"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Software Engineer (w/m/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": true,
+   "arbeitszeitTeilzeitVormittag": true,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-10-15"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "UNBEFRISTET",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "10785",
+      "ort": "Berlin",
+      "region": "BERLIN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 52.506327,
+     "laenge": 13.3650884
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "526437",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-29"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-29",
+   "aenderungsdatum": "2026-10-15T15:03:09.906",
+   "hauptberuf": "Softwareentwickler/in",
+   "firma": "Capgemini Deutschland GmbH",
+   "arbeitgeberKundennummerHash": "oWT74Mpbdj5YwZ5RocquNMW_kXPfYT21lJCUoSyvOdA=",
+   "referenznummer": "17311-44470334-928-S",
+   "entfernung": 4,
+   "alleBerufe": [
+    "Softwareentwickler/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Senior Software Engineer (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": false,
+   "eintrittszeitraum": {
+    "von": "2026-10-01"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "10178",
+      "ort": "Berlin",
+      "region": "BERLIN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 52.5210906,
+     "laenge": 13.4099785
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "310774",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-03"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-03",
+   "aenderungsdatum": "2026-10-01T07:08:56.711",
+   "externeURL": "https://www.get-in-it.de/jobsuche/p310774?utm_source=arbeitsagentur&utm_medium=organic&utm_campaign=launch-basic",
+   "hauptberuf": "Anwendungsprogrammierer/in",
+   "firma": "BettercallPaul",
+   "referenznummer": "13644-310774-S",
+   "entfernung": 2,
+   "alleBerufe": [
+    "Anwendungsprogrammierer/in"
+   ]
+  }
+ ],
+ "maxErgebnisse": 4,
+ "page": 1,
+ "size": 100,
+ "woOutput": {
+  "bereinigterOrt": "Berlin",
+  "suchmodus": "UMKREISSUCHE",
+  "koordinaten": [
+   {
+    "lat": 52.5112613,
+    "lon": 13.4255145
+   }
+  ]
+ }
+}

@@ -1,7 +1,7 @@
 """A real local web server that answers like a source, with saved real responses."""
 
 import threading
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -15,15 +15,15 @@ SAVED = Path(__file__).resolve().parents[2] / "fixtures" / "sources"
 
 
 class Source(BaseHTTPRequestHandler):
-    """Answers one path with one saved response, anything else with 404."""
+    """Answers each of its paths with a saved response, anything else with 404."""
 
-    path_and_body: tuple[str, str] = ("", "")
+    bodies: Mapping[str, str] = {}
 
     def answer_get(self) -> None:
-        path, body = self.path_and_body
-        self.send_response(200 if self.path == path else 404)
+        body = self.bodies.get(self.path)
+        self.send_response(404 if body is None else 200)
         self.end_headers()
-        self.wfile.write(body.encode() if self.path == path else b"not found")
+        self.wfile.write(b"not found" if body is None else body.encode())
 
     def answer_post(self) -> None:
         """Searches posted as JSON (Workday) get the same answer as a GET of the path."""
@@ -40,14 +40,13 @@ setattr(Source, "do_" + "POST", Source.answer_post)
 
 
 @pytest.fixture
-def source_api() -> Iterator[Callable[[str, str | None], str]]:
-    """Starts a source that answers `path` with the saved response `saved`; None answers 404."""
+def source_pages() -> Iterator[Callable[[Mapping[str, str]], str]]:
+    """Starts a source that answers each path with the saved response named for it."""
     servers: list[ThreadingHTTPServer] = []
 
-    def start(path: str, saved: str | None) -> str:
-        body = (SAVED / saved).read_text(encoding="utf-8") if saved else ""
-        answers = type("Saved", (Source,), {"path_and_body": (path if saved else "", body)})
-        server = ThreadingHTTPServer(("127.0.0.1", 0), answers)
+    def start(saved: Mapping[str, str]) -> str:
+        bodies = {path: (SAVED / name).read_text(encoding="utf-8") for path, name in saved.items()}
+        server = ThreadingHTTPServer(("127.0.0.1", 0), type("Saved", (Source,), {"bodies": bodies}))
         threading.Thread(target=server.serve_forever, daemon=True).start()
         servers.append(server)
         return f"http://127.0.0.1:{server.server_address[1]}"
@@ -55,6 +54,18 @@ def source_api() -> Iterator[Callable[[str, str | None], str]]:
     yield start
     for server in servers:
         server.shutdown()
+
+
+@pytest.fixture
+def source_api(
+    source_pages: Callable[[Mapping[str, str]], str],
+) -> Callable[[str, str | None], str]:
+    """Starts a source that answers `path` with the saved response `saved`; None answers 404."""
+
+    def start(path: str, saved: str | None) -> str:
+        return source_pages({path: saved} if saved else {})
+
+    return start
 
 
 @pytest.fixture

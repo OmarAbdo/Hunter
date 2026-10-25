@@ -1,0 +1,4 @@
+id = "35"
+title = "Search the Bundesagentur"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/**", "src/hunter/adapters/sources/reading.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/discover_command.py", "tests/integration/sources/**", "tests/integration/cli/**", "tests/fixtures/sources/bundesagentur-*", "docs/**"]

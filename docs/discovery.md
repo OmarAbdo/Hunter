@@ -102,6 +102,19 @@ One file each, `campaigns/<id>.toml`, holding criteria and sources, and nothing 
 is `de-swe-berlin`: full-time software jobs in Berlin (onsite or hybrid), and remote jobs open to
 Germany.
 
+Company feeds are read for every campaign. Search sources only find what they're asked for, so a
+campaign names its searches:
+
+```toml
+[[searches]]
+source = "bundesagentur"
+query = "Softwareentwickler"
+place = "Berlin"   # optional; without it, the whole area the source covers
+```
+
+A search two campaigns share is read once. A search on a source Hunter doesn't know stops the run
+before anything is read.
+
 ## Build order (one item each)
 
 1. **Domain:** `Posting`, `Location`, job keys, `Company`, `Campaign` and matching.

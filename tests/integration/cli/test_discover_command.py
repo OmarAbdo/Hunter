@@ -44,3 +44,18 @@ def test_an_unknown_campaign_is_refused(run: Run) -> None:
     status, out = run("discover", "--campaign", "nowhere")
     assert status == 1
     assert "no campaign nowhere" in out
+
+
+def test_discover_runs_the_searches_the_campaigns_name(run: Run) -> None:
+    status, out = run("discover")
+    assert status == 0
+    assert "bundesagentur:Softwareentwickler@Berlin" in out
+
+
+def test_a_campaign_with_an_unknown_search_source_is_refused(project: Path, run: Run) -> None:
+    pilot = project / "campaigns" / "de-swe-berlin.toml"
+    nowhere = pilot.read_text(encoding="utf-8").replace('"bundesagentur"', '"nowhere"')
+    pilot.write_text(nowhere, encoding="utf-8")
+    status, out = run("discover")
+    assert status == 1
+    assert "no search source nowhere" in out
