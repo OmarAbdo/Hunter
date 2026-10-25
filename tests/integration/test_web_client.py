@@ -29,6 +29,12 @@ class Site(BaseHTTPRequestHandler):
             self.answer(200, json.dumps({"path": self.path, "agent": self.headers["User-Agent"]}))
         elif self.path == "/busy" and self.hits[self.path] == 1:
             self.answer(429, "slow down", retry_after="0")
+        elif self.path == "/dropped":  # the site hangs up without an answer
+            self.close_connection = True
+        elif self.path == "/latin":  # Latin-1 bytes in a page that says nothing of its encoding
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write("Stellen für Entwickler".encode("latin-1"))
         elif self.path in {"/busy", "/public", "/private"}:
             self.answer(200, "<html>a page</html>")
         else:
@@ -125,3 +131,14 @@ def test_pages_follow_robots_txt(client: WebClient, site: str) -> None:
         client.get_page(f"{site}/private")
     assert "/private" not in Site.hits
 
+
+def test_a_page_in_another_encoding_than_utf_8_is_still_read(client: WebClient, site: str) -> None:
+    """Many small employers' sites send Latin-1 without saying so; the odd letter is lost."""
+    assert client.get_text(f"{site}/latin") == "Stellen f\ufffdr Entwickler"
+
+
+def test_a_site_that_hangs_up_is_no_answer(client: WebClient, site: str) -> None:
+    with pytest.raises(WebError, match="no answer") as raised:
+        client.get_text(f"{site}/dropped")
+    assert raised.value.status is None
+    assert Site.hits["/dropped"] == 3  # tried again, like any request without an answer

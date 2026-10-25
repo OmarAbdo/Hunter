@@ -3,6 +3,7 @@
 - a rate limit, a server error or no answer is tried again, three tries in all;
 - web pages are read only where the site's robots.txt allows it."""
 
+import http.client
 import json
 import threading
 import time
@@ -11,7 +12,6 @@ import urllib.parse
 import urllib.request
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
-from email.message import Message
 from typing import Any
 from urllib.robotparser import RobotFileParser
 
@@ -45,9 +45,18 @@ def utc_now() -> datetime:
     return datetime.now(UTC)
 
 
-def retry_after(headers: Message) -> float | None:
+def decoded(body: bytes, charset: str | None) -> str:
+    """Text in the encoding the site names, else UTF-8. Letters that don't fit are replaced, since
+    many small sites send Latin-1 without saying so."""
+    try:
+        return body.decode(charset or "utf-8", errors="replace")
+    except LookupError:  # an encoding Python doesn't know
+        return body.decode("utf-8", errors="replace")
+
+
+def retry_after(error: urllib.error.HTTPError) -> float | None:
     """The pause a Retry-After header asks for, in seconds. HTTP dates aren't read."""
-    value = headers.get("Retry-After", "")
+    value = error.headers.get("Retry-After", "")
     return min(float(value), LONGEST_PAUSE_SECONDS) if value.isdigit() else None
 
 
@@ -131,14 +140,13 @@ class WebClient:
         self._wait_turn(request.host)
         try:
             with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
-                text: str = response.read().decode(response.headers.get_content_charset("utf-8"))
-                return text
+                return decoded(response.read(), response.headers.get_content_charset())
         except urllib.error.HTTPError as error:
             message = f"{request.host}: HTTP {error.code} for {request.full_url}"
-            pause = retry_after(error.headers)
+            pause = retry_after(error)
             error.close()  # an error answer is a response too; left open, it's closed at exit
             raise WebError(message, error.code, pause) from error
-        except (urllib.error.URLError, TimeoutError) as error:
+        except (OSError, http.client.HTTPException) as error:  # no answer, or cut off
             raise WebError(f"{request.host}: no answer ({error})") from error
 
     def _wait_turn(self, host: str) -> None:
