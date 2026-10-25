@@ -1,0 +1,4 @@
+id = "44"
+title = "Read a page in the wrong encoding"
+kind = "fix"
+scope = ["src/hunter/adapters/web_client.py", "tests/integration/test_web_client.py"]
