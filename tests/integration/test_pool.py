@@ -94,3 +94,33 @@ def test_the_database_writes_ahead_so_commits_stay_cheap(tmp_path: Path) -> None
 def test_the_pool_survives_a_restart(tmp_path: Path) -> None:
     job_id = Pool(open_database(tmp_path / "hunter.db")).add(GREENHOUSE, SEEN).job_id
     assert Pool(open_database(tmp_path / "hunter.db")).posting(job_id) == GREENHOUSE
+
+
+def test_a_posting_already_seen_is_its_job_even_when_it_changed(tmp_path: Path) -> None:
+    """The Bundesagentur lets employers edit a job; its reference number stays."""
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    first = pool.add(INDEED, SEEN)
+    edited = pool.add(replace(INDEED, title="Backend Engineer (Python)"), SEEN)
+    assert (edited.job_id, edited.is_new) == (first.job_id, False)
+    assert pool.job_count() == 1
+
+
+def test_a_posting_the_same_as_another_source_s_joins_its_job(tmp_path: Path) -> None:
+    """EURES shows the Bundesagentur's jobs under its own ids, with titles of its own."""
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    agency = replace(INDEED, source=SourceRef(source="bundesagentur", native_id="10001-1-S"))
+    eures = replace(
+        INDEED,
+        title="Senior Backend Engineer (Softwareentwickler/in)",
+        source=SourceRef(source="eures", native_id="MTAwMDEtMS1TIDE"),
+        same_as=(agency.source,),
+    )
+    first = pool.add(agency, SEEN)
+    assert pool.add(eures, SEEN).job_id == first.job_id
+    assert pool.sightings(first.job_id) == [agency.source, eures.source]
+
+
+def test_a_job_keeps_the_postings_it_is_the_same_as(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    eures = replace(INDEED, same_as=(SourceRef(source="bundesagentur", native_id="10001-1-S"),))
+    assert pool.posting(pool.add(eures, SEEN).job_id) == eures

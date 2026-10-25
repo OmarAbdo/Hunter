@@ -53,6 +53,8 @@ class Posting:
     # The source offers its own one-step application: Indeed's "Schnellbewerbung", LinkedIn's
     # Easy Apply. A later apply route can use it.
     quick_apply: bool = False
+    # Other sources' ids for this very posting: EURES shows the Bundesagentur's jobs as its own.
+    same_as: tuple[SourceRef, ...] = ()
 
     @property
     def locations(self) -> tuple[Location, ...]:
