@@ -8,7 +8,7 @@ from typing import TextIO
 from hunter.adapters.cli.parallel_reading import in_parallel
 from hunter.adapters.cli.probe_targets import companies_to_probe
 from hunter.adapters.cli.project import Project
-from hunter.adapters.sources.feed_table import APIS
+from hunter.adapters.sources.feed_table import APIS, PACES
 from hunter.adapters.sources.feeds.board_check import FeedCheck
 from hunter.adapters.storage.probe_log import ProbeLog
 from hunter.adapters.storage.registry import Registry
@@ -26,7 +26,7 @@ def run_probe(project: Project, limit: int, out: TextIO) -> int:
     out.write(
         f"Probing {len(companies)} compan{'y' if len(companies) == 1 else 'ies'} for their boards\n"
     )
-    check = FeedCheck(WebClient(Pacing({}, default=PACE)), {**APIS, **project.apis})
+    check = FeedCheck(WebClient(Pacing(PACES, default=PACE)), {**APIS, **project.apis})
     stores = ProbeStores(companies=Registry(database), log=ProbeLog(database))
     now = datetime.now(UTC)
     found = 0

@@ -8,7 +8,7 @@ from datetime import timedelta
 from hunter.adapters.cli.alerts import alert_sources_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.registry import Registry
-from hunter.adapters.sources.feed_table import APIS, FEEDS
+from hunter.adapters.sources.feed_table import APIS, FEEDS, PACES
 from hunter.adapters.sources.searches.search_table import searches_of
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import JobSource
@@ -29,7 +29,7 @@ def sources_of(
 
 def feeds_of(project: Project, database: sqlite3.Connection) -> list[JobSource]:
     """One feed per board, even where two companies in the registry claim the same one."""
-    web = WebClient(Pacing({}, default=PACE))
+    web = WebClient(Pacing(PACES, default=PACE))
     apis = {**APIS, **project.apis}
     owners: dict[Board, str] = {}
     for company in Registry(database).all():
