@@ -1,0 +1,4 @@
+id = "45"
+title = "Wait as long as a site asks"
+kind = "fix"
+scope = ["src/hunter/domain/pacing.py", "src/hunter/adapters/web_client.py", "src/hunter/adapters/web_answers.py", "tests/**"]

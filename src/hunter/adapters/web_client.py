@@ -1,9 +1,10 @@
 """Hunter's one way to talk to websites (docs/sources.md):
 - every request waits its turn under its host's pace, and gives up after 30 seconds;
-- a rate limit, a server error or no answer is tried again, three tries in all;
+- a rate limit, a server error or no answer is tried again, three tries in all, after the pause
+  the site asks for. A site that asks for longer than a run should wait isn't asked again until
+  then;
 - web pages are read only where the site's robots.txt allows it."""
 
-import http.client
 import json
 import threading
 import time
@@ -11,17 +12,18 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Callable, Mapping
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib.robotparser import RobotFileParser
 
+from hunter.adapters.web_answers import NO_ANSWER, decoded, retry_after
 from hunter.domain.pacing import Pacing
 
 USER_AGENT = "Hunter/0.1 (personal job search)"
 TIMEOUT_SECONDS = 30
 TRIES = 3
 PAUSES_SECONDS = (5.0, 15.0)
-LONGEST_PAUSE_SECONDS = 600.0
+LONGEST_PAUSE_SECONDS = 600.0  # the longest pause Hunter waits out within a run
 RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
 FORBIDDEN_STATUSES = frozenset({401, 403})
 
@@ -41,23 +43,12 @@ class WebError(Exception):
         return self.status is None or self.status in RETRY_STATUSES
 
 
+def when(moment: datetime) -> str:
+    return f"{moment:%Y-%m-%d %H:%M} UTC"
+
+
 def utc_now() -> datetime:
     return datetime.now(UTC)
-
-
-def decoded(body: bytes, charset: str | None) -> str:
-    """Text in the encoding the site names, else UTF-8. Letters that don't fit are replaced, since
-    many small sites send Latin-1 without saying so."""
-    try:
-        return body.decode(charset or "utf-8", errors="replace")
-    except LookupError:  # an encoding Python doesn't know
-        return body.decode("utf-8", errors="replace")
-
-
-def retry_after(error: urllib.error.HTTPError) -> float | None:
-    """The pause a Retry-After header asks for, in seconds. HTTP dates aren't read."""
-    value = error.headers.get("Retry-After", "")
-    return min(float(value), LONGEST_PAUSE_SECONDS) if value.isdigit() else None
 
 
 class WebClient:
@@ -127,13 +118,18 @@ class WebClient:
             try:
                 return self._read(request)
             except WebError as error:
-                self._pause_before_retry(error, attempt)
+                self._pause_before_retry(error, attempt, request.host)
         return self._read(request)
 
-    def _pause_before_retry(self, error: WebError, attempt: int) -> None:
+    def _pause_before_retry(self, error: WebError, attempt: int, host: str) -> None:
         if not error.retryable:
             raise error
         pause = error.retry_after if error.retry_after is not None else PAUSES_SECONDS[attempt - 1]
+        if pause > LONGEST_PAUSE_SECONDS:
+            until = self.clock() + timedelta(seconds=pause)
+            self.pacing.hold(host, until)
+            message = f"{error}; asked Hunter to wait until {when(until)}"
+            raise WebError(message, error.status, pause) from error
         self.sleep(pause)
 
     def _read(self, request: urllib.request.Request) -> str:
@@ -143,16 +139,20 @@ class WebClient:
                 return decoded(response.read(), response.headers.get_content_charset())
         except urllib.error.HTTPError as error:
             message = f"{request.host}: HTTP {error.code} for {request.full_url}"
-            pause = retry_after(error)
+            pause = retry_after(error, self.clock())
             error.close()  # an error answer is a response too; left open, it's closed at exit
             raise WebError(message, error.code, pause) from error
-        except (OSError, http.client.HTTPException) as error:  # no answer, or cut off
+        except NO_ANSWER as error:
             raise WebError(f"{request.host}: no answer ({error})") from error
 
     def _wait_turn(self, host: str) -> None:
         """One request at a time per host, also when several threads read the same site."""
         with self._turn_of(host):
-            pause = self.pacing.wait(host, self.clock())
+            now = self.clock()
+            pause = self.pacing.wait(host, now)
+            if pause.total_seconds() > LONGEST_PAUSE_SECONDS:
+                message = f"{host}: asked Hunter to wait until {when(now + pause)}"
+                raise WebError(message, None, pause.total_seconds())
             if pause:
                 self.sleep(pause.total_seconds())
             self.pacing.record(host, self.clock())
