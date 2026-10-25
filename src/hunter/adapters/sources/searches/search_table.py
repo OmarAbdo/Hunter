@@ -3,16 +3,18 @@ search for; a search two campaigns share is read once."""
 
 from collections.abc import Callable, Iterable, Mapping
 
-from hunter.adapters.sources.searches import bundesagentur
+from hunter.adapters.sources.searches import bundesagentur, eures
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import JobSource
 from hunter.domain.discovery.campaign import Campaign
 
 SEARCHES: dict[str, Callable[..., JobSource]] = {
     "bundesagentur": bundesagentur.BundesagenturSearch,
+    "eures": eures.EuresSearch,
 }
 APIS: dict[str, str] = {
     "bundesagentur": bundesagentur.API,
+    "eures": eures.API,
 }
 
 
