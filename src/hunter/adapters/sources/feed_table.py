@@ -13,7 +13,7 @@ from hunter.adapters.sources import (
     smartrecruiters,
     workable,
 )
-from hunter.adapters.sources.feeds import dvinci, teamtailor, workday
+from hunter.adapters.sources.feeds import coveto, dvinci, teamtailor, workday
 from hunter.application.ports import JobSource
 from hunter.domain.pacing import PaceRule
 
@@ -28,6 +28,7 @@ FEEDS: dict[str, Callable[..., JobSource]] = {
     "teamtailor": teamtailor.TeamtailorFeed,
     "workday": workday.WorkdayFeed,
     "dvinci": dvinci.DvinciFeed,
+    "coveto": coveto.CovetoFeed,
 }
 APIS: dict[str, str | tuple[str, ...]] = {
     "greenhouse": greenhouse.API,
@@ -40,5 +41,6 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "teamtailor": teamtailor.API,
     "workday": workday.API,
     "dvinci": dvinci.API,
+    "coveto": coveto.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}
