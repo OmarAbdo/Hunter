@@ -1,0 +1,31 @@
+from hunter.domain.discovery.boards import Board
+from hunter.domain.discovery.probing import board_candidates, slugs
+
+
+def test_slugs_come_from_the_name_without_its_legal_form() -> None:
+    assert slugs("Bartko & Reher GmbH & Co. KG") == [
+        "bartkoandreher",
+        "bartko-and-reher",
+        "bartkoreher",
+    ]
+    assert slugs("N26 GmbH") == ["n26"]
+    assert slugs("Redcare Pharmacy") == ["redcarepharmacy", "redcare-pharmacy"]
+
+
+def test_a_name_without_letters_has_no_slugs() -> None:
+    assert slugs("GmbH") == []
+
+
+def test_every_guessable_system_is_tried_with_every_slug() -> None:
+    boards = board_candidates("Redcare Pharmacy")
+    assert Board(ats="greenhouse", slug="redcarepharmacy") in boards
+    assert Board(ats="ashby", slug="redcare-pharmacy") in boards
+    assert Board(ats="personio", slug="redcarepharmacy.de") in boards
+    assert Board(ats="personio", slug="redcare-pharmacy.com") in boards
+    assert Board(ats="smartrecruiters", slug="Redcare-Pharmacy") in boards
+    assert Board(ats="smartrecruiters", slug="RedcarePharmacy") in boards
+    assert not [board for board in boards if board.ats == "workday"]
+
+
+def test_the_most_likely_board_comes_first() -> None:
+    assert board_candidates("N26")[0] == Board(ats="greenhouse", slug="n26")

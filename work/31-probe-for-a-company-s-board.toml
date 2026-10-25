@@ -1,0 +1,4 @@
+id = "31"
+title = "Probe for a company's board"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/**", "src/hunter/application/probe.py", "src/hunter/application/ports.py"]
