@@ -1,0 +1,4 @@
+id = "38"
+title = "Resolve job-board jobs to the employer's posting"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/resolution.py", "src/hunter/application/resolve.py", "src/hunter/application/ports.py", "src/hunter/adapters/storage/job_links.py", "src/hunter/adapters/cli/project.py", "src/hunter/adapters/cli/discover_command.py", "tests/**"]

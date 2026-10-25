@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from typing import TextIO
 
 from hunter.adapters.campaign_files import CampaignFileError, load_campaigns
-from hunter.adapters.cli.project import Project, stores_of
+from hunter.adapters.cli.project import Project, linked_jobs, stores_of
 from hunter.adapters.cli.report import progress_line, report_text
 from hunter.adapters.cli.sources import sources_of
 from hunter.adapters.storage.matches import Matches
@@ -32,6 +32,8 @@ def run_discovery(project: Project, campaign_ids: Sequence[str], out: TextIO) ->
     except KeyboardInterrupt:
         out.write("Stopped. Everything read until now is kept.\n")
         return STOPPED
+    linked = linked_jobs(project.database())
+    out.write(f"{linked} job-board jobs linked to the employer's own posting\n")
     out.write(report_text(reports, campaigns, Matches(project.database())))
     return 0
 
