@@ -41,6 +41,7 @@ LINK_PATTERNS = tuple(
         ("dvinci", r"//([a-z0-9-]+)\.dvinci-easy\.com\b", "{0}"),
         ("softgarden", r"//([a-z0-9-]+)\.softgarden\.io\b", "{0}"),
         ("coveto", r"//(k\d+)\.coveto\.de\b", "{0}"),
+        ("onlyfy", r"//([a-z0-9-]+)\.onlyfy\.jobs\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
     )
 )
