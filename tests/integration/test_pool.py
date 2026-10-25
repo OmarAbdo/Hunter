@@ -124,3 +124,9 @@ def test_a_job_keeps_the_postings_it_is_the_same_as(tmp_path: Path) -> None:
     pool = Pool(open_database(tmp_path / "hunter.db"))
     eures = replace(INDEED, same_as=(SourceRef(source="bundesagentur", native_id="10001-1-S"),))
     assert pool.posting(pool.add(eures, SEEN).job_id) == eures
+
+
+def test_a_job_keeps_the_company_s_website(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    named = replace(INDEED, company_website="https://nextcloud.com")
+    assert pool.posting(pool.add(named, SEEN).job_id) == named

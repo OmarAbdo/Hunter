@@ -131,5 +131,7 @@ class Discovery:
         company = known or Company(name=posting.company)
         for board in boards:
             company = company.with_board(board)
+        if posting.company_website:
+            company = company.with_website(posting.company_website)
         if company != known:
             self.stores.companies.save(company)

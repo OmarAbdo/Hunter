@@ -1,0 +1,4 @@
+id = "41"
+title = "Companies keep their websites"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/posting.py", "src/hunter/domain/discovery/company.py", "src/hunter/application/discover.py", "src/hunter/adapters/storage/**", "tests/**"]
