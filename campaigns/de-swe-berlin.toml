@@ -58,7 +58,9 @@ excluded_roles = [
     "director",
 ]
 
-# Searches on search sources; company feeds are read for every campaign anyway.
+# Searches on search sources; company feeds are read for every campaign anyway. The
+# Bundesagentur matches queries loosely and the roles above decide, so the searches are broad.
+
 [[searches]]
 source = "bundesagentur"
 query = "Softwareentwickler"
@@ -72,4 +74,49 @@ place = "Berlin"
 [[searches]]
 source = "bundesagentur"
 query = "Backend Developer"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Developer"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Entwickler"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Informatiker"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Full Stack"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Frontend"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "DevOps"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Cloud Engineer"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Data Engineer"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Machine Learning"
 place = "Berlin"
