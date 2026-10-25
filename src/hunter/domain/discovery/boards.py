@@ -43,6 +43,14 @@ LINK_PATTERNS = tuple(
         ("coveto", r"//(k\d+)\.coveto\.de\b", "{0}"),
         ("onlyfy", r"//([a-z0-9-]+)\.onlyfy\.jobs\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
+        # A SuccessFactors career site is on the company's own host, so it's known by the shape
+        # of its job links, `/job/<title>/<id>/`; it comes last, after every system with a host
+        # of its own.
+        (
+            "successfactors",
+            r"//([a-z0-9-]+(?:\.[a-z0-9-]+)+)/(?:[a-z]{2}(?:_[A-Z]{2})?/)?job/[^/?#]+/\d{8,}/",
+            "{0}",
+        ),
     )
 )
 # Path parts that aren't companies. `j` is Workable's job link (apply.workable.com/j/<shortcode>).
