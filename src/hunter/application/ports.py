@@ -48,3 +48,14 @@ class MatchStore(Protocol):
     def record(
         self, job_id: int, campaign_id: str, rejection: Rejection | None, decided_at: datetime
     ) -> None: ...
+
+
+class BoardCheck(Protocol):
+    def exists(self, board: Board) -> bool:
+        """Whether the board is there with jobs. Raises SourceUnavailableError when it can't
+        tell."""
+        ...
+
+
+class ProbeLog(Protocol):
+    def record(self, company_key: str, probed_at: datetime) -> None: ...

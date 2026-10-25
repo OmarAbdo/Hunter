@@ -22,10 +22,15 @@ def text_key(text: str) -> str:
     return NOT_ALPHANUMERIC.sub(" ", folded(text)).strip()
 
 
+def company_words(name: str) -> list[str]:
+    """'Bartko & Reher GmbH & Co. KG' -> ['bartko', 'and', 'reher']."""
+    plain = AND_COMPANY.sub(" ", folded(name)).replace("&", " and ")
+    return NOT_ALPHANUMERIC.sub(" ", LEGAL_FORMS.sub(" ", plain)).split()
+
+
 def company_key(name: str) -> str:
     """'Bartko & Reher GmbH & Co. KG' -> 'bartkoandreher'."""
-    plain = AND_COMPANY.sub(" ", folded(name)).replace("&", " and ")
-    return NOT_ALPHANUMERIC.sub("", LEGAL_FORMS.sub(" ", plain))
+    return "".join(company_words(name))
 
 
 def title_key(title: str) -> str:
