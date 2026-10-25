@@ -1,7 +1,6 @@
 import itertools
 import json
 import threading
-import time
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
@@ -9,8 +8,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from hunter.adapters.web_client import USER_AGENT, WebClient, WebError
-from hunter.domain.pacing import Pacing, PaceRule
+from hunter.adapters.web_client import USER_AGENT, WebClient, WebError, moment_now
+from hunter.domain.pacing import Moment, Pacing, PaceRule
 
 ROBOTS = "User-agent: *\nDisallow: /private\n"
 PAUSE = timedelta(seconds=30)
@@ -29,10 +28,8 @@ class Site(BaseHTTPRequestHandler):
     """A small real web server: JSON, text, a rate limit that clears, a missing page, robots."""
 
     hits: dict[str, int] = {}
-    arrivals: list[float] = []  # when each request arrived, by the monotonic clock
 
     def answer_get(self) -> None:
-        self.arrivals.append(time.monotonic())
         self.hits[self.path] = self.hits.get(self.path, 0) + 1
         if self.path == "/robots.txt":
             self.answer(200, ROBOTS)
@@ -79,7 +76,6 @@ for method in ("GET", "POST"):
 @pytest.fixture
 def site() -> Iterator[str]:
     Site.hits = {}
-    Site.arrivals = []
     server = ThreadingHTTPServer(("127.0.0.1", 0), Site)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{server.server_address[1]}"
@@ -118,19 +114,26 @@ def test_the_second_request_to_a_host_is_paced(
 
 
 def test_requests_to_one_host_from_several_threads_still_take_turns(site: str) -> None:
-    """Measured where the site sees the requests: when each answer came back also depends on how
-    busy the machine is. One request goes first, because the first request of a program also
-    looks up the system's proxy settings, which on Windows can take a quarter of a second."""
-    client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=0.3))))
-    client.get_json(f"{site}/jobs")
+    """Measured at the turns themselves: when a request reaches the site, or its answer comes
+    back, also depends on how busy the machine is. Each turn reads the clock twice while it holds
+    the host's lock (before its pause, and as it's recorded), so the readings come in pairs."""
+    readings: list[float] = []
+
+    def clock() -> Moment:
+        now = moment_now()
+        readings.append(now.steady)
+        return now
+
+    client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=0.3))), clock=clock)
     threads = [threading.Thread(target=client.get_json, args=(f"{site}/jobs",)) for _ in range(3)]
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
-    threaded = sorted(Site.arrivals)[1:]  # the threads' requests, after the first one
-    gaps = [later - earlier for earlier, later in itertools.pairwise(threaded)]
-    assert min(gaps) >= 0.25
+    turns = readings[1::2]
+    gaps = [later - earlier for earlier, later in itertools.pairwise(turns)]
+    assert len(turns) == 3
+    assert min(gaps) >= 0.28  # Windows' monotonic clock ticks in steps of about 16 ms
 
 
 def test_a_rate_limit_is_retried_after_the_time_it_asks_for(client: WebClient, site: str) -> None:

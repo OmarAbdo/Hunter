@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+ <channel>
+  <title>Aktuelle Jobs bei empiricus GmbH | IT-Personalberatung und Executive Advisory</title>
+  <description>Hier finden Sie aktuelle Stellen.</description>
+  <language>de-de</language>
+  <link>https://empiricus.eu</link>
+  <atom:link href="https://k11145.coveto.de/public/rss/" rel="self" type="application/rss+xml"/>
+  <item>
+   <title><![CDATA[IT Projekt Manager/in (m/w/d)]]></title>
+   <description><![CDATA[Arbeitsort: Mainz. Referenznummer: #3943. Jetzt bewerben.]]></description>
+   <link><![CDATA[https://job-portal.empiricus.eu/job-it-projekt-manager-in-m-w-d-mainz-3943.html]]></link>
+   <pubDate><![CDATA[Tue, 13 Oct 2026 15:41:34 +0200]]></pubDate>
+   <guid><![CDATA[https://job-portal.empiricus.eu/job-id-3943.html]]></guid>
+  </item>
+  <item>
+   <title><![CDATA[IT Projekt Manager/in (m/w/d)]]></title>
+   <description><![CDATA[Arbeitsort: Frankfurt am Main. Referenznummer: #3942. Jetzt bewerben.]]></description>
+   <link><![CDATA[https://job-portal.empiricus.eu/job-it-projekt-manager-in-m-w-d-frankfurt-am-main-3942.html]]></link>
+   <pubDate><![CDATA[Tue, 13 Oct 2026 15:41:20 +0200]]></pubDate>
+   <guid><![CDATA[https://job-portal.empiricus.eu/job-id-3942.html]]></guid>
+  </item>
+  <item>
+   <title><![CDATA[Recruiter/in (m/w/d) in der IT-Personalberatung]]></title>
+   <description><![CDATA[Arbeitsort: Mannheim. Referenznummer: #3223. Jetzt bewerben.]]></description>
+   <link><![CDATA[https://job-portal.empiricus.eu/job-recruiter-in-m-w-d-in-der-it-personalberatung-mannheim-3223.html]]></link>
+   <pubDate><![CDATA[Wed, 12 Jul 2023 12:01:36 +0200]]></pubDate>
+   <guid><![CDATA[https://job-portal.empiricus.eu/job-id-3223.html]]></guid>
+  </item>
+ </channel>
+</rss>
