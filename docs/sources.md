@@ -44,7 +44,7 @@ source before building its adapter, because access rules change.
 | Workday | Feed: `POST {tenant}.wd{n}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` | 200 | All, mostly large employers | Not in HQ |
 | JOIN | Alert and confirmation mails | Pages publish no job data | DE | No public feed found |
 | Bundesagentur für Arbeit | Search: `rest.arbeitsagentur.de/.../pc/v6/jobs`, header `X-API-Key: jobboerse-jobsuche` | 200 | DE | Built. Jobs within 25 km of the place, published in the last 30 days, 100 a page. No descriptions in the list. About two thirds are applied to on arbeitsagentur.de; the rest link to other job boards (jobexport, gute-jobs, get-in-it), rarely to the employer's own system |
-| EURES | Search: `POST europa.eu/eures/api/jv-searchengine/public/jv-search/search` | 200 | Every EU campaign | Loose keyword matching; overlaps with the Bundesagentur |
+| EURES | Search: `POST europa.eu/eures/api/jv-searchengine/public/jv-search/search` | 200 | Every EU campaign | Built. Title search, last month, 50 a page; the place is a country or NUTS code (`nl`, `de3`). German jobs are the Bundesagentur's own (the id holds its reference), so they join those jobs; about half name the employer's website. Elsewhere jobs rarely name the employer, and only the region is given: 1,567 of 2,000 Dutch jobs got no city |
 | UN Careers | Search: `careers.un.org/api/public/opening/jo/list/filteredV2/en` | 200 | Culture, diplomacy, internships | |
 | Arbeitnow | Search: `www.arbeitnow.com/api/job-board-api` | 200 | DE | |
 | Himalayas, Remotive, We Work Remotely | Search (API or RSS) | 200 | Remote, US part-time | Remote only |

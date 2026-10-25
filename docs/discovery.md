@@ -112,6 +112,9 @@ query = "Softwareentwickler"
 place = "Berlin"   # optional; without it, the whole area the source covers
 ```
 
+Each source reads the place its own way: the Bundesagentur takes a town and searches 25 km around
+it, EURES takes a country or NUTS region code (`nl`, `de3`).
+
 A search two campaigns share is read once. A search on a source Hunter doesn't know stops the run
 before anything is read.
 
