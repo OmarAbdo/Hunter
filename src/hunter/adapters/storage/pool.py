@@ -1,6 +1,7 @@
 """The pool: every job Hunter has seen, stored once, with a sighting for each source that showed it.
 
-A posting is the same job as one in the pool when the employer's own key matches, or else when
+A posting is the same job as one in the pool when a source already showed it (under this source's
+id, or another source's id the posting names), when the employer's own key matches, or else when
 company, title and place match a job that doesn't have a different employer key."""
 
 import json
@@ -45,6 +46,19 @@ class Pool:
         return int(self.database.execute("SELECT count(*) FROM jobs").fetchone()[0])
 
     def _find(self, posting: Posting) -> int | None:
+        return self._sighted(posting) or self._keyed(posting)
+
+    def _sighted(self, posting: Posting) -> int | None:
+        for ref in (posting.source, *posting.same_as):
+            row = self.database.execute(
+                "SELECT job_id FROM sightings WHERE source = ? AND native_id = ?",
+                (ref.source, ref.native_id),
+            ).fetchone()
+            if row:
+                return int(row[0])
+        return None
+
+    def _keyed(self, posting: Posting) -> int | None:
         row = self.database.execute(
             "SELECT id FROM jobs WHERE exact_key = ? "
             "UNION ALL "
@@ -111,6 +125,7 @@ def decoded(text: str) -> Posting:
         location=decoded_location(record["location"]),
         other_locations=tuple(map(decoded_location, record.get("other_locations", []))),
         quick_apply=record.get("quick_apply", False),
+        same_as=tuple(SourceRef(**ref) for ref in record.get("same_as", [])),
         source=SourceRef(**record["source"]),
         employer=EmployerRef(**employer) if employer else None,
         employment=Employment(record["employment"]) if record["employment"] else None,

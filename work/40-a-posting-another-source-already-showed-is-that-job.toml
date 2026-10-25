@@ -1,0 +1,4 @@
+id = "40"
+title = "A posting another source already showed is that job"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/posting.py", "src/hunter/adapters/storage/pool.py", "tests/**"]
