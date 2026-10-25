@@ -1,5 +1,6 @@
 """Every company feed Hunter can read, by applicant tracking system, and each one's web address.
-A board in the registry is read with the feed of its system."""
+A board in the registry is read with the feed of its system. Sites that refuse Hunter's usual pace
+get their own."""
 
 from collections.abc import Callable
 
@@ -14,6 +15,7 @@ from hunter.adapters.sources import (
 )
 from hunter.adapters.sources.feeds import teamtailor, workday
 from hunter.application.ports import JobSource
+from hunter.domain.pacing import PaceRule
 
 FEEDS: dict[str, Callable[..., JobSource]] = {
     "greenhouse": greenhouse.GreenhouseFeed,
@@ -37,3 +39,4 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "teamtailor": teamtailor.API,
     "workday": workday.API,
 }
+PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}

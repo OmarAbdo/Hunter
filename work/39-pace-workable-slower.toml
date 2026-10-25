@@ -1,0 +1,4 @@
+id = "39"
+title = "Pace Workable slower"
+kind = "fix"
+scope = ["src/hunter/adapters/sources/workable.py", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/probe_command.py", "tests/**"]

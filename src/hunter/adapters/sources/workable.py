@@ -2,6 +2,7 @@
 open in, all under one shortcode; Hunter makes that one posting with all of its places."""
 
 from dataclasses import replace
+from datetime import timedelta
 from typing import Any
 
 from hunter.adapters.html_text import plain_text
@@ -9,8 +10,13 @@ from hunter.adapters.sources.reading import employment_from, parsed_time, place_
 from hunter.adapters.web_client import WebClient
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef
+from hunter.domain.pacing import PaceRule
 
 API = "https://apply.workable.com"
+HOST = "apply.workable.com"
+# Workable refuses (HTTP 429) after about 16 requests a second apart; 12 three seconds apart went
+# through (2026-10-25).
+PACE = PaceRule(min_gap=timedelta(seconds=3))
 
 
 class WorkableFeed:
