@@ -3,7 +3,6 @@ Hunter only reads: the inbox is opened read-only, and nothing is flagged, moved 
 per inbox and sender remembers the last mail read, so each mail is read once."""
 
 import imaplib
-import sqlite3
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -15,6 +14,7 @@ from typing import Any
 
 from hunter.adapters.credentials import MailAccount
 from hunter.adapters.html_text import plain_text
+from hunter.adapters.storage.mail_marks import MailMarks
 
 TIMEOUT_SECONDS = 30
 
@@ -27,28 +27,6 @@ class Mail:
     validity: int
     received_at: datetime
     text: str
-
-
-class MailMarks:
-    """Per inbox and sender: the UIDVALIDITY and the last UID read."""
-
-    def __init__(self, database: sqlite3.Connection) -> None:
-        self.database = database
-
-    def get(self, address: str, sender: str) -> tuple[int, int] | None:
-        row = self.database.execute(
-            "SELECT validity, last_uid FROM mail_marks WHERE address = ? AND sender = ?",
-            (address, sender),
-        ).fetchone()
-        return (row[0], row[1]) if row else None
-
-    def set(self, address: str, sender: str, validity: int, last_uid: int) -> None:
-        with self.database:
-            self.database.execute(
-                "INSERT OR REPLACE INTO mail_marks (address, sender, validity, last_uid) "
-                "VALUES (?, ?, ?, ?)",
-                (address, sender, validity, last_uid),
-            )
 
 
 class Mailbox:

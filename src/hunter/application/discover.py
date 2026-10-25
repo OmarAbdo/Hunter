@@ -1,6 +1,9 @@
 """Discovery's use case: read each source, add what it brings to the pool, keep the company
 registry up to date, and let every campaign judge each job it hasn't judged yet. A source that
-can't be read is reported, and the others still run."""
+can't be read is reported, and the others still run.
+
+What sources bring is taken in one source at a time, in their order. How they're read (one after
+another here, several at a time in the command line) is up to the caller of `take_each`."""
 
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass, field
@@ -47,10 +50,31 @@ def discover(
 def discover_each(
     sources: Iterable[JobSource], campaigns: Sequence[Campaign], stores: Stores, now: datetime
 ) -> Iterator[SourceReport]:
-    """Each source's report as soon as that source is read, so a long run can show progress."""
+    """Each source read and taken in, one after another."""
+    return take_each(((source, fetched(source)) for source in sources), campaigns, stores, now)
+
+
+Fetched = list[Posting] | SourceUnavailableError
+
+
+def fetched(source: JobSource) -> Fetched:
+    """What a source brings, or why it couldn't be read."""
+    try:
+        return list(source.fetch())
+    except SourceUnavailableError as error:
+        return error
+
+
+def take_each(
+    readings: Iterable[tuple[JobSource, Fetched]],
+    campaigns: Sequence[Campaign],
+    stores: Stores,
+    now: datetime,
+) -> Iterator[SourceReport]:
+    """Each source's report as soon as what it brought is taken in, so a run can show progress."""
     discovery = Discovery(campaigns, stores)
-    for source in sources:
-        yield discovery.read(source, now)
+    for source, postings in readings:
+        yield discovery.take(source, postings, now)
 
 
 def boards_of(posting: Posting) -> list[Board]:
@@ -66,13 +90,11 @@ class Discovery:
         self.campaigns = campaigns
         self.stores = stores
 
-    def read(self, source: JobSource, now: datetime) -> SourceReport:
+    def take(self, source: JobSource, postings: Fetched, now: datetime) -> SourceReport:
         report = SourceReport(source=source.name)
-        try:
-            postings = list(source.fetch())
-        except SourceUnavailableError as error:
-            report.error = str(error)
-            self._record_feed(source.name, FeedStatus.GONE if error.gone else None)
+        if isinstance(postings, SourceUnavailableError):
+            report.error = str(postings)
+            self._record_feed(source.name, FeedStatus.GONE if postings.gone else None)
             return report
         report.fetched = len(postings)
         for posting in postings:
