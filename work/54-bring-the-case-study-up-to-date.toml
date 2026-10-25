@@ -1,0 +1,4 @@
+id = "54"
+title = "Bring the case study up to date"
+kind = "chore"
+scope = ["docs/**"]
