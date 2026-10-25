@@ -27,9 +27,14 @@ EMPLOYMENT_WORDS = (
 )
 
 
-def read_json(web: WebClient, url: str, params: Mapping[str, str] | None = None) -> Any:
+def read_json(
+    web: WebClient,
+    url: str,
+    params: Mapping[str, str] | None = None,
+    headers: Mapping[str, str] | None = None,
+) -> Any:
     try:
-        return web.get_json(url, params)
+        return web.get_json(url, params, headers)
     except WebError as error:
         raise SourceUnavailableError(str(error), gone=error.status in GONE_STATUSES) from error
     except ValueError as error:

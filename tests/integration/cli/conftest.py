@@ -1,5 +1,6 @@
 """A temporary Hunter project with the real campaigns, and a local web server answering like
-Greenhouse with the saved N26 board."""
+Greenhouse with the saved N26 board. The campaigns' searches go to the same server, which has
+nothing for them."""
 
 import io
 import shutil
@@ -52,7 +53,8 @@ def run(project: Path, greenhouse: str) -> Run:
 
     def command(*arguments: str) -> tuple[int, str]:
         out = io.StringIO()
-        status = main(list(arguments), project, apis={"greenhouse": greenhouse}, out=out)
+        apis = {"greenhouse": greenhouse, "bundesagentur": greenhouse}
+        status = main(list(arguments), project, apis=apis, out=out)
         return status, out.getvalue()
 
     return command
