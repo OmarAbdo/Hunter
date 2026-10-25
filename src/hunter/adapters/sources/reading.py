@@ -59,6 +59,14 @@ def read_text(web: WebClient, url: str, params: Mapping[str, str] | None = None)
         raise SourceUnavailableError(str(error), gone=error.status in GONE_STATUSES) from error
 
 
+def read_page(web: WebClient, url: str) -> str:
+    """For sources that are web pages: read only where the site's robots.txt allows it."""
+    try:
+        return web.get_page(url)
+    except WebError as error:
+        raise SourceUnavailableError(str(error), gone=error.status in GONE_STATUSES) from error
+
+
 def parsed_time(text: str | None) -> datetime | None:
     """An ISO 8601 time ("…Z", "…+02:00", "… UTC"), or None when there is none or it can't
     be read."""
