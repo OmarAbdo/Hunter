@@ -1,0 +1,4 @@
+id = "36"
+title = "Document campaign searches"
+kind = "chore"
+scope = ["docs/**"]
