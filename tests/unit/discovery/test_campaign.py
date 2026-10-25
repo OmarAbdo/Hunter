@@ -1,6 +1,6 @@
 from dataclasses import replace
 
-from hunter.domain.discovery.campaign import Campaign, Rejection
+from hunter.domain.discovery.campaign import Campaign, Rejection, Search
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import Employment, Posting, SourceRef
 
@@ -102,3 +102,11 @@ def test_a_job_open_in_several_places_none_of_which_fit_is_rejected_for_the_firs
 def test_cities_are_compared_by_their_normalised_names() -> None:
     zurich = replace(PILOT, countries=frozenset({"CH"}), cities=frozenset({"Zurich"}))
     assert zurich.rejects(replace(JOB, location=Location(country="CH", city="Zürich"))) is None
+
+
+def test_a_campaign_names_its_searches() -> None:
+    search = Search(source="bundesagentur", query="Softwareentwickler", place="Berlin")
+    assert replace(PILOT, searches=(search,)).searches == (search,)
+    assert PILOT.searches == ()
+    assert Search(source="eures", query="software engineer").place == ""
+    assert len({search, replace(search)}) == 1  # a value: the same search counts once

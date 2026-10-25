@@ -6,12 +6,13 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-from hunter.domain.discovery.campaign import Campaign
+from hunter.domain.discovery.campaign import Campaign, Search
 from hunter.domain.discovery.location import Workplace
 from hunter.domain.discovery.posting import Employment
 
 REQUIRED = ("title", "home", "countries")
-OPTIONAL = ("cities", "workplaces", "employment", "roles", "excluded_roles")
+OPTIONAL = ("cities", "workplaces", "employment", "roles", "excluded_roles", "searches")
+SEARCH_SETTINGS = ("source", "query", "place")
 
 
 class CampaignFileError(Exception):
@@ -53,4 +54,15 @@ def campaign_from(campaign_id: str, settings: dict[str, Any]) -> Campaign:
         employment=frozenset(map(Employment, settings.get("employment", []))),
         roles=tuple(settings.get("roles", [])),
         excluded_roles=tuple(settings.get("excluded_roles", [])),
+        searches=tuple(map(search_from, settings.get("searches", []))),
     )
+
+
+def search_from(settings: dict[str, Any]) -> Search:
+    """A `[[searches]]` table: `source` and `query`, and `place` when the search has one."""
+    unknown = sorted(set(settings) - set(SEARCH_SETTINGS))
+    if unknown:
+        raise ValueError(f"a search with unknown setting {', '.join(unknown)}")
+    if not settings.get("query") or not settings.get("source"):
+        raise ValueError("a search without a query or a source")
+    return Search(str(settings["source"]), str(settings["query"]), str(settings.get("place", "")))

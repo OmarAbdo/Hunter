@@ -1,0 +1,4 @@
+id = "34"
+title = "Campaigns name their searches"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/campaign.py", "src/hunter/adapters/campaign_files.py", "campaigns/**"]

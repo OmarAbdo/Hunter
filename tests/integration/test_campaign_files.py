@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from hunter.adapters.campaign_files import CampaignFileError, load_campaign, load_campaigns
-from hunter.domain.discovery.campaign import Campaign
+from hunter.domain.discovery.campaign import Campaign, Search
 from hunter.domain.discovery.location import Workplace
 from hunter.domain.discovery.posting import Employment
 
@@ -69,3 +69,48 @@ def test_every_campaign_in_a_folder_in_name_order(tmp_path: Path) -> None:
 def test_the_pilot_campaign_loads() -> None:
     pilot = load_campaign(CAMPAIGNS / "de-swe-berlin.toml")
     assert (pilot.id, pilot.home, pilot.cities) == ("de-swe-berlin", "DE", frozenset({"Berlin"}))
+
+
+def test_searches_are_read_from_the_file(tmp_path: Path) -> None:
+    searches = """
+[[searches]]
+source = "bundesagentur"
+query = "Softwareentwickler"
+place = "Dubai"
+
+[[searches]]
+source = "eures"
+query = "software engineer"
+"""
+    (tmp_path / "ae-dubai.toml").write_text(DUBAI + searches, encoding="utf-8")
+    assert load_campaign(tmp_path / "ae-dubai.toml").searches == (
+        Search(source="bundesagentur", query="Softwareentwickler", place="Dubai"),
+        Search(source="eures", query="software engineer"),
+    )
+
+
+def test_a_search_with_an_unknown_setting_is_refused(tmp_path: Path) -> None:
+    search = """
+[[searches]]
+source = "bundesagentur"
+query = "x"
+where = "Berlin"
+"""
+    (tmp_path / "typo.toml").write_text(DUBAI + search, encoding="utf-8")
+    with pytest.raises(CampaignFileError, match="typo.toml: a search with unknown setting where"):
+        load_campaign(tmp_path / "typo.toml")
+
+
+def test_a_search_without_a_query_is_refused(tmp_path: Path) -> None:
+    search = """
+[[searches]]
+source = "eures"
+"""
+    (tmp_path / "short.toml").write_text(DUBAI + search, encoding="utf-8")
+    with pytest.raises(CampaignFileError, match="short.toml: a search without a query or a source"):
+        load_campaign(tmp_path / "short.toml")
+
+
+def test_the_pilot_campaign_searches_the_bundesagentur() -> None:
+    pilot = load_campaign(CAMPAIGNS / "de-swe-berlin.toml")
+    assert {search.source for search in pilot.searches} == {"bundesagentur"}
