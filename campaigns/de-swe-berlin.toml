@@ -57,3 +57,19 @@ excluded_roles = [
     "\\bvp\\b",
     "director",
 ]
+
+# Searches on search sources; company feeds are read for every campaign anyway.
+[[searches]]
+source = "bundesagentur"
+query = "Softwareentwickler"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Software Engineer"
+place = "Berlin"
+
+[[searches]]
+source = "bundesagentur"
+query = "Backend Developer"
+place = "Berlin"
