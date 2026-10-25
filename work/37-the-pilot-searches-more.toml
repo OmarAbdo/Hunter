@@ -1,0 +1,4 @@
+id = "37"
+title = "The pilot searches more"
+kind = "chore"
+scope = ["campaigns/**", "tests/integration/cli/test_progress.py"]
