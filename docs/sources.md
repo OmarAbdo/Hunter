@@ -41,6 +41,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | coveto (RSS) | No limit published | No rate headers | 1 a second |
 | softgarden (list page) | No limit published | No rate headers | 1 a second |
 | onlyfy (list page) | `Crawl-delay: 1` in robots.txt | No rate headers | 1 a second |
+| SuccessFactors (RSS) | No limit published | No rate headers | 1 a second |
 | Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
 | EURES | No limit published | No rate headers | 1 a second |
 
@@ -71,6 +72,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | coveto | Feed: RSS at `{board}.coveto.de/public/rss/` (`k11145`) | 200 | DE | Built. German ATS, used mostly by staffing agencies. The place is a line of the description; job pages are on the company's own domain. Not guessed: boards are numbered |
 | softgarden | Page: the vacancy list at `{board}.softgarden.io/de/vacancies` | 200; 404 for a missing board | DE | Built. German ATS; no feed, so the list page is read where robots.txt allows (it bars only `/api/` and the recruiters' pages). Each board picks its columns: title always, mostly the date and places, on a group's board the company |
 | onlyfy (was Prescreen) | Page: the job list at `{board}.onlyfy.jobs/?page=N`, 10 a page | 200; 404 for a missing board | DE, AT | Built. German-speaking ATS (XING's); no feed, robots.txt allows the list (`Crawl-delay: 1`). Each card has the title and a line of facts: the town first, the employment type, the date |
+| SAP SuccessFactors | Feed: RSS at `{host}/sitemal.xml` on a Career Site Builder site (`jobs.bechtle.com`) | 200; 404 where there's none | All, mostly large employers | Built. Undocumented by SAP but on every such site. The board is the site's host, known from its job links (`/job/<title>/<id>/`). Sites on SuccessFactors' own `career*.successfactors.*` hosts (Recruiting without Career Site Builder) have no feed. Not guessed |
 | JOIN | Alert and confirmation mails | Pages publish no job data | DE | No public feed found |
 | Bundesagentur für Arbeit | Search: `rest.arbeitsagentur.de/.../pc/v6/jobs`, header `X-API-Key: jobboerse-jobsuche` | 200 | DE | Built. Jobs within 25 km of the place, published in the last 30 days, 100 a page. No descriptions in the list. About two thirds are applied to on arbeitsagentur.de; the rest link to other job boards (jobexport, gute-jobs, get-in-it), rarely to the employer's own system |
 | EURES | Search: `POST europa.eu/eures/api/jv-searchengine/public/jv-search/search` | 200 | Every EU campaign | Built. Title search, last month, 50 a page; the place is a country or NUTS code (`nl`, `de3`). German jobs are the Bundesagentur's own (the id holds its reference), so they join those jobs; about half name the employer's website. Elsewhere jobs rarely name the employer, and only the region is given: 1,567 of 2,000 Dutch jobs got no city |

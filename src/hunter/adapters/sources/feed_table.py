@@ -18,6 +18,7 @@ from hunter.adapters.sources.feeds import (
     dvinci,
     onlyfy,
     softgarden,
+    successfactors,
     teamtailor,
     workday,
 )
@@ -38,6 +39,7 @@ FEEDS: dict[str, Callable[..., JobSource]] = {
     "coveto": coveto.CovetoFeed,
     "softgarden": softgarden.SoftgardenFeed,
     "onlyfy": onlyfy.OnlyfyFeed,
+    "successfactors": successfactors.SuccessFactorsFeed,
 }
 APIS: dict[str, str | tuple[str, ...]] = {
     "greenhouse": greenhouse.API,
@@ -53,5 +55,6 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "coveto": coveto.API,
     "softgarden": softgarden.API,
     "onlyfy": onlyfy.API,
+    "successfactors": successfactors.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}
