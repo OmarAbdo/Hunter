@@ -109,3 +109,4 @@ def test_a_campaign_names_its_searches() -> None:
     assert replace(PILOT, searches=(search,)).searches == (search,)
     assert PILOT.searches == ()
     assert Search(source="eures", query="software engineer").place == ""
+    assert len({search, replace(search)}) == 1  # a value: the same search counts once
