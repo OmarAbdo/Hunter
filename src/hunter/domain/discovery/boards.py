@@ -38,6 +38,7 @@ LINK_PATTERNS = tuple(
             r"//([a-z0-9-]+)\.(wd\d+)\.myworkdayjobs\.com/(?:[a-z]{2}-[A-Z]{2}/)?([\w-]+)",
             "{0}/{1}/{2}",
         ),
+        ("dvinci", r"//([a-z0-9-]+)\.dvinci-easy\.com\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
     )
 )
