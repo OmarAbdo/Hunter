@@ -1,0 +1,4 @@
+id = "33"
+title = "The boards probe command"
+kind = "feature"
+scope = ["src/hunter/adapters/cli/**", "src/hunter/domain/discovery/probing.py", "src/hunter/application/probe.py", "src/hunter/adapters/web_client.py"]

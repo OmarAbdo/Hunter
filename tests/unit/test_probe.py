@@ -89,3 +89,21 @@ def test_finding_a_board_gives_the_board_none_or_why_it_could_not_tell() -> None
     assert find_board(Company(name="N26"), Boards()) is None
     could_not = find_board(Company(name="N26"), Boards(down=True))
     assert isinstance(could_not, SourceUnavailableError)
+
+
+class OwnedBoards(Companies):
+    def __init__(self, owner: Company) -> None:
+        super().__init__()
+        self.owner = owner
+
+    def owner_of(self, board: Board) -> Company | None:
+        return self.owner if board in self.owner.feeds else None
+
+
+def test_a_board_another_company_owns_is_not_given_to_a_second_one() -> None:
+    board = Board(ats="personio", slug="zvoove.de")
+    companies = OwnedBoards(Company(name="zvoove Software Germany GmbH").with_board(board))
+    kept_ = ProbeStores(companies=companies, log=Log())
+    [result] = probe([Company(name="zvoove")], Boards(board), kept_, NOW)
+    assert result.board == board
+    assert companies.saved == {}

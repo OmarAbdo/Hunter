@@ -125,3 +125,4 @@ def test_pages_follow_robots_txt(client: WebClient, site: str) -> None:
     with pytest.raises(WebError, match="robots.txt"):
         client.get_page(f"{site}/private")
     assert "/private" not in Site.hits
+
