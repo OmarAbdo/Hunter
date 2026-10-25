@@ -152,3 +152,12 @@ def test_a_company_without_boards_is_still_registered() -> None:
     kept = stores()
     discover([Feed("indeed-alert", [alert])], [BERLIN], kept, NOW)
     assert kept.companies.get("nextcloud") == Company(name="Nextcloud GmbH")
+
+
+def test_a_company_keeps_the_website_a_source_names() -> None:
+    named = replace(JOB, company_website="https://nextcloud.com")
+    kept = stores()
+    discover([Feed("eures:x", [named])], [BERLIN], kept, NOW)
+    company = kept.companies.get("nextcloud")
+    assert company is not None
+    assert company.website == "https://nextcloud.com"

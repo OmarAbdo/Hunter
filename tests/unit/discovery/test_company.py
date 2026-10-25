@@ -32,3 +32,9 @@ def test_feeds_to_read_leave_out_boards_that_are_gone() -> None:
         .checked(GREENHOUSE, FeedStatus.GONE)
     )
     assert company.feeds_to_read() == (ASHBY,)
+
+
+def test_the_first_website_found_is_kept() -> None:
+    company = Company(name="Baier GmbH").with_website("http://www.baier.de")
+    assert company.with_website("http://baier-werbetechnik.de").website == "http://www.baier.de"
+    assert Company(name="Baier GmbH").website is None

@@ -1,5 +1,5 @@
 """A company in the registry: known by its normalised name, with the boards where it posts jobs
-and what Hunter found when it last read each one."""
+and what Hunter found when it last read each one, and its website where a source named it."""
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
@@ -20,6 +20,7 @@ class FeedStatus(Enum):
 class Company:
     name: str
     feeds: Mapping[Board, FeedStatus] = field(default_factory=dict)
+    website: str | None = None
 
     @property
     def key(self) -> str:
@@ -36,6 +37,10 @@ class Company:
         if board in self.feeds:
             return self
         return replace(self, feeds={**self.feeds, board: FeedStatus.UNCHECKED})
+
+    def with_website(self, website: str) -> "Company":
+        """The first website found is kept: a later, different one is more likely a mix-up."""
+        return self if self.website else replace(self, website=website)
 
     def checked(self, board: Board, status: FeedStatus) -> "Company":
         return replace(self, feeds={**self.feeds, board: status})

@@ -55,6 +55,9 @@ class Posting:
     quick_apply: bool = False
     # Other sources' ids for this very posting: EURES shows the Bundesagentur's jobs as its own.
     same_as: tuple[SourceRef, ...] = ()
+    # The employer's website, where a source names it (EURES does): its careers page may link
+    # to the employer's board.
+    company_website: str | None = None
 
     @property
     def locations(self) -> tuple[Location, ...]:

@@ -44,3 +44,12 @@ def test_all_companies_in_name_order(tmp_path: Path) -> None:
     registry.save(Company(name="Zalando"))
     registry.save(Company(name="Ashby"))
     assert [company.name for company in registry.all()] == ["Ashby", "Zalando"]
+
+
+def test_a_company_s_website_is_kept(tmp_path: Path) -> None:
+    registry = Registry(open_database(tmp_path / "hunter.db"))
+    registry.save(Company(name="Nextcloud").with_website("https://nextcloud.com"))
+    company = registry.get("nextcloud")
+    assert company is not None
+    assert company.website == "https://nextcloud.com"
+    assert [known.website for known in registry.all()] == ["https://nextcloud.com"]

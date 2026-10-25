@@ -126,6 +126,7 @@ def decoded(text: str) -> Posting:
         other_locations=tuple(map(decoded_location, record.get("other_locations", []))),
         quick_apply=record.get("quick_apply", False),
         same_as=tuple(SourceRef(**ref) for ref in record.get("same_as", [])),
+        company_website=record.get("company_website"),
         source=SourceRef(**record["source"]),
         employer=EmployerRef(**employer) if employer else None,
         employment=Employment(record["employment"]) if record["employment"] else None,
