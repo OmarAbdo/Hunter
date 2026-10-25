@@ -3,7 +3,8 @@ import json
 import threading
 import time
 from collections.abc import Iterator
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -12,6 +13,12 @@ from hunter.adapters.web_client import USER_AGENT, WebClient, WebError
 from hunter.domain.pacing import Pacing, PaceRule
 
 ROBOTS = "User-agent: *\nDisallow: /private\n"
+PAUSE = timedelta(seconds=30)
+RATE_LIMITED = {  # the Retry-After each sends: "/held" every time, the others the first time only
+    "/busy": lambda: "0",
+    "/dated": lambda: format_datetime(datetime.now(UTC) + PAUSE),
+    "/held": lambda: "75335",  # a day's rest, as Workable asked on 2026-10-25
+}
 ENCODED = {  # pages in encodings other than the plain UTF-8 of the rest
     "/latin": (None, "Stellen für Entwickler".encode("latin-1")),  # Latin-1, said nowhere
     "/unknown-encoding": ("text/html; charset=utf8mb4", "Stellen für Entwickler".encode()),
@@ -31,13 +38,13 @@ class Site(BaseHTTPRequestHandler):
             self.answer(200, ROBOTS)
         elif self.path.startswith("/jobs"):
             self.answer(200, json.dumps({"path": self.path, "agent": self.headers["User-Agent"]}))
-        elif self.path == "/busy" and self.hits[self.path] == 1:
-            self.answer(429, "slow down", retry_after="0")
+        elif self.path in RATE_LIMITED and (self.hits[self.path] == 1 or self.path == "/held"):
+            self.answer(429, "slow down", retry_after=RATE_LIMITED[self.path]())
         elif self.path == "/dropped":  # the site hangs up without an answer
             self.close_connection = True
         elif self.path in ENCODED:
             self.answer_bytes(*ENCODED[self.path])
-        elif self.path in {"/busy", "/public", "/private"}:
+        elif self.path in {"/busy", "/dated", "/public", "/private"}:
             self.answer(200, "<html>a page</html>")
         else:
             self.answer(404, "missing")
@@ -155,3 +162,22 @@ def test_a_site_that_hangs_up_is_no_answer(client: WebClient, site: str) -> None
 
 def test_an_encoding_python_does_not_know_is_read_as_utf_8(client: WebClient, site: str) -> None:
     assert client.get_text(f"{site}/unknown-encoding") == "Stellen für Entwickler"
+
+
+def test_a_pause_asked_for_as_a_date_is_waited_out(
+    client: WebClient, site: str, waits: list[float]
+) -> None:
+    assert client.get_text(f"{site}/dated") == "<html>a page</html>"
+    assert 28 <= waits[0] <= 30
+
+
+def test_a_site_asking_for_a_long_pause_is_not_asked_again(
+    client: WebClient, site: str, waits: list[float]
+) -> None:
+    """Longer than a run should wait: the source is reported, and the site left alone."""
+    with pytest.raises(WebError, match="HTTP 429.*asked Hunter to wait until 20"):
+        client.get_text(f"{site}/held")
+    with pytest.raises(WebError, match="asked Hunter to wait until"):
+        client.get_text(f"{site}/jobs")
+    assert (Site.hits.get("/held"), Site.hits.get("/jobs")) == (1, None)
+    assert waits == []

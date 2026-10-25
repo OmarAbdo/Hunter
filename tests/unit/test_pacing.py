@@ -54,3 +54,24 @@ def test_the_daily_cap_starts_again_the_next_day() -> None:
     hosts.record("www.linkedin.com", NOON)
     hosts.record("www.linkedin.com", NOON + timedelta(minutes=3))
     assert hosts.wait("www.linkedin.com", NOON + timedelta(days=1)) == timedelta(0)
+
+
+def test_a_host_that_asked_for_a_pause_waits_until_it_ends() -> None:
+    hosts = pacing()
+    hosts.hold("apply.workable.com", NOON + timedelta(hours=21))
+    assert hosts.wait("apply.workable.com", NOON) == timedelta(hours=21)
+    hosts.record("apply.workable.com", NOON)
+    assert hosts.wait("apply.workable.com", NOON + timedelta(hours=1)) == timedelta(hours=20)
+
+
+def test_a_pause_that_has_ended_holds_nothing() -> None:
+    hosts = pacing()
+    hosts.hold("apply.workable.com", NOON)
+    assert hosts.wait("apply.workable.com", NOON + timedelta(seconds=1)) == timedelta(0)
+
+
+def test_a_shorter_pause_asked_later_does_not_end_a_longer_one() -> None:
+    hosts = pacing()
+    hosts.hold("apply.workable.com", NOON + timedelta(hours=2))
+    hosts.hold("apply.workable.com", NOON + timedelta(minutes=1))
+    assert hosts.wait("apply.workable.com", NOON) == timedelta(hours=2)
