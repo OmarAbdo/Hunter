@@ -1,0 +1,4 @@
+id = "48"
+title = "Measure gaps on a clock that only moves forward"
+kind = "fix"
+scope = ["src/hunter/domain/pacing.py", "src/hunter/adapters/web_client.py", "tests/**", "docs/**"]

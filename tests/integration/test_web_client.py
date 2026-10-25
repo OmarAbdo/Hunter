@@ -119,14 +119,17 @@ def test_the_second_request_to_a_host_is_paced(
 
 def test_requests_to_one_host_from_several_threads_still_take_turns(site: str) -> None:
     """Measured where the site sees the requests: when each answer came back also depends on how
-    busy the machine is."""
+    busy the machine is. One request goes first, because the first request of a program also
+    looks up the system's proxy settings, which on Windows can take a quarter of a second."""
     client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=0.3))))
+    client.get_json(f"{site}/jobs")
     threads = [threading.Thread(target=client.get_json, args=(f"{site}/jobs",)) for _ in range(3)]
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
-    gaps = [later - earlier for earlier, later in itertools.pairwise(sorted(Site.arrivals))]
+    threaded = sorted(Site.arrivals)[1:]  # the threads' requests, after the first one
+    gaps = [later - earlier for earlier, later in itertools.pairwise(threaded)]
     assert min(gaps) >= 0.25
 
 

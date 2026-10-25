@@ -17,7 +17,7 @@ from typing import Any
 from urllib.robotparser import RobotFileParser
 
 from hunter.adapters.web_answers import NO_ANSWER, decoded, retry_after
-from hunter.domain.pacing import CapReachedError, Pacing
+from hunter.domain.pacing import CapReachedError, Moment, Pacing
 
 USER_AGENT = "Hunter/0.1 (personal job search)"
 TIMEOUT_SECONDS = 30
@@ -54,8 +54,8 @@ def when(moment: datetime) -> str:
     return f"{moment:%Y-%m-%d %H:%M} UTC"
 
 
-def utc_now() -> datetime:
-    return datetime.now(UTC)
+def moment_now() -> Moment:
+    return Moment(wall=datetime.now(UTC), steady=time.monotonic())
 
 
 class WebClient:
@@ -63,7 +63,7 @@ class WebClient:
         self,
         pacing: Pacing,
         sleep: Callable[[float], None] = time.sleep,
-        clock: Callable[[], datetime] = utc_now,
+        clock: Callable[[], Moment] = moment_now,
     ) -> None:
         self.pacing = pacing
         self.sleep = sleep
@@ -133,7 +133,7 @@ class WebClient:
             raise error
         pause = error.retry_after if error.retry_after is not None else PAUSES_SECONDS[attempt - 1]
         if pause > LONGEST_PAUSE_SECONDS:
-            until = self.clock() + timedelta(seconds=pause)
+            until = self.clock().wall + timedelta(seconds=pause)
             self.pacing.hold(host, until)
             message = f"{error}; asked Hunter to wait until {when(until)}"
             raise WebError(message, error.status, pause) from error
@@ -146,7 +146,7 @@ class WebClient:
                 return decoded(response.read(), response.headers.get_content_charset())
         except urllib.error.HTTPError as error:
             message = f"{request.host}: HTTP {error.code} for {request.full_url}"
-            pause = retry_after(error, self.clock())
+            pause = retry_after(error, self.clock().wall)
             error.close()  # an error answer is a response too; left open, it's closed at exit
             raise WebError(message, error.code, pause) from error
         except NO_ANSWER as error:
@@ -161,7 +161,7 @@ class WebClient:
             except CapReachedError as error:  # Hunter's own budget for the site, used up today
                 raise WebError(str(error), final=True) from error
             if pause.total_seconds() > LONGEST_PAUSE_SECONDS:
-                message = f"{host}: asked Hunter to wait until {when(now + pause)}"
+                message = f"{host}: asked Hunter to wait until {when(now.wall + pause)}"
                 raise WebError(message, None, pause.total_seconds())
             if pause:
                 self.sleep(pause.total_seconds())
