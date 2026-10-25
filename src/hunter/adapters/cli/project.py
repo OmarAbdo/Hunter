@@ -28,9 +28,13 @@ class Project:
     def accounts_path(self) -> Path:
         return self.root / "var" / "accounts.toml"
 
+    @property
+    def database_path(self) -> Path:
+        return self.root / "var" / "hunter.db"
+
     def database(self) -> sqlite3.Connection:
-        (self.root / "var").mkdir(exist_ok=True)
-        return open_database(self.root / "var" / "hunter.db")
+        self.database_path.parent.mkdir(exist_ok=True)
+        return open_database(self.database_path)
 
 
 def stores_of(database: sqlite3.Connection) -> Stores:

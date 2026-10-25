@@ -4,6 +4,7 @@
 - web pages are read only where the site's robots.txt allows it."""
 
 import json
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -61,6 +62,8 @@ class WebClient:
         self.sleep = sleep
         self.clock = clock
         self.robots: dict[str, RobotFileParser] = {}
+        self.turns: dict[str, threading.Lock] = {}
+        self.turns_lock = threading.Lock()
 
     def get_json(
         self,
@@ -137,7 +140,13 @@ class WebClient:
             raise WebError(f"{request.host}: no answer ({error})") from error
 
     def _wait_turn(self, host: str) -> None:
-        pause = self.pacing.wait(host, self.clock())
-        if pause:
-            self.sleep(pause.total_seconds())
-        self.pacing.record(host, self.clock())
+        """One request at a time per host, also when several threads read the same site."""
+        with self._turn_of(host):
+            pause = self.pacing.wait(host, self.clock())
+            if pause:
+                self.sleep(pause.total_seconds())
+            self.pacing.record(host, self.clock())
+
+    def _turn_of(self, host: str) -> threading.Lock:
+        with self.turns_lock:
+            return self.turns.setdefault(host, threading.Lock())

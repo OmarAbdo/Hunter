@@ -1,5 +1,7 @@
+import itertools
 import json
 import threading
+import time
 from collections.abc import Iterator
 from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -88,6 +90,23 @@ def test_the_second_request_to_a_host_is_paced(
     client.get_json(f"{site}/jobs")
     assert len(waits) == 1
     assert 4 < waits[0] <= 5
+
+
+def test_requests_to_one_host_from_several_threads_still_take_turns(site: str) -> None:
+    client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=0.3))))
+    asked: list[float] = []
+
+    def ask() -> None:
+        client.get_json(f"{site}/jobs")
+        asked.append(time.monotonic())
+
+    threads = [threading.Thread(target=ask) for _ in range(3)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    asked.sort()
+    assert min(later - earlier for earlier, later in itertools.pairwise(asked)) >= 0.25
 
 
 def test_a_rate_limit_is_retried_after_the_time_it_asks_for(client: WebClient, site: str) -> None:
