@@ -119,14 +119,17 @@ def test_the_second_request_to_a_host_is_paced(
 
 def test_requests_to_one_host_from_several_threads_still_take_turns(site: str) -> None:
     """Measured where the site sees the requests: when each answer came back also depends on how
-    busy the machine is."""
+    busy the machine is. One request goes first, because the first request of a program also
+    looks up the system's proxy settings, which on Windows can take a quarter of a second."""
     client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=0.3))))
+    client.get_json(f"{site}/jobs")
     threads = [threading.Thread(target=client.get_json, args=(f"{site}/jobs",)) for _ in range(3)]
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
-    gaps = [later - earlier for earlier, later in itertools.pairwise(sorted(Site.arrivals))]
+    threaded = sorted(Site.arrivals)[1:]  # the threads' requests, after the first one
+    gaps = [later - earlier for earlier, later in itertools.pairwise(threaded)]
     assert min(gaps) >= 0.25
 
 
@@ -181,3 +184,15 @@ def test_a_site_asking_for_a_long_pause_is_not_asked_again(
         client.get_text(f"{site}/jobs")
     assert (Site.hits.get("/held"), Site.hits.get("/jobs")) == (1, None)
     assert waits == []
+
+
+def test_a_host_s_daily_cap_ends_its_requests_for_the_day(site: str) -> None:
+    host = site.removeprefix("http://")
+    once = PaceRule(min_gap=timedelta(0), per_day=1)
+    capped = Pacing({host: once}, default=PaceRule(min_gap=timedelta(0)))
+    client = WebClient(capped, sleep=lambda _: None)
+    client.get_json(f"{site}/jobs")
+    with pytest.raises(WebError, match="1 a day reached") as raised:
+        client.get_json(f"{site}/jobs?page=2")
+    assert not raised.value.retryable
+    assert Site.hits.get("/jobs?page=2") is None

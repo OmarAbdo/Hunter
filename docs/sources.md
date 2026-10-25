@@ -19,6 +19,27 @@ source before building its adapter, because access rules change.
 - **Every source has to earn its place.** Hunter counts each source's jobs found, matched to a
   campaign and applied to. A source that never leads to an application is dropped.
 
+## Rate limits
+
+What each source publishes about how often it may be asked, checked on 2026-10-25 in its docs and
+in its answers' headers. Hunter's own pace is in `PACES` (`adapters/sources/feed_table.py`): one
+request a second per host unless a source needs less. A `Retry-After` is always honoured; a site
+asking for more than 10 minutes isn't asked again in that run.
+
+| Source | What it publishes | Seen | Hunter's pace |
+|---|---|---|---|
+| Greenhouse (Job Board API) | No limit published | No rate headers | 1 a second |
+| Ashby (posting API) | No limit published | No rate headers | 1 a second |
+| Lever (postings API) | No limit for reading; 2 applications a second; its key API allows 10 a second | No rate headers | 1 a second |
+| Workable (public widget API) | No limit published; its key API allows 10 per 10 seconds | 429 after about 16 requests a second apart; after a day of probing, `Retry-After: 75335` (21 hours) for the whole host | 1 per 10 seconds, 100 a day; never guessed when probing |
+| Personio (XML feed) | No limit for the feed; 100 applications a minute per IP | No rate headers | 1 a second |
+| SmartRecruiters | 10 requests a second and 8 at once (its customer API) | No rate headers | 1 a second |
+| Recruitee (careers site API) | No limit published | No rate headers | 1 a second |
+| Teamtailor | 50 requests per 10 seconds (its key API; the RSS feed says nothing) | No rate headers | 1 a second |
+| Workday | No limit published | No rate headers | 1 a second |
+| Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
+| EURES | No limit published | No rate headers | 1 a second |
+
 ## Access kinds
 
 | Kind | What it is |

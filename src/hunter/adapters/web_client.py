@@ -17,7 +17,7 @@ from typing import Any
 from urllib.robotparser import RobotFileParser
 
 from hunter.adapters.web_answers import NO_ANSWER, decoded, retry_after
-from hunter.domain.pacing import Moment, Pacing
+from hunter.domain.pacing import CapReachedError, Moment, Pacing
 
 USER_AGENT = "Hunter/0.1 (personal job search)"
 TIMEOUT_SECONDS = 30
@@ -29,18 +29,25 @@ FORBIDDEN_STATUSES = frozenset({401, 403})
 
 
 class WebError(Exception):
-    """A failed request. `status` is the HTTP status, or None when no answer came."""
+    """A failed request. `status` is the HTTP status, or None when no answer came; a `final` one
+    isn't worth trying again, whatever its status."""
 
     def __init__(
-        self, message: str, status: int | None = None, retry_after: float | None = None
+        self,
+        message: str,
+        status: int | None = None,
+        retry_after: float | None = None,
+        *,
+        final: bool = False,
     ) -> None:
         super().__init__(message)
         self.status = status
         self.retry_after = retry_after
+        self.final = final
 
     @property
     def retryable(self) -> bool:
-        return self.status is None or self.status in RETRY_STATUSES
+        return not self.final and (self.status is None or self.status in RETRY_STATUSES)
 
 
 def when(moment: datetime) -> str:
@@ -149,7 +156,10 @@ class WebClient:
         """One request at a time per host, also when several threads read the same site."""
         with self._turn_of(host):
             now = self.clock()
-            pause = self.pacing.wait(host, now)
+            try:
+                pause = self.pacing.wait(host, now)
+            except CapReachedError as error:  # Hunter's own budget for the site, used up today
+                raise WebError(str(error), final=True) from error
             if pause.total_seconds() > LONGEST_PAUSE_SECONDS:
                 message = f"{host}: asked Hunter to wait until {when(now.wall + pause)}"
                 raise WebError(message, None, pause.total_seconds())
