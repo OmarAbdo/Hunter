@@ -25,8 +25,8 @@ def test_the_first_request_to_a_host_waits_for_nothing() -> None:
 
 def test_the_next_request_waits_out_the_rest_of_the_gap() -> None:
     hosts = pacing()
-    hosts.record("www.linkedin.com", at(0))
-    assert hosts.wait("www.linkedin.com", at(30)) == timedelta(seconds=90)
+    hosts.record("www.linkedin.com", at(10))
+    assert hosts.wait("www.linkedin.com", at(40)) == timedelta(seconds=90)
 
 
 def test_no_wait_once_the_gap_has_passed() -> None:
@@ -94,3 +94,20 @@ def test_a_shorter_pause_asked_later_does_not_end_a_longer_one() -> None:
     hosts.hold("apply.workable.com", NOON + 2 * HOUR)
     hosts.hold("apply.workable.com", NOON + timedelta(minutes=1))
     assert hosts.wait("apply.workable.com", at(0)) == 2 * HOUR
+
+
+def test_the_cap_counts_each_request_once() -> None:
+    hosts = Pacing({"apply.workable.com": PaceRule(timedelta(0), per_day=3)}, default=DEFAULT)
+    hosts.record("apply.workable.com", at(0))
+    hosts.record("apply.workable.com", at(1))
+    assert hosts.wait("apply.workable.com", at(2)) == timedelta(0)
+
+
+def test_a_cap_of_one_allows_one_again_the_next_day() -> None:
+    hosts = Pacing({"apply.workable.com": PaceRule(timedelta(0), per_day=1)}, default=DEFAULT)
+    hosts.record("apply.workable.com", at(0))
+    assert hosts.wait("apply.workable.com", at(86400)) == timedelta(0)
+
+
+def test_a_moment_is_a_value() -> None:
+    assert len({at(0), at(0)}) == 1
