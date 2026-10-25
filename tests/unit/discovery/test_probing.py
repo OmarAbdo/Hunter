@@ -35,3 +35,9 @@ def test_names_too_long_for_a_web_address_give_no_board() -> None:
     long_name = "Berufliche Schulen Potsdam der ASG Anerkannten Schulgesellschaft mbH"
     assert all(len(slug) <= 63 for slug in slugs(long_name))
     assert all(len(board.slug.split(".")[0]) <= 63 for board in board_candidates(long_name))
+
+
+def test_workable_is_not_guessed() -> None:
+    """Workable allows few requests a day, and blocked Hunter for 21 hours after a day of
+    guessing (2026-10-25). Its boards come from links."""
+    assert all(board.ats != "workable" for board in board_candidates("Redcare Pharmacy"))

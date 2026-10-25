@@ -181,3 +181,15 @@ def test_a_site_asking_for_a_long_pause_is_not_asked_again(
         client.get_text(f"{site}/jobs")
     assert (Site.hits.get("/held"), Site.hits.get("/jobs")) == (1, None)
     assert waits == []
+
+
+def test_a_host_s_daily_cap_ends_its_requests_for_the_day(site: str) -> None:
+    host = site.removeprefix("http://")
+    once = PaceRule(min_gap=timedelta(0), per_day=1)
+    capped = Pacing({host: once}, default=PaceRule(min_gap=timedelta(0)))
+    client = WebClient(capped, sleep=lambda _: None)
+    client.get_json(f"{site}/jobs")
+    with pytest.raises(WebError, match="1 a day reached") as raised:
+        client.get_json(f"{site}/jobs?page=2")
+    assert not raised.value.retryable
+    assert Site.hits.get("/jobs?page=2") is None

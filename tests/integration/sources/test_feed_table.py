@@ -16,6 +16,7 @@ def test_every_feed_has_a_web_address() -> None:
 
 
 def test_workable_is_read_slowly_enough_not_to_be_refused() -> None:
-    """Workable answered 429 after about 16 requests a second apart (2026-10-25); 12 three
-    seconds apart went through."""
-    assert PACES["apply.workable.com"].min_gap >= timedelta(seconds=3)
+    """Workable answered 429 after about 16 requests a second apart, and after a day of probing
+    asked for 21 hours' rest (2026-10-25). It publishes 10 requests per 10 seconds for its API."""
+    assert PACES["apply.workable.com"].min_gap >= timedelta(seconds=10)
+    assert PACES["apply.workable.com"].per_day == 100
