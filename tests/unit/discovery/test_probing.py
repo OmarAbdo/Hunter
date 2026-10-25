@@ -29,3 +29,9 @@ def test_every_guessable_system_is_tried_with_every_slug() -> None:
 
 def test_the_most_likely_board_comes_first() -> None:
     assert board_candidates("N26")[0] == Board(ats="greenhouse", slug="n26")
+
+
+def test_names_too_long_for_a_web_address_give_no_board() -> None:
+    long_name = "Berufliche Schulen Potsdam der ASG Anerkannten Schulgesellschaft mbH"
+    assert all(len(slug) <= 63 for slug in slugs(long_name))
+    assert all(len(board.slug.split(".")[0]) <= 63 for board in board_candidates(long_name))

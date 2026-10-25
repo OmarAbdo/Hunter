@@ -135,7 +135,9 @@ class WebClient:
                 return text
         except urllib.error.HTTPError as error:
             message = f"{request.host}: HTTP {error.code} for {request.full_url}"
-            raise WebError(message, error.code, retry_after(error.headers)) from error
+            pause = retry_after(error.headers)
+            error.close()  # an error answer is a response too; left open, it's closed at exit
+            raise WebError(message, error.code, pause) from error
         except (urllib.error.URLError, TimeoutError) as error:
             raise WebError(f"{request.host}: no answer ({error})") from error
 

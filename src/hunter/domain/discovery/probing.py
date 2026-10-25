@@ -12,6 +12,8 @@ from hunter.domain.discovery.identity import LEGAL_FORMS, company_words
 GUESSABLE = ("greenhouse", "ashby", "lever", "workable", "recruitee", "teamtailor")
 PERSONIO_DOMAINS = ("de", "com")
 WORDS = re.compile(r"[A-Za-z0-9]+")
+# The longest name a web address can have in one part, and so the longest slug any board can have.
+LONGEST_SLUG = 63
 
 
 def slugs(name: str) -> list[str]:
@@ -20,14 +22,15 @@ def slugs(name: str) -> list[str]:
     if not words:
         return []
     forms = ["".join(words), "-".join(words), "".join(word for word in words if word != "and")]
-    return list(dict.fromkeys(forms))
+    return [form for form in dict.fromkeys(forms) if len(form) <= LONGEST_SLUG]
 
 
 def capitalised(name: str) -> list[str]:
     """SmartRecruiters keeps the name's capitals: 'Redcare Pharmacy' -> Redcare-Pharmacy."""
     plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     words = [word for word in WORDS.findall(plain) if not LEGAL_FORMS.fullmatch(word.lower())]
-    return list(dict.fromkeys(form for form in ("-".join(words), "".join(words)) if form))
+    forms = ("-".join(words), "".join(words))
+    return [form for form in dict.fromkeys(forms) if form and len(form) <= LONGEST_SLUG]
 
 
 def board_candidates(name: str) -> list[Board]:

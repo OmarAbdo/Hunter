@@ -51,7 +51,7 @@ def kept(company: Company, found: Found, stores: ProbeStores, now: datetime) -> 
     couldn't be probed isn't logged, so it's tried again next time."""
     if isinstance(found, SourceUnavailableError):
         return ProbeResult(company=company.name, board=None, error=str(found))
-    if found:
+    if found and not stores.companies.owner_of(found):  # a board belongs to one company
         stores.companies.save(company.with_board(found).checked(found, FeedStatus.LIVE))
     stores.log.record(company.key, now)
     return ProbeResult(company=company.name, board=found)
