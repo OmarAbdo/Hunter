@@ -12,6 +12,10 @@ from hunter.adapters.web_client import USER_AGENT, WebClient, WebError
 from hunter.domain.pacing import Pacing, PaceRule
 
 ROBOTS = "User-agent: *\nDisallow: /private\n"
+ENCODED = {  # pages in encodings other than the plain UTF-8 of the rest
+    "/latin": (None, "Stellen für Entwickler".encode("latin-1")),  # Latin-1, said nowhere
+    "/unknown-encoding": ("text/html; charset=utf8mb4", "Stellen für Entwickler".encode()),
+}
 
 
 class Site(BaseHTTPRequestHandler):
@@ -31,14 +35,19 @@ class Site(BaseHTTPRequestHandler):
             self.answer(429, "slow down", retry_after="0")
         elif self.path == "/dropped":  # the site hangs up without an answer
             self.close_connection = True
-        elif self.path == "/latin":  # Latin-1 bytes in a page that says nothing of its encoding
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write("Stellen für Entwickler".encode("latin-1"))
+        elif self.path in ENCODED:
+            self.answer_bytes(*ENCODED[self.path])
         elif self.path in {"/busy", "/public", "/private"}:
             self.answer(200, "<html>a page</html>")
         else:
             self.answer(404, "missing")
+
+    def answer_bytes(self, content_type: str | None, body: bytes) -> None:
+        self.send_response(200)
+        if content_type:
+            self.send_header("Content-Type", content_type)
+        self.end_headers()
+        self.wfile.write(body)
 
     def answer_post(self) -> None:
         body = self.rfile.read(int(self.headers["Content-Length"]))
@@ -142,3 +151,7 @@ def test_a_site_that_hangs_up_is_no_answer(client: WebClient, site: str) -> None
         client.get_text(f"{site}/dropped")
     assert raised.value.status is None
     assert Site.hits["/dropped"] == 3  # tried again, like any request without an answer
+
+
+def test_an_encoding_python_does_not_know_is_read_as_utf_8(client: WebClient, site: str) -> None:
+    assert client.get_text(f"{site}/unknown-encoding") == "Stellen für Entwickler"
