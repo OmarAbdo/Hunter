@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from hunter.application.ports import SourceUnavailableError
-from hunter.application.probe import ProbeResult, ProbeStores, probe
+from hunter.application.probe import ProbeResult, ProbeStores, find_board, probe
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.company import Company, FeedStatus
 
@@ -16,7 +16,7 @@ class Boards:
         self.down = down
         self.asked: list[Board] = []
 
-    def exists(self, board: Board) -> bool:
+    def exists(self, board: Board, company: str) -> bool:
         self.asked.append(board)
         if self.down:
             raise SourceUnavailableError(f"{board.key}: no answer")
@@ -81,3 +81,11 @@ def test_a_company_that_could_not_be_probed_is_tried_again_next_time() -> None:
     assert result.error == "greenhouse:n26: no answer"
     assert isinstance(kept.log, Log)
     assert kept.log.probed == {}
+
+
+def test_finding_a_board_gives_the_board_none_or_why_it_could_not_tell() -> None:
+    found = Board(ats="ashby", slug="n26")
+    assert find_board(Company(name="N26"), Boards(found)) == found
+    assert find_board(Company(name="N26"), Boards()) is None
+    could_not = find_board(Company(name="N26"), Boards(down=True))
+    assert isinstance(could_not, SourceUnavailableError)

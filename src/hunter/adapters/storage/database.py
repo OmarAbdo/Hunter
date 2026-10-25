@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS boards (
     company_key TEXT NOT NULL REFERENCES companies (key)
 );
 
+CREATE TABLE IF NOT EXISTS probes (
+    company_key TEXT PRIMARY KEY,
+    probed_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS mail_marks (
     address TEXT NOT NULL,
     sender TEXT NOT NULL,

@@ -1,0 +1,4 @@
+id = "32"
+title = "Check guessed boards and keep the probe log"
+kind = "feature"
+scope = ["src/hunter/application/probe.py", "src/hunter/application/ports.py", "src/hunter/adapters/sources/feeds/board_check.py", "src/hunter/adapters/storage/probe_log.py", "src/hunter/adapters/storage/database.py"]
