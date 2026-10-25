@@ -14,9 +14,10 @@ from hunter.domain.pacing import PaceRule
 
 API = "https://apply.workable.com"
 HOST = "apply.workable.com"
-# Workable refuses (HTTP 429) after about 16 requests a second apart; 12 three seconds apart went
-# through (2026-10-25).
-PACE = PaceRule(min_gap=timedelta(seconds=3))
+# Workable publishes no limit for this public API; for its own API it allows 10 requests per 10
+# seconds. On 2026-10-25 it refused (HTTP 429) after about 16 requests a second apart, and after a
+# day of probing asked for 21 hours' rest. A request every 10 seconds, 100 a day, leaves room.
+PACE = PaceRule(min_gap=timedelta(seconds=10), per_day=100)
 
 
 class WorkableFeed:

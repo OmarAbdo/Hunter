@@ -1,0 +1,4 @@
+id = "47"
+title = "Keep within Workable's limits"
+kind = "fix"
+scope = ["src/hunter/adapters/web_client.py", "src/hunter/adapters/sources/workable.py", "src/hunter/domain/discovery/probing.py", "docs/**", "tests/**"]

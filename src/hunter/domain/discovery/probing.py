@@ -9,7 +9,8 @@ import unicodedata
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.identity import LEGAL_FORMS, company_words
 
-GUESSABLE = ("greenhouse", "ashby", "lever", "workable", "recruitee", "teamtailor")
+# Workable isn't guessed: it allows few requests a day, and its boards come in through links.
+GUESSABLE = ("greenhouse", "ashby", "lever", "recruitee", "teamtailor")
 PERSONIO_DOMAINS = ("de", "com")
 WORDS = re.compile(r"[A-Za-z0-9]+")
 # The longest name a web address can have in one part, and so the longest slug any board can have.
