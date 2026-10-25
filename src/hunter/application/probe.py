@@ -30,16 +30,27 @@ def probe(
 ) -> Iterator[ProbeResult]:
     """Each company's result as soon as it's probed, so a long probe can show progress."""
     for company in companies:
-        yield probed(company, check, stores, now)
+        yield kept(company, find_board(company, check), stores, now)
 
 
-def probed(company: Company, check: BoardCheck, stores: ProbeStores, now: datetime) -> ProbeResult:
+Found = Board | SourceUnavailableError | None
+
+
+def find_board(company: Company, check: BoardCheck) -> Found:
+    """The first likely board that's the company's, None when there's none, or why it couldn't
+    tell. Finding only asks the outside world, so several companies can be probed at once."""
+    candidates = board_candidates(company.name)
     try:
-        found = next(
-            (board for board in board_candidates(company.name) if check.exists(board)), None
-        )
+        return next((board for board in candidates if check.exists(board, company.name)), None)
     except SourceUnavailableError as error:
-        return ProbeResult(company=company.name, board=None, error=str(error))
+        return error
+
+
+def kept(company: Company, found: Found, stores: ProbeStores, now: datetime) -> ProbeResult:
+    """What a probe found, stored: the board as live, and the company as probed. A company that
+    couldn't be probed isn't logged, so it's tried again next time."""
+    if isinstance(found, SourceUnavailableError):
+        return ProbeResult(company=company.name, board=None, error=str(found))
     if found:
         stores.companies.save(company.with_board(found).checked(found, FeedStatus.LIVE))
     stores.log.record(company.key, now)

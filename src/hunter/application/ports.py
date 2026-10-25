@@ -51,9 +51,9 @@ class MatchStore(Protocol):
 
 
 class BoardCheck(Protocol):
-    def exists(self, board: Board) -> bool:
-        """Whether the board is there with jobs. Raises SourceUnavailableError when it can't
-        tell."""
+    def exists(self, board: Board, company: str) -> bool:
+        """Whether the board is there with the company's jobs. Raises SourceUnavailableError when
+        it can't tell."""
         ...
 
 
