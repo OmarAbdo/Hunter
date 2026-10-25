@@ -1,0 +1,4 @@
+id = "30"
+title = "A board belongs to one company"
+kind = "fix"
+scope = ["src/hunter/application/discover.py", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/alerts.py"]
