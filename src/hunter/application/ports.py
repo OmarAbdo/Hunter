@@ -59,3 +59,15 @@ class BoardCheck(Protocol):
 
 class ProbeLog(Protocol):
     def record(self, company_key: str, probed_at: datetime) -> None: ...
+
+
+class JobLinks(Protocol):
+    def unresolved(self) -> list[tuple[int, Posting]]:
+        """The jobs not yet known from the employer's own system, by id."""
+        ...
+
+    def employer_jobs(self, company_key: str) -> list[tuple[int, Posting]]:
+        """The jobs on the boards of the company, by id."""
+        ...
+
+    def merge(self, job_id: int, into: int) -> None: ...

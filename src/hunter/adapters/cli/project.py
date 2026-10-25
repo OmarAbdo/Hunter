@@ -7,10 +7,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.job_links import JobLinks
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool
 from hunter.adapters.storage.registry import Registry
 from hunter.application.discover import Stores
+from hunter.application.resolve import resolve
 
 
 @dataclass(frozen=True)
@@ -39,3 +41,8 @@ class Project:
 
 def stores_of(database: sqlite3.Connection) -> Stores:
     return Stores(jobs=Pool(database), companies=Registry(database), matches=Matches(database))
+
+
+def linked_jobs(database: sqlite3.Connection) -> int:
+    """Links job-board jobs to their employer's posting; how many it linked."""
+    return resolve(JobLinks(database))
