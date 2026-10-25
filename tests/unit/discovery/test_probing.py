@@ -23,6 +23,7 @@ def test_every_guessable_system_is_tried_with_every_slug() -> None:
     assert Board(ats="personio", slug="redcarepharmacy.de") in boards
     assert Board(ats="personio", slug="redcare-pharmacy.com") in boards
     assert Board(ats="smartrecruiters", slug="Redcare-Pharmacy") in boards
+    assert Board(ats="softgarden", slug="redcarepharmacy") in boards
     assert Board(ats="smartrecruiters", slug="RedcarePharmacy") in boards
     assert not [board for board in boards if board.ats == "workday"]
 

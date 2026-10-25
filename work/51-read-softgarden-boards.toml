@@ -1,0 +1,4 @@
+id = "51"
+title = "Read softgarden boards"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/feeds/**", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/sources/reading.py", "src/hunter/domain/discovery/boards.py", "src/hunter/domain/discovery/probing.py", "tests/**", "docs/**"]
