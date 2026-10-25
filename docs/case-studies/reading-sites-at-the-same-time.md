@@ -165,11 +165,13 @@ The same sources and about 15,000 postings took **85 seconds instead of 202** (#
 minute later on. Greenhouse alone still needs at least 35 seconds a run, since its 35 boards share
 one host at one request a second. Reading in parallel shortens a run to roughly its busiest host.
 
-## The flaky test (#43)
+## The flaky test (#43, #49, #51)
 
-A test checks rule 1 across threads: three threads ask one host with a 0.3-second gap, and the
-requests must be spaced at least 0.25 seconds apart. Its first version recorded the time **each
-thread got its answer back**:
+A test checks rule 1 across threads: three threads ask one host with a 0.3-second gap, and their
+requests must be spaced that far apart. It took three tries to make that test measure the right
+thing.
+
+**First: when each answer came back.**
 
 ```python
 def ask() -> None:
@@ -177,32 +179,53 @@ def ask() -> None:
     asked.append(time.monotonic())        # when the answer came back
 ```
 
-One day, on a machine busy with a long probe run, it failed: two answers came back 0.23 seconds
-apart. The pacing hadn't failed. A thread can be **scheduled late**: its request may wait to be
-sent after its turn, and its answer may wait to be read. So answers can bunch up even when the
-requests were spaced right. The test measured something the code never promised.
+On a machine busy with a long probe run, it failed: two answers came back 0.23 seconds apart. The
+pacing hadn't failed. A thread can be **scheduled late**: its request may wait to be sent after its
+turn, and its answer may wait to be read. So answers can bunch up even when the turns were spaced
+right. The test measured something the code never promised.
 
-The fix measures what the code does promise. The local test server notes when each request
-**arrives**:
+**Second: when each request reached the site (#43).** The local test server noted the arrival
+time of every request. That was closer, but still not the promise:
+
+- **After a restart, it failed every time.** Tracing showed the turns spaced exactly 0.3 seconds
+  apart, yet the program's first request arrived up to 0.27 seconds late. The reason was Python's
+  `urllib`, which looks up the system's proxy settings on first use, and on Windows that is slow.
+  Sending one request before the threads start fixed that (#49).
+- **During a full test run, it still failed now and then** (a 0.197-second gap). A thread can be
+  delayed between its turn and the moment its request leaves, by however busy the machine is.
+
+**Third: the turns themselves (#51).** Each turn reads the clock twice while it holds the host's
+lock: once before its pause, once as the turn is recorded. The test gives the web client a clock
+that notes every reading, and takes every second one as a turn:
 
 ```python
-def answer_get(self) -> None:
-    self.arrivals.append(time.monotonic())   # on the server, as each request arrives
+def clock() -> Moment:
+    now = moment_now()
+    readings.append(now.steady)
+    return now
+...
+turns = readings[1::2]
+assert min(gaps) >= 0.28  # Windows' monotonic clock ticks in steps of about 16 ms
 ```
 
-Arrival is still a little after the turn, so the test keeps 0.05 seconds of slack. The lesson:
-with threads, a test should observe the guarantee itself, as close to where it happens as
-possible, and not a side effect that depends on scheduling.
+That is exactly what the code promises, and a missing lock would still fail it: two threads would
+then both take their turn after the same pause.
 
-## The clock
+The lesson: with threads, observe the guarantee where it is made, not a side effect further down
+the line that depends on scheduling.
+
+## The clock (#49)
 
 Looking into the test raised a second question: **which clock measures the gap?** The web client
-asks for `datetime.now(UTC)`, the computer's wall clock. A wall clock can jump. Windows corrects
-it from time to time against a time server, and a jump back by a minute would make the next wait a
-minute longer, while a jump forward would shorten a gap. Gaps should be measured with a
-**monotonic clock** (`time.monotonic()`), which only ever moves forward and doesn't care what time
-it is. The daily cap still needs the calendar date, so it keeps the wall clock. That change is
-planned as its own item.
+used `datetime.now(UTC)`, the computer's wall clock. A wall clock can jump. Windows corrects it
+from time to time against a time server, so a jump back by a minute would make the next wait a
+minute longer, and a jump forward would shorten a gap.
+
+Since #49, `Pacing` is given a `Moment`, which is now on two clocks:
+- `wall`, the time of day, for the day of a daily cap and for a site's pause, since those name
+  times of day;
+- `steady`, from `time.monotonic()`, which only ever moves forward, for the gap since a host's
+  last request.
 
 ## When pacing isn't enough: a site that asked for a day
 
@@ -226,12 +249,12 @@ Since #46:
 - **Done:**
   - parallel reading (#29) and generic `in_parallel` (#33), used for probing too;
   - per-host turns and gaps;
-  - the arrival-time test (#43);
-  - holds for long pauses (#46).
-- **Next:**
-  - the monotonic clock for gaps;
-  - a daily budget for Workable, and leaving Workable out of probing's guesses;
-  - each source's published rate limits written down next to its feed.
+  - holds for long pauses (#46);
+  - a daily budget for Workable, and no more guessing on Workable when probing (#48);
+  - gaps on the monotonic clock (#49);
+  - the test that measures turns where they're taken (#51);
+  - each source's published rate limits, in `docs/sources.md`.
 - **Known limits:**
   - 8 workers is a first guess and hasn't been tuned;
-  - a hold lasts one run, so the next run asks the site once more and is told again.
+  - holds and daily counts last one run; the next run starts counting again and asks a held site
+    once more.
