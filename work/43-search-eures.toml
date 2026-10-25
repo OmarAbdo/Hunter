@@ -1,0 +1,4 @@
+id = "43"
+title = "Search EURES"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/**", "tests/integration/sources/**", "tests/fixtures/sources/eures-*", "docs/**"]
