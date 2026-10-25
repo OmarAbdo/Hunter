@@ -1,0 +1,4 @@
+id = "49"
+title = "Read d.vinci boards"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/feeds/**", "src/hunter/adapters/sources/feed_table.py", "src/hunter/domain/discovery/boards.py", "tests/**", "docs/**"]

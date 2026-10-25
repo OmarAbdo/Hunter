@@ -37,6 +37,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | Recruitee (careers site API) | No limit published | No rate headers | 1 a second |
 | Teamtailor | 50 requests per 10 seconds (its key API; the RSS feed says nothing) | No rate headers | 1 a second |
 | Workday | No limit published | No rate headers | 1 a second |
+| d.vinci (job publication list) | No limit published | No rate headers | 1 a second |
 | Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
 | EURES | No limit published | No rate headers | 1 a second |
 
@@ -63,6 +64,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | Recruitee | Feed: `{board}.recruitee.com/api/offers/` | 200 | All | Not in HQ |
 | Teamtailor | Feed: `{board}.teamtailor.com/jobs.rss` | 200 | All | Not in HQ |
 | Workday | Feed: `POST {tenant}.wd{n}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs` | 200 | All, mostly large employers | Not in HQ |
+| d.vinci | Feed: `{board}.dvinci-easy.com/jobPublication/list.json` | 200; a missing portal doesn't resolve | DE, AT | Built. German ATS. One portal can hold a group's companies; one opening can have several ads. Not guessed when probing: a missing portal gives no answer at all, so a guess can't be told from a site that's down |
 | JOIN | Alert and confirmation mails | Pages publish no job data | DE | No public feed found |
 | Bundesagentur für Arbeit | Search: `rest.arbeitsagentur.de/.../pc/v6/jobs`, header `X-API-Key: jobboerse-jobsuche` | 200 | DE | Built. Jobs within 25 km of the place, published in the last 30 days, 100 a page. No descriptions in the list. About two thirds are applied to on arbeitsagentur.de; the rest link to other job boards (jobexport, gute-jobs, get-in-it), rarely to the employer's own system |
 | EURES | Search: `POST europa.eu/eures/api/jv-searchengine/public/jv-search/search` | 200 | Every EU campaign | Built. Title search, last month, 50 a page; the place is a country or NUTS code (`nl`, `de3`). German jobs are the Bundesagentur's own (the id holds its reference), so they join those jobs; about half name the employer's website. Elsewhere jobs rarely name the employer, and only the region is given: 1,567 of 2,000 Dutch jobs got no city |
