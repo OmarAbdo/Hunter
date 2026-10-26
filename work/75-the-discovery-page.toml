@@ -1,0 +1,4 @@
+id = "75"
+title = "The discovery page"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/static/**", "tests/integration/gui/**"]
