@@ -1,5 +1,6 @@
-"""Hunter's database: one SQLite file in var/ for the pool, the company registry and the campaign
-matches. var/ is personal data and never committed (docs/discovery.md)."""
+"""Hunter's database: one SQLite file in var/ for the pool, the company registry, the campaign
+matches and the discovery runs' reports. var/ is personal data and never committed
+(docs/discovery.md)."""
 
 import sqlite3
 from pathlib import Path
@@ -59,6 +60,25 @@ CREATE TABLE IF NOT EXISTS matches (
     decided_at TEXT NOT NULL,
     PRIMARY KEY (job_id, campaign_id)
 );
+
+CREATE TABLE IF NOT EXISTS runs (
+    id INTEGER PRIMARY KEY,
+    started_at TEXT NOT NULL,
+    ended_at TEXT,
+    campaign_ids TEXT NOT NULL,
+    linked_jobs INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS run_sources (
+    id INTEGER PRIMARY KEY,
+    run_id INTEGER NOT NULL REFERENCES runs (id),
+    source TEXT NOT NULL,
+    fetched INTEGER NOT NULL,
+    new_jobs INTEGER NOT NULL,
+    taken TEXT NOT NULL,
+    error TEXT
+);
+CREATE INDEX IF NOT EXISTS run_sources_by_run ON run_sources (run_id);
 """
 
 

@@ -1,0 +1,4 @@
+id = "73"
+title = "Keep each discovery run's report"
+kind = "feature"
+scope = ["src/hunter/adapters/storage/run_log.py", "src/hunter/adapters/storage/database.py", "src/hunter/adapters/cli/discover_command.py", "tests/integration/test_run_log.py", "tests/integration/cli/test_discover_command.py"]
