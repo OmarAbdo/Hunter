@@ -1,5 +1,6 @@
 """Which companies to probe for a board: those with no board whose jobs the campaigns took, most
-taken first, and not probed yet. Those are the ones whose jobs Hunter will want to apply to."""
+taken first, and not probed yet, or not since they gained a website. Those are the ones whose jobs
+Hunter will want to apply to."""
 
 import sqlite3
 from collections import Counter
@@ -10,6 +11,7 @@ from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool
 from hunter.adapters.storage.probe_log import ProbeLog
 from hunter.adapters.storage.registry import Registry
+from hunter.application.probe import probe_marks
 from hunter.domain.discovery.company import Company
 from hunter.domain.discovery.identity import company_key
 
@@ -26,5 +28,5 @@ def companies_to_probe(project: Project, database: sqlite3.Connection, limit: in
     return [
         company
         for company in known
-        if company is not None and not company.boards and company.key not in probed
+        if company is not None and not company.boards and not set(probe_marks(company)) <= probed
     ][:limit]

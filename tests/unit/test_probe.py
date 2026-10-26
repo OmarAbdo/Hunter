@@ -1,7 +1,14 @@
 from datetime import UTC, datetime
 
 from hunter.application.ports import SourceUnavailableError
-from hunter.application.probe import ProbeResult, ProbeStores, find_board, probe
+from hunter.application.probe import (
+    ProbeResult,
+    ProbeStores,
+    find_board,
+    kept,
+    probe,
+    probe_marks,
+)
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.company import Company, FeedStatus
 
@@ -107,3 +114,39 @@ def test_a_board_another_company_owns_is_not_given_to_a_second_one() -> None:
     [result] = probe([Company(name="zvoove")], Boards(board), kept_, NOW)
     assert result.board == board
     assert companies.saved == {}
+
+
+class Pages:
+    """The links on each website's pages, as a careers-page reader would find them."""
+
+    def __init__(self, links: dict[str, list[str]]) -> None:
+        self.links_by_site = links
+
+    def links(self, website: str) -> list[str]:
+        return self.links_by_site.get(website, [])
+
+
+ACME = Company(name="Acme", website="https://acme.example")
+SITE = Pages(
+    {"https://acme.example": ["https://acme.example/team", "https://jobs.ashbyhq.com/acme"]}
+)
+
+
+def test_a_board_the_company_s_website_links_to_is_tried_first() -> None:
+    boards = Boards(Board(ats="ashby", slug="acme"), Board(ats="greenhouse", slug="acme"))
+    assert find_board(ACME, boards, SITE) == Board(ats="ashby", slug="acme")
+    assert boards.asked == [Board(ats="ashby", slug="acme")]
+
+
+def test_without_a_board_on_its_site_a_company_s_boards_are_still_guessed() -> None:
+    boards = Boards(Board(ats="greenhouse", slug="acme"))
+    assert find_board(ACME, boards, Pages({})) == Board(ats="greenhouse", slug="acme")
+
+
+def test_a_company_probed_with_its_website_is_marked_so() -> None:
+    """A company probed before it had a website is probed once more when it gains one."""
+    kept_stores = stores()
+    kept(ACME, find_board(ACME, Boards(), SITE), kept_stores, NOW)
+    assert isinstance(kept_stores.log, Log)
+    assert set(kept_stores.log.probed) == set(probe_marks(ACME)) == {"acme", "acme website"}
+    assert probe_marks(Company(name="Acme")) == ["acme"]

@@ -17,6 +17,8 @@ class FeedCheck:
         self.apis = apis
 
     def exists(self, board: Board, company: str) -> bool:
+        if board.ats not in FEEDS:  # a system Hunter can't read (JOIN), so nothing to check
+            return False
         feed = FEEDS[board.ats](self.web, board.slug, company, api=self.apis[board.ats])
         try:
             postings = feed.fetch()

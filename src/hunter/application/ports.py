@@ -71,3 +71,10 @@ class JobLinks(Protocol):
         ...
 
     def merge(self, job_id: int, into: int) -> None: ...
+
+
+class CareersPages(Protocol):
+    def links(self, website: str) -> list[str]:
+        """Every link on the website's home page and on its own careers pages; none when the site
+        can't be read."""
+        ...

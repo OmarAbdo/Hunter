@@ -109,8 +109,14 @@ Workable, JOIN and SmartRecruiters). Companies come in one at a time, through th
 The company registry grows from every company name and every link Hunter sees. For a company
 without a known board, Hunter looks in this order:
 1. **Links:** a link to an ATS on any job or in any mail names the board directly.
-2. **Likely board names:** Hunter tries them on every feed above.
-3. **The company's careers page:** Hunter looks for ATS links and `JobPosting` data.
+2. **The company's careers page** (built), where its website is known. Today EURES is the only
+   source that gives the website. Hunter reads the home page and up to two of the site's own
+   pages it calls careers ("Karriere", "Jobs"), and tries every board they link to, embed or name
+   in their code, first. A company is probed again once it gains a website. `JobPosting` data on
+   the pages isn't read yet.
+3. **Likely board names:** Hunter tries them on every system that answers a missing board with a
+   404: Greenhouse, Ashby, Lever, Recruitee, Teamtailor, softgarden, onlyfy, Personio and
+   SmartRecruiters. Workable isn't guessed.
 4. **A web search:** an AI step using Claude's own WebSearch, last.
 
 ## What's still to do outside the code

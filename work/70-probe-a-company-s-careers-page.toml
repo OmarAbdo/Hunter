@@ -1,0 +1,4 @@
+id = "70"
+title = "Probe a company's careers page"
+kind = "feature"
+scope = ["src/hunter/application/ports.py", "src/hunter/application/probe.py", "src/hunter/adapters/sources/feeds/careers_pages.py", "src/hunter/adapters/sources/feeds/board_check.py", "src/hunter/adapters/cli/probe_command.py", "src/hunter/adapters/cli/probe_targets.py", "tests/**", "docs/**"]
