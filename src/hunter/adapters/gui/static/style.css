@@ -58,6 +58,27 @@ select, input[type="search"] {
 }
 input[type="search"] { min-width: 280px; }
 
+h2 { font-size: 15px; margin: 20px 0 8px; }
+button.primary {
+  font: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+button.primary:disabled { opacity: 0.5; cursor: default; }
+pre {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+  max-height: 340px;
+  overflow: auto;
+  font: 12px/1.4 Consolas, monospace;
+}
+
 table { width: 100%; border-collapse: collapse; background: var(--surface); }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { position: sticky; top: 0; background: var(--surface); font-weight: 600; }

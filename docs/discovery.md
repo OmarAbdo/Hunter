@@ -101,7 +101,9 @@ project's environment: `doctrine check` builds it once.
 once. The icon opens Hunter's window without a console; `hunter gui` does the same from a console.
 The window is an Edge app window on a page Hunter serves on this computer only. It shows the
 pool's size, each campaign's jobs (filtered as you type) with where they were seen, and the
-companies with their boards. Closing the window stops Hunter about half a minute later.
+companies with their boards. Its Runs tab starts a discovery run, shows each source as it's read
+(the same lines `hunter discover` prints), and lists the latest runs with what they brought and
+which sources failed; one run at a time. Closing the window stops Hunter about half a minute later.
 
 ## Campaigns
 

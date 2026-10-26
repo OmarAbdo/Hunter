@@ -1,24 +1,26 @@
 import json
-import shutil
 import threading
+import time
 import urllib.request
 from collections.abc import Iterator
-from pathlib import Path
 
 import pytest
 
 from hunter.adapters.cli.project import Project
 from hunter.adapters.gui.server import gui_server
 
-REPOSITORY = Path(__file__).resolve().parents[3]
-
 
 @pytest.fixture
-def address(tmp_path: Path) -> Iterator[str]:
-    shutil.copytree(REPOSITORY / "campaigns", tmp_path / "campaigns")
-    server = gui_server(Project(tmp_path))
+def address(quiet_project: Project) -> Iterator[str]:
+    """The window's server for a project whose sources answer locally, with nothing."""
+    server = gui_server(quiet_project)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    yield f"http://127.0.0.1:{server.server_address[1]}"
+    url = f"http://127.0.0.1:{server.server_address[1]}"
+    yield url
+    for _ in range(200):  # a run a test started ends before its project goes
+        if not json.loads(read(f"{url}/api/runs/live")[2])["running"]:
+            break
+        time.sleep(0.05)
     server.shutdown()
 
 
@@ -55,3 +57,16 @@ def test_anything_else_is_not_found(address: str) -> None:
 
 def test_the_window_saying_it_is_open_is_heard(address: str) -> None:
     assert read(f"{address}/api/alive")[0] == 200
+
+
+def post(url: str) -> int:
+    request = urllib.request.Request(url, data=b"", method="POST")
+    with urllib.request.urlopen(request, timeout=10) as answer:
+        return int(answer.status)
+
+
+def test_a_run_can_be_started_and_followed(address: str) -> None:
+    assert post(f"{address}/api/runs") == 202
+    live = json.loads(read(f"{address}/api/runs/live")[2])
+    assert set(live) == {"running", "lines"}
+    assert isinstance(json.loads(read(f"{address}/api/runs")[2]), list)

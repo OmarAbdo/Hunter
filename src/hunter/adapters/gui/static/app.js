@@ -97,8 +97,46 @@ async function loadAll() {
   await loadCampaign();
 }
 
+const localTime = (moment) => new Date(moment).toLocaleString([], {
+  year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+});
+
+async function showRuns() {
+  const runs = await getJson("/api/runs");
+  byId("run-rows").replaceChildren(...runs.map((run) => {
+    const failed = run.sources.filter((source) => source.error);
+    const failedCell = cell(failed.length ? `${failed.length} of ${run.sources.length}` : "none");
+    failedCell.title = failed.map((source) => `${source.source}: ${source.error}`).join("\n");
+    return row(
+      cell(localTime(run.started_at)), cell(run.ended_at ? localTime(run.ended_at) : "not finished"),
+      cell(String(run.fetched)),
+      cell(String(run.new)), cell(String(run.taken)), failedCell, cell(String(run.linked)),
+    );
+  }));
+}
+
+async function followRun() {
+  const live = await getJson("/api/runs/live");
+  const lines = byId("run-lines");
+  lines.hidden = live.lines.length === 0;
+  lines.textContent = live.lines.join("\n");
+  lines.scrollTop = lines.scrollHeight;
+  byId("run").disabled = live.running;
+  byId("run-state").textContent = live.running ? "Running…" : "";
+  if (live.running) {
+    setTimeout(followRun, 1000);
+  } else if (live.lines.length) {
+    await Promise.all([showRuns(), loadAll()]);
+  }
+}
+
+async function startRun() {
+  await fetch("/api/runs", { method: "POST" });
+  followRun();
+}
+
 function showTab(name) {
-  for (const tab of ["jobs", "companies"]) {
+  for (const tab of ["jobs", "companies", "runs"]) {
     byId(tab).hidden = tab !== name;
     byId(`show-${tab}`).classList.toggle("active", tab === name);
   }
@@ -106,6 +144,10 @@ function showTab(name) {
 
 byId("show-jobs").addEventListener("click", () => showTab("jobs"));
 byId("show-companies").addEventListener("click", () => showTab("companies"));
+byId("show-runs").addEventListener("click", () => showTab("runs"));
+byId("run").addEventListener("click", startRun);
+showRuns();
+followRun();
 byId("campaign").addEventListener("change", loadCampaign);
 byId("job-filter").addEventListener("input", showJobs);
 byId("company-filter").addEventListener("input", showCompanies);

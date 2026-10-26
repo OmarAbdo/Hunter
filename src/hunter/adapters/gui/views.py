@@ -9,6 +9,8 @@ from typing import Any
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool, decoded
 from hunter.adapters.storage.registry import Registry
+from hunter.adapters.storage.run_log import RunLog
+from hunter.application.discover import SourceReport
 from hunter.domain.discovery.campaign import Campaign
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting
@@ -76,6 +78,38 @@ def companies_view(database: sqlite3.Connection) -> list[Any]:
         }
         for company in Registry(database).all()
     ]
+
+
+def runs_view(database: sqlite3.Connection, limit: int = 10) -> list[Any]:
+    """The latest discovery runs, the newest first, each with what its sources brought."""
+    runs = RunLog(database)
+    shown = []
+    for run in runs.latest(limit):
+        reports = runs.reports(run.run_id)
+        shown.append(
+            {
+                "id": run.run_id,
+                "started_at": run.started_at.isoformat(),
+                "ended_at": run.ended_at.isoformat() if run.ended_at else None,
+                "linked": run.linked_jobs,
+                "fetched": sum(report.fetched for report in reports),
+                "new": sum(report.new_jobs for report in reports),
+                "taken": sum(sum(report.taken.values()) for report in reports),
+                "failed": sum(1 for report in reports if report.error),
+                "sources": [source_of(report) for report in reports],
+            }
+        )
+    return shown
+
+
+def source_of(report: SourceReport) -> dict[str, Any]:
+    return {
+        "source": report.source,
+        "fetched": report.fetched,
+        "new": report.new_jobs,
+        "taken": sum(report.taken.values()),
+        "error": report.error,
+    }
 
 
 def pool_view(database: sqlite3.Connection) -> dict[str, int]:
