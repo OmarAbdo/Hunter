@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from hunter.adapters.credentials import Keys, keys_from
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.job_links import JobLinks
 from hunter.adapters.storage.matches import Matches
@@ -33,6 +34,10 @@ class Project:
     @property
     def database_path(self) -> Path:
         return self.root / "var" / "hunter.db"
+
+    def keys(self) -> Keys:
+        """The keyed search sources' keys, from the credentials file."""
+        return keys_from(self.accounts_path)
 
     def database(self) -> sqlite3.Connection:
         self.database_path.parent.mkdir(exist_ok=True)

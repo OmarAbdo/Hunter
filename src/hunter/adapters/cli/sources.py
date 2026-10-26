@@ -9,7 +9,7 @@ from hunter.adapters.cli.alerts import alert_sources_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.registry import Registry
 from hunter.adapters.sources.feed_table import APIS, FEEDS, PACES
-from hunter.adapters.sources.searches.search_table import searches_of
+from hunter.adapters.sources.searches.search_table import PACES as SEARCH_PACES, searches_of
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import JobSource
 from hunter.domain.discovery.boards import Board
@@ -22,8 +22,9 @@ PACE = PaceRule(min_gap=timedelta(seconds=1))
 def sources_of(
     project: Project, database: sqlite3.Connection, campaigns: list[Campaign]
 ) -> list[JobSource]:
-    """Raises LookupError for a search on a source Hunter doesn't know."""
-    searches = searches_of(WebClient(Pacing({}, default=PACE)), campaigns, project.apis)
+    """Raises LookupError for a search on a source Hunter doesn't know, or without its key."""
+    web = WebClient(Pacing(SEARCH_PACES, default=PACE))
+    searches = searches_of(web, campaigns, project.apis, project.keys())
     return [*feeds_of(project, database), *searches, *alert_sources_of(project)]
 
 
