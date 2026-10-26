@@ -7,7 +7,40 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<main id="app"><p>Hunter</p></main>
+<header>
+  <h1>Hunter <span class="part">Discovery</span></h1>
+  <p id="pool" class="muted"></p>
+</header>
+<nav>
+  <button id="show-jobs" class="tab active">Jobs</button>
+  <button id="show-companies" class="tab">Companies</button>
+</nav>
+<main>
+  <section id="jobs">
+    <div class="bar">
+      <select id="campaign" aria-label="Campaign"></select>
+      <input id="job-filter" type="search" placeholder="Filter by title, company or place">
+      <span id="job-count" class="muted"></span>
+    </div>
+    <p id="turned-down" class="muted"></p>
+    <table>
+      <thead><tr><th>Posted</th><th>Job</th><th>Company</th><th>Place</th><th>Work</th>
+        <th>Seen on</th><th>Employer's system</th></tr></thead>
+      <tbody id="job-rows"></tbody>
+    </table>
+  </section>
+  <section id="companies" hidden>
+    <div class="bar">
+      <input id="company-filter" type="search" placeholder="Filter by company">
+      <label><input id="with-boards" type="checkbox"> Only with a board</label>
+      <span id="company-count" class="muted"></span>
+    </div>
+    <table>
+      <thead><tr><th>Company</th><th>Boards</th><th>Website</th></tr></thead>
+      <tbody id="company-rows"></tbody>
+    </table>
+  </section>
+</main>
 <script src="/app.js"></script>
 </body>
 </html>
