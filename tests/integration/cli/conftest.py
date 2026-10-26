@@ -53,7 +53,10 @@ def run(project: Path, greenhouse: str) -> Run:
 
     def command(*arguments: str) -> tuple[int, str]:
         out = io.StringIO()
-        apis = {"greenhouse": greenhouse, "bundesagentur": greenhouse}
+        # Every search source the real campaigns name goes to the local server too, so no test
+        # reaches a real site; the keyed ones have no key here and are reported unavailable.
+        local = ("bundesagentur", "eures", "adzuna", "careerjet", "jooble", "usajobs", "uncareers")
+        apis = {"greenhouse": greenhouse, **dict.fromkeys(local, greenhouse)}
         status = main(list(arguments), project, apis=apis, out=out)
         return status, out.getvalue()
 

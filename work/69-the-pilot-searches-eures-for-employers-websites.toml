@@ -1,0 +1,4 @@
+id = "69"
+title = "The pilot searches EURES for employers' websites"
+kind = "chore"
+scope = ["campaigns/**", "tests/integration/test_campaign_files.py", "tests/integration/cli/conftest.py"]
