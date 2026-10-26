@@ -111,3 +111,8 @@ byId("job-filter").addEventListener("input", showJobs);
 byId("company-filter").addEventListener("input", showCompanies);
 byId("with-boards").addEventListener("change", showCompanies);
 loadAll();
+
+// Hunter stops once its window has been closed for a while; the page keeps saying it's open.
+const sayOpen = () => fetch("/api/alive");
+sayOpen();
+setInterval(sayOpen, 5000);

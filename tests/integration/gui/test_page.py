@@ -37,3 +37,9 @@ def test_the_page_has_light_and_dark_colours() -> None:
 
 def test_nothing_else_lives_next_to_the_page() -> None:
     assert {path.name for path in Path(STATIC).iterdir()} == {"index.html", "app.js", "style.css"}
+
+
+def test_the_page_keeps_saying_it_is_open() -> None:
+    """Hunter stops once its window has been closed for a while; the page says it's open."""
+    assert re.search(r'const sayOpen = \(\) => fetch\("/api/alive"\)', SCRIPT)
+    assert "setInterval(sayOpen, 5000)" in SCRIPT
