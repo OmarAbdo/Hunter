@@ -45,11 +45,12 @@ LINK_PATTERNS = tuple(
         ("rexx", r"//([a-z0-9-]+)-portal\.rexx-recruitment\.com\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
         # A SuccessFactors career site is on the company's own host, so it's known by the shape
-        # of its job links, `/job/<title>/<id>/`; it comes last, after every system with a host
-        # of its own.
+        # of its job links, `/job/<title>/<id>/` or `/job/<title>/<number>-<locale>`; it comes
+        # last, after every system with a host of its own.
         (
             "successfactors",
-            r"//([a-z0-9-]+(?:\.[a-z0-9-]+)+)/(?:[a-z]{2}(?:_[A-Z]{2})?/)?job/[^/?#]+/\d{8,}/",
+            r"//([a-z0-9-]+(?:\.[a-z0-9-]+)+)/(?:[a-z]{2}(?:_[A-Z]{2})?/)?job/[^/?#]+/"
+            r"(?:\d{8,}/|\d+-[a-z]{2}_[A-Z]{2})",
             "{0}",
         ),
     )
