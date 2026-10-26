@@ -10,6 +10,7 @@ from hunter.adapters.sources.searches import (
     careerjet,
     eures,
     jooble,
+    uncareers,
     usajobs,
 )
 from hunter.adapters.web_client import WebClient
@@ -21,6 +22,7 @@ from hunter.domain.pacing import PaceRule
 SEARCHES: dict[str, Callable[..., JobSource]] = {
     "bundesagentur": bundesagentur.BundesagenturSearch,
     "eures": eures.EuresSearch,
+    "uncareers": uncareers.UnCareersSearch,
 }
 # Sources that need a key: `[keys.<source>]` in var/accounts.toml.
 KEYED: dict[str, Callable[..., JobSource]] = {
@@ -35,6 +37,7 @@ APIS: dict[str, str] = {
     "careerjet": careerjet.API,
     "eures": eures.API,
     "jooble": jooble.API,
+    "uncareers": uncareers.API,
     "usajobs": usajobs.API,
 }
 PACES: dict[str, PaceRule] = {adzuna.HOST: adzuna.PACE}
