@@ -53,6 +53,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
 | Careerjet | No limit published | No rate headers | 1 a second |
 | USAJobs | No request rate published; at most 500 jobs a page and 10,000 a search | No rate headers | 1 a second |
+| UN Careers | No limit published | No rate headers; `cache-control: max-age=900` | 1 a second |
 | EURES | No limit published | No rate headers | 1 a second |
 
 ## Access kinds
@@ -87,7 +88,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | JOIN | Alert and confirmation mails | Pages publish no job data | DE | No public feed found |
 | Bundesagentur für Arbeit | Search: `rest.arbeitsagentur.de/.../pc/v6/jobs`, header `X-API-Key: jobboerse-jobsuche` | 200 | DE | Built. Jobs within 25 km of the place, published in the last 30 days, 100 a page. No descriptions in the list. About two thirds are applied to on arbeitsagentur.de; the rest link to other job boards (jobexport, gute-jobs, get-in-it), rarely to the employer's own system |
 | EURES | Search: `POST europa.eu/eures/api/jv-searchengine/public/jv-search/search` | 200 | Every EU campaign | Built. Title search, last month, 50 a page; the place is a country or NUTS code (`nl`, `de3`). German jobs are the Bundesagentur's own (the id holds its reference), so they join those jobs; about half name the employer's website. Elsewhere jobs rarely name the employer, and only the region is given: 1,567 of 2,000 Dutch jobs got no city |
-| UN Careers | Search: `careers.un.org/api/public/opening/jo/list/filteredV2/en` | 200 | Culture, diplomacy, internships | |
+| UN Careers | Search: `POST careers.un.org/api/public/opening/jo/list/filteredV2/en`, 100 a page from page 0; duty stations from `GET …/jo-filter/list/v2/en` | 200; no robots.txt (the path serves the app) | Culture, diplomacy, internships | Built. The UN Secretariat's open jobs; no key. The query is matched as one phrase in a job's text, duty station included. A campaign's place is a duty station ("Geneva", "New York", "Nairobi") or a country as the UN writes it ("Kenya", "United States of America"); empty means every station. Up to 300 jobs, newest first. The company is the UN entity, and the title carries the grade; internships and consultancies are marked, and a home-based work location makes a job remote |
 | Arbeitnow | Search: `www.arbeitnow.com/api/job-board-api` | 200 | DE | |
 | Himalayas, Remotive, We Work Remotely | Search (API or RSS) | 200 | Remote, US part-time | Remote only |
 | USAJobs | Keyed search: `data.usajobs.gov/api/search`, headers `User-Agent: <account mail>` and `Authorization-Key` | 200 with Omar's key | US | Built. US government jobs, at home and at posts abroad. Last 30 days, the place as `LocationName`, 100 a page, up to 3 pages. Every place a job names, read by its city alone, since states share names with towns; remote where marked, hybrid where telework is allowed. Links go to the job's usajobs.gov page, where it's applied to |

@@ -45,3 +45,9 @@ def test_every_keyed_source_built_is_wired_in(web: WebClient) -> None:
         keyed = replace(BERLIN, searches=(Search(source=source, query="x", country="US"),))
         [found] = searches_of(web, [keyed], {}, {source: key})
         assert found.name.startswith(f"{source}:x")
+
+
+def test_un_careers_is_wired_in(web: WebClient) -> None:
+    geneva = replace(BERLIN, searches=(Search(source="uncareers", query="intern", place="Geneva"),))
+    [found] = searches_of(web, [geneva], {}, {})
+    assert found.name == "uncareers:intern@Geneva"

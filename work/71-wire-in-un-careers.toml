@@ -1,0 +1,4 @@
+id = "71"
+title = "Wire in UN Careers"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/search_table.py", "docs/sources.md", "tests/integration/sources/test_search_table.py"]
