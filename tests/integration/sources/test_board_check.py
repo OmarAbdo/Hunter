@@ -36,3 +36,8 @@ def test_a_site_that_does_not_answer_can_not_tell() -> None:
     web = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(0))), sleep=lambda _: None)
     with pytest.raises(SourceUnavailableError):
         FeedCheck(web, {"greenhouse": "http://127.0.0.1:9"}).exists(N26, "N26")
+
+
+def test_a_board_on_a_system_without_a_feed_is_not_taken(web: WebClient) -> None:
+    """JOIN publishes no job data; a link to it found on a careers page can't be checked."""
+    assert not FeedCheck(web, {}).exists(Board(ats="join", slug="acme"), "Acme")

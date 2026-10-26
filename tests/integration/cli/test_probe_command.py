@@ -89,3 +89,14 @@ def test_each_result_is_one_line() -> None:
     assert result_line(ProbeResult(company="N26", board=None)) == "  N26: no board"
     could_not = ProbeResult(company="N26", board=None, error="greenhouse:n26: no answer")
     assert result_line(could_not) == "  N26: couldn't tell (greenhouse:n26: no answer)"
+
+
+def test_a_company_that_gains_a_website_is_probed_again(project: Path) -> None:
+    taken(Project(project), "N26")
+    database = Project(project).database()
+    ProbeLog(database).record("n26", NOW)
+    assert companies_to_probe(Project(project), database, 5) == []
+    Registry(database).save(Company(name="N26").with_website("https://n26.com"))
+    assert [company.name for company in companies_to_probe(Project(project), database, 5)] == [
+        "N26"
+    ]
