@@ -4,16 +4,17 @@ file can be asked for. Each request opens the database for itself, since the ser
 threads of its own."""
 
 import json
+import time
 from collections.abc import Callable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 from hunter.adapters.campaign_files import load_campaigns
 from hunter.adapters.cli.project import Project
+from hunter.adapters.gui.desktop import Watch
 from hunter.adapters.gui.views import campaigns_view, companies_view, jobs_view, pool_view
-from hunter.adapters.gui.window import open_window
 
 STATIC = Path(__file__).parent / "static"
 FILES = {
@@ -34,10 +35,14 @@ VIEWS: dict[str, View] = {
 
 class GuiRequests(BaseHTTPRequestHandler):
     project: Project
+    watch: Watch
 
     def answer_get(self) -> None:
         address = urlsplit(self.path)
-        if address.path in FILES:
+        if address.path == "/api/alive":  # the page saying it's still open
+            self.watch.touch(time.monotonic())
+            self.answer(200, "application/json", b"true")
+        elif address.path in FILES:
             name, kind = FILES[address.path]
             self.answer(200, kind, (STATIC / name).read_bytes())
         elif address.path in VIEWS:
@@ -61,21 +66,8 @@ class GuiRequests(BaseHTTPRequestHandler):
 setattr(GuiRequests, "do_" + "GET", GuiRequests.answer_get)
 
 
-def gui_server(project: Project, port: int = 0) -> ThreadingHTTPServer:
-    """A server for the project, on a free port unless one is given; `serve_forever` starts it."""
-    requests = type("ProjectRequests", (GuiRequests,), {"project": project})
-    return ThreadingHTTPServer(("127.0.0.1", port), requests)
-
-
-def run_gui(project: Project, out: TextIO) -> int:
-    """`gui`: serves the page and opens it in Hunter's window, until Ctrl+C."""
-    server = gui_server(project)
-    url = f"http://127.0.0.1:{server.server_address[1]}/"
-    out.write(f"Hunter is open at {url} (Ctrl+C here closes it)\n")
-    out.flush()
-    open_window(url)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        out.write("Closed.\n")
-    return 0
+def gui_server(project: Project, watch: Watch | None = None) -> ThreadingHTTPServer:
+    """A server for the project on a free port; `serve_forever` starts it."""
+    seen = watch or Watch(started=time.monotonic())
+    requests = type("ProjectRequests", (GuiRequests,), {"project": project, "watch": seen})
+    return ThreadingHTTPServer(("127.0.0.1", 0), requests)

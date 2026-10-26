@@ -51,3 +51,7 @@ def test_a_campaign_s_jobs_and_the_companies_and_the_pool_come_as_json(address: 
 def test_anything_else_is_not_found(address: str) -> None:
     assert read(f"{address}/api/nothing")[0] == 404
     assert read(f"{address}/../var/accounts.toml")[0] == 404
+
+
+def test_the_window_saying_it_is_open_is_heard(address: str) -> None:
+    assert read(f"{address}/api/alive")[0] == 200
