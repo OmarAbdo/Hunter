@@ -1,4 +1,5 @@
 from dataclasses import replace
+from datetime import UTC, datetime, timedelta
 
 from hunter.domain.discovery.campaign import Campaign, Rejection, Search
 from hunter.domain.discovery.location import Location, Workplace
@@ -114,3 +115,28 @@ def test_a_campaign_names_its_searches() -> None:
 
 def test_a_search_names_no_country_unless_it_says() -> None:
     assert Search(source="bundesagentur", query="Softwareentwickler").country == ""
+
+
+NOW = datetime(2026, 10, 26, 12, 0, tzinfo=UTC)
+
+
+def test_a_job_older_than_the_campaign_allows_is_turned_down() -> None:
+    fresh_only = replace(PILOT, max_age_days=30)
+    old = replace(JOB, posted_at=NOW - timedelta(days=31))
+    assert fresh_only.rejects(old, NOW) is Rejection.TOO_OLD
+    assert fresh_only.rejects(replace(old, posted_at=NOW - timedelta(days=30)), NOW) is None
+
+
+def test_a_job_of_unknown_age_is_taken() -> None:
+    fresh_only = replace(PILOT, max_age_days=30)
+    assert fresh_only.rejects(replace(JOB, posted_at=None), NOW) is None
+
+
+def test_a_campaign_without_an_age_limit_takes_old_jobs() -> None:
+    old = replace(JOB, posted_at=NOW - timedelta(days=400))
+    assert PILOT.rejects(old, NOW) is None
+
+
+def test_age_is_judged_only_when_the_time_is_given() -> None:
+    old = replace(JOB, posted_at=NOW - timedelta(days=400))
+    assert replace(PILOT, max_age_days=30).rejects(old) is None

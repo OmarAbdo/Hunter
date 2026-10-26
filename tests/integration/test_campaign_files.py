@@ -127,3 +127,10 @@ country = "DE"
     (tmp_path / "keyed.toml").write_text(DUBAI + search, encoding="utf-8")
     [found] = load_campaign(tmp_path / "keyed.toml").searches
     assert found == Search(source="adzuna", query="software engineer", place="Berlin", country="DE")
+
+
+def test_a_campaign_can_limit_the_age_of_its_jobs(tmp_path: Path) -> None:
+    (tmp_path / "fresh.toml").write_text(DUBAI + "max_age_days = 30\n", encoding="utf-8")
+    assert load_campaign(tmp_path / "fresh.toml").max_age_days == 30
+    (tmp_path / "plain.toml").write_text(DUBAI, encoding="utf-8")
+    assert load_campaign(tmp_path / "plain.toml").max_age_days is None

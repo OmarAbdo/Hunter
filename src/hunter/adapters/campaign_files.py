@@ -11,7 +11,15 @@ from hunter.domain.discovery.location import Workplace
 from hunter.domain.discovery.posting import Employment
 
 REQUIRED = ("title", "home", "countries")
-OPTIONAL = ("cities", "workplaces", "employment", "roles", "excluded_roles", "searches")
+OPTIONAL = (
+    "cities",
+    "workplaces",
+    "employment",
+    "roles",
+    "excluded_roles",
+    "searches",
+    "max_age_days",
+)
 SEARCH_SETTINGS = ("source", "query", "place", "country")
 
 
@@ -54,6 +62,7 @@ def campaign_from(campaign_id: str, settings: dict[str, Any]) -> Campaign:
         employment=frozenset(map(Employment, settings.get("employment", []))),
         roles=tuple(settings.get("roles", [])),
         excluded_roles=tuple(settings.get("excluded_roles", [])),
+        max_age_days=settings.get("max_age_days"),
         searches=tuple(map(search_from, settings.get("searches", []))),
     )
 
