@@ -1,0 +1,4 @@
+id = "77"
+title = "Run discovery from the window"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/**", "tests/integration/gui/**", "docs/discovery.md"]

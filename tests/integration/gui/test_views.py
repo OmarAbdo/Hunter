@@ -3,7 +3,15 @@ from pathlib import Path
 
 import pytest
 
-from hunter.adapters.gui.views import campaigns_view, companies_view, jobs_view, pool_view
+from hunter.adapters.gui.views import (
+    campaigns_view,
+    companies_view,
+    jobs_view,
+    pool_view,
+    runs_view,
+)
+from hunter.adapters.storage.run_log import RunLog
+from hunter.application.discover import SourceReport
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool
@@ -91,3 +99,21 @@ def test_companies_show_their_boards_and_website(database_path: Path) -> None:
 
 def test_the_pool_is_counted(database_path: Path) -> None:
     assert pool_view(open_database(database_path)) == {"jobs": 2, "companies": 1, "boards": 1}
+
+
+def test_the_latest_runs_come_with_what_each_source_brought(database_path: Path) -> None:
+    database = open_database(database_path)
+    runs = RunLog(database, clock=lambda: NOW)
+    run = runs.start(["berlin"])
+    runs.record(run.run_id, SourceReport("greenhouse:n26", 3, 2, {"berlin": 1}))
+    runs.record(run.run_id, SourceReport("greenhouse:gone", error="HTTP 404"))
+    runs.finish(run.run_id, linked_jobs=4)
+    [shown] = runs_view(database)
+    # In UTC; the page shows them in the computer's own time.
+    assert shown["started_at"] == shown["ended_at"] == "2026-10-26T12:00:00+00:00"
+    assert (shown["fetched"], shown["new"], shown["taken"], shown["failed"]) == (3, 2, 1, 1)
+    assert shown["linked"] == 4
+    assert shown["sources"] == [
+        {"source": "greenhouse:n26", "fetched": 3, "new": 2, "taken": 1, "error": None},
+        {"source": "greenhouse:gone", "fetched": 0, "new": 0, "taken": 0, "error": "HTTP 404"},
+    ]

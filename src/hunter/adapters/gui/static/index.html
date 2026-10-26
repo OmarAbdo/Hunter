@@ -14,6 +14,7 @@
 <nav>
   <button id="show-jobs" class="tab active">Jobs</button>
   <button id="show-companies" class="tab">Companies</button>
+  <button id="show-runs" class="tab">Runs</button>
 </nav>
 <main>
   <section id="jobs">
@@ -38,6 +39,19 @@
     <table>
       <thead><tr><th>Company</th><th>Boards</th><th>Website</th></tr></thead>
       <tbody id="company-rows"></tbody>
+    </table>
+  </section>
+  <section id="runs" hidden>
+    <div class="bar">
+      <button id="run" class="primary">Run discovery</button>
+      <span id="run-state" class="muted"></span>
+    </div>
+    <pre id="run-lines" hidden></pre>
+    <h2>Recent runs</h2>
+    <table>
+      <thead><tr><th>Started</th><th>Ended</th><th>Fetched</th><th>New</th><th>Taken</th>
+        <th>Failed sources</th><th>Linked</th></tr></thead>
+      <tbody id="run-rows"></tbody>
     </table>
   </section>
 </main>
