@@ -1,0 +1,7 @@
+{"status": 1, "message": "Success.", "data": {"jl": {"name": "Job Locations", "shortname": "jl", "type": "checkbox", "values": [
+{"name": "Bangkok", "code": "BANGKOK", "countryName": "Thailand", "inspiraDutyStations": [{"code": "4200", "name": "BANGKOK"}], "isActive": true},
+{"name": "Geneva", "code": "Geneva", "countryName": "Switzerland", "inspiraDutyStations": [{"code": "5750", "name": "GENEVA"}, {"code": "5750", "name": "GENEVA"}, {"code": "575A", "name": "GENEVA - HISTORICAL"}], "isActive": true},
+{"name": "Nairobi", "code": "NAIROBI", "countryName": "Kenya", "inspiraDutyStations": [{"code": "2400", "name": "NAIROBI"}, {"code": "D1563", "name": "Nairobi"}, {"code": "D1531", "name": "Nairobi"}], "isActive": true},
+{"name": "OTHER", "code": "OTHER", "countryName": "ALL", "inspiraDutyStations": [{"code": "0000", "name": "OTHER"}, {"code": "5750", "name": "GENEVA"}, {"code": "5750", "name": "GENEVA"}], "isActive": true},
+{"name": "Santiago", "code": "SANTIAGO", "countryName": "Chile", "inspiraDutyStations": [{"code": "0840", "name": "SANTIAGO"}], "isActive": true}
+], "hidden": true}}}

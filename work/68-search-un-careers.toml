@@ -1,0 +1,4 @@
+id = "68"
+title = "Search UN Careers"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/uncareers.py", "tests/integration/sources/test_uncareers.py", "tests/fixtures/sources/uncareers-*"]
