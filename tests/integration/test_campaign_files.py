@@ -114,3 +114,16 @@ source = "eures"
 def test_the_pilot_campaign_searches_the_bundesagentur() -> None:
     pilot = load_campaign(CAMPAIGNS / "de-swe-berlin.toml")
     assert {search.source for search in pilot.searches} == {"bundesagentur"}
+
+
+def test_a_search_can_name_a_country(tmp_path: Path) -> None:
+    search = """
+[[searches]]
+source = "adzuna"
+query = "software engineer"
+place = "Berlin"
+country = "DE"
+"""
+    (tmp_path / "keyed.toml").write_text(DUBAI + search, encoding="utf-8")
+    [found] = load_campaign(tmp_path / "keyed.toml").searches
+    assert found == Search(source="adzuna", query="software engineer", place="Berlin", country="DE")
