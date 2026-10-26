@@ -1,0 +1,4 @@
+id = "72"
+title = "Take Adzuna out of the pilot"
+kind = "chore"
+scope = ["campaigns/**", "tests/integration/test_campaign_files.py", "docs/sources.md"]
