@@ -4,6 +4,7 @@ every job it turns down gets a reason that can be counted."""
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from enum import Enum
 
 from hunter.domain.discovery.identity import text_key
@@ -17,6 +18,7 @@ class Rejection(Enum):
     WORKPLACE = "workplace"
     PLACE = "place"
     EMPLOYMENT = "employment"
+    TOO_OLD = "too-old"
 
 
 def mentions_any(title: str, patterns: Iterable[str]) -> bool:
@@ -45,8 +47,9 @@ class Campaign:
     - `employment`: the employment types it takes; none means any.
     - `searches`: what it looks for on search sources (the Bundesagentur, EURES); company feeds
       need none, they're read for every campaign.
-    A job with an unknown workplace counts as onsite; an unknown employment type is taken. A job
-    open in several places is taken when one of them fits.
+    - `max_age_days`: how long ago a job may have been posted; none means any age.
+    A job with an unknown workplace counts as onsite; an unknown employment type is taken, and so
+    is a job of unknown age. A job open in several places is taken when one of them fits.
     """
 
     id: str
@@ -59,14 +62,23 @@ class Campaign:
     roles: tuple[str, ...] = ()
     excluded_roles: tuple[str, ...] = ()
     searches: tuple[Search, ...] = ()
+    max_age_days: int | None = None
 
-    def rejects(self, posting: Posting) -> Rejection | None:
-        """Why the campaign turns the job down, or None when the job is the campaign's own."""
+    def rejects(self, posting: Posting, now: datetime | None = None) -> Rejection | None:
+        """Why the campaign turns the job down, or None when the job is the campaign's own. A
+        job's age is judged only when `now` is given."""
         return (
             self._role_rejection(posting.title)
             or self._places_rejection(posting.locations)
             or self._employment_rejection(posting.employment)
+            or self._age_rejection(posting.posted_at, now)
         )
+
+    def _age_rejection(self, posted_at: datetime | None, now: datetime | None) -> Rejection | None:
+        if self.max_age_days is None or posted_at is None or now is None:
+            return None
+        too_old = now - posted_at > timedelta(days=self.max_age_days)
+        return Rejection.TOO_OLD if too_old else None
 
     def _places_rejection(self, locations: tuple[Location, ...]) -> Rejection | None:
         """One place that fits is enough; when none fits, the main place's reason counts."""

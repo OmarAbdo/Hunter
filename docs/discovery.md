@@ -123,6 +123,10 @@ committed.
 A search two campaigns share is read once. A search on a source Hunter doesn't know stops the run
 before anything is read.
 
+`max_age_days = 30` turns down jobs posted longer ago than that, as "too-old"; a job whose source
+gives no date is taken. A job is judged once, when it first comes in, so a job taken while fresh
+stays taken.
+
 ## Build order (one item each)
 
 1. **Domain:** `Posting`, `Location`, job keys, `Company`, `Campaign` and matching.

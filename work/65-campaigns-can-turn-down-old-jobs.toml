@@ -1,0 +1,4 @@
+id = "65"
+title = "Campaigns can turn down old jobs"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/campaign.py", "src/hunter/adapters/campaign_files.py", "src/hunter/application/discover.py", "tests/unit/**", "tests/integration/test_campaign_files.py", "docs/discovery.md"]

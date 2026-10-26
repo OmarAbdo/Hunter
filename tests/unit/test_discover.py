@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass, field, replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from hunter.application.discover import Stores, discover, discover_each
 from hunter.application.ports import SourceUnavailableError
@@ -161,3 +161,11 @@ def test_a_company_keeps_the_website_a_source_names() -> None:
     company = kept.companies.get("nextcloud")
     assert company is not None
     assert company.website == "https://nextcloud.com"
+
+
+def test_a_campaign_judges_a_job_s_age_at_the_time_of_the_run() -> None:
+    fresh_only = replace(BERLIN, max_age_days=7)
+    old = replace(JOB, posted_at=NOW - timedelta(days=10))
+    kept = stores()
+    [report] = discover([Feed("greenhouse:nextcloud", [old])], [fresh_only], kept, NOW)
+    assert report.taken == {}

@@ -117,7 +117,7 @@ class Discovery:
         for campaign in self.campaigns:
             if self.stores.matches.decided(pooled.job_id, campaign.id):
                 continue
-            rejection = campaign.rejects(posting)
+            rejection = campaign.rejects(posting, now)
             self.stores.matches.record(pooled.job_id, campaign.id, rejection, now)
             if rejection is None:
                 report.taken[campaign.id] = report.taken.get(campaign.id, 0) + 1
