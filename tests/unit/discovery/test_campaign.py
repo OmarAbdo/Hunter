@@ -140,3 +140,28 @@ def test_a_campaign_without_an_age_limit_takes_old_jobs() -> None:
 def test_age_is_judged_only_when_the_time_is_given() -> None:
     old = replace(JOB, posted_at=NOW - timedelta(days=400))
     assert replace(PILOT, max_age_days=30).rejects(old) is None
+
+
+ENGLISH_AD = (
+    "We are looking for an engineer to join our team. You will work with us on the platform and "
+    "you are responsible for the quality of the software that we build with our customers."
+)
+GERMAN_AD = (
+    "Wir suchen eine Entwicklerin oder einen Entwickler für unser Team. Du arbeitest mit uns an "
+    "der Plattform und bist für die Qualität der Software verantwortlich, die wir bauen."
+)
+
+
+def test_a_job_ad_in_a_language_the_campaign_does_not_work_in_is_turned_down() -> None:
+    english_only = replace(PILOT, languages=frozenset({"en"}))
+    assert english_only.rejects(replace(JOB, description=GERMAN_AD)) is Rejection.LANGUAGE
+    assert english_only.rejects(replace(JOB, description=ENGLISH_AD)) is None
+
+
+def test_a_job_ad_whose_language_cannot_be_told_is_taken() -> None:
+    english_only = replace(PILOT, languages=frozenset({"en"}))
+    assert english_only.rejects(replace(JOB, description="")) is None
+
+
+def test_a_campaign_without_languages_takes_every_language() -> None:
+    assert PILOT.rejects(replace(JOB, description=GERMAN_AD)) is None
