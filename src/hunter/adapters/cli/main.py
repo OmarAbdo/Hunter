@@ -1,5 +1,5 @@
-"""`python -m hunter boards add <link>... [--company NAME]`, `boards probe [--limit N]` and
-`discover [--campaign ID]...`, run from the project folder."""
+"""`python -m hunter boards add <link>... [--company NAME]`, `boards probe [--limit N]`,
+`discover [--campaign ID]...` and `gui`, run from the project folder."""
 
 import argparse
 import sys
@@ -11,6 +11,7 @@ from hunter.adapters.cli.boards_command import add_boards
 from hunter.adapters.cli.discover_command import run_discovery
 from hunter.adapters.cli.probe_command import run_probe
 from hunter.adapters.cli.project import Project
+from hunter.adapters.gui.server import run_gui
 
 
 def parser() -> argparse.ArgumentParser:
@@ -26,6 +27,7 @@ def parser() -> argparse.ArgumentParser:
     probe.add_argument("--limit", type=int, default=20, help="companies probed in one run")
     discover = commands.add_parser("discover", help="read every source for the campaigns")
     discover.add_argument("--campaign", action="append", default=[], help="all when left out")
+    commands.add_parser("gui", help="open Hunter's window")
     return root
 
 
@@ -41,4 +43,6 @@ def main(
         return run_probe(project, chosen.limit, out)
     if chosen.command == "boards":
         return add_boards(project, chosen.links, chosen.company, out)
+    if chosen.command == "gui":
+        return run_gui(project, out)
     return run_discovery(project, chosen.campaign, out)
