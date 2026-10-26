@@ -1,0 +1,282 @@
+Date : 2026-10-26 13:24:43
+Directory : d:\1 Software\Projects\Hunter
+Total : 213 files,  6567 codes, 401 comments, 2028 blanks, all 8996 lines
+
+Languages
++--------------+------------+------------+------------+------------+------------+
+| language     | files      | code       | comment    | blank      | total      |
++--------------+------------+------------+------------+------------+------------+
+| Python       |        127 |      5,563 |        374 |      1,818 |      7,755 |
+| Markdown     |          5 |        418 |          4 |        104 |        526 |
+| TOML         |         56 |        339 |          8 |         74 |        421 |
+| YAML         |          4 |         76 |         10 |         13 |         99 |
+| JSON         |         11 |         64 |          0 |         11 |         75 |
+| XML          |          3 |         54 |          0 |          1 |         55 |
+| HTML         |          4 |         30 |          0 |          4 |         34 |
+| Batch        |          1 |         12 |          2 |          1 |         15 |
+| Shell Script |          1 |          8 |          3 |          1 |         12 |
+| JSON Lines   |          1 |          3 |          0 |          1 |          4 |
++--------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                     | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                        |        213 |      6,567 |        401 |      2,028 |      8,996 |
+| . (Files)                                                                                                |          6 |         59 |         10 |         13 |         82 |
+| .github                                                                                                  |          4 |         74 |         12 |         16 |        102 |
+| .github (Files)                                                                                          |          1 |          4 |          4 |          4 |         12 |
+| .github\workflows                                                                                        |          3 |         70 |          8 |         12 |         90 |
+| campaigns                                                                                                |          1 |        103 |          5 |         15 |        123 |
+| docs                                                                                                     |          3 |        405 |          0 |         96 |        501 |
+| docs (Files)                                                                                             |          2 |        198 |          0 |         42 |        240 |
+| docs\case-studies                                                                                        |          1 |        207 |          0 |         54 |        261 |
+| metrics                                                                                                  |          1 |          3 |          0 |          1 |          4 |
+| src                                                                                                      |         73 |      2,819 |        336 |        767 |      3,922 |
+| src\hunter                                                                                               |         73 |      2,819 |        336 |        767 |      3,922 |
+| src\hunter (Files)                                                                                       |          2 |          4 |          1 |          5 |         10 |
+| src\hunter\adapters                                                                                      |         53 |      2,253 |        221 |        546 |      3,020 |
+| src\hunter\adapters (Files)                                                                              |          8 |        401 |         46 |        107 |        554 |
+| src\hunter\adapters\cli                                                                                  |         11 |        302 |         34 |         87 |        423 |
+| src\hunter\adapters\mail                                                                                 |          2 |         58 |          8 |         17 |         83 |
+| src\hunter\adapters\sources                                                                              |         24 |      1,171 |        108 |        262 |      1,541 |
+| src\hunter\adapters\sources (Files)                                                                      |         11 |        566 |         48 |        127 |        741 |
+| src\hunter\adapters\sources\feeds                                                                        |          8 |        395 |         38 |         88 |        521 |
+| src\hunter\adapters\sources\searches                                                                     |          5 |        210 |         22 |         47 |        279 |
+| src\hunter\adapters\storage                                                                              |          8 |        321 |         25 |         73 |        419 |
+| src\hunter\application                                                                                   |          5 |        187 |         36 |         72 |        295 |
+| src\hunter\domain                                                                                        |         13 |        375 |         78 |        144 |        597 |
+| src\hunter\domain (Files)                                                                                |          3 |         79 |         16 |         32 |        127 |
+| src\hunter\domain\discovery                                                                              |         10 |        296 |         62 |        112 |        470 |
+| tests                                                                                                    |         72 |      2,892 |         38 |      1,067 |      3,997 |
+| tests\fixtures                                                                                           |         17 |        147 |          0 |         15 |        162 |
+| tests\fixtures\sources                                                                                   |         17 |        147 |          0 |         15 |        162 |
+| tests\integration                                                                                        |         40 |      1,968 |         31 |        706 |      2,705 |
+| tests\integration (Files)                                                                                |         12 |        738 |         12 |        246 |        996 |
+| tests\integration\cli                                                                                    |          7 |        316 |          8 |        106 |        430 |
+| tests\integration\sources                                                                                |         21 |        914 |         11 |        354 |      1,279 |
+| tests\unit                                                                                               |         15 |        777 |          7 |        346 |      1,130 |
+| tests\unit (Files)                                                                                       |          7 |        474 |          4 |        205 |        683 |
+| tests\unit\discovery                                                                                     |          8 |        303 |          3 |        141 |        447 |
+| work                                                                                                     |         53 |        212 |          0 |         53 |        265 |
++----------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| filename                                                                                                 | language     | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| d:\1 Software\Projects\Hunter\.github\pull_request_template.md                                           | Markdown     |          4 |          4 |          4 |         12 |
+| d:\1 Software\Projects\Hunter\.github\workflows\doctrine-approval.yml                                    | YAML         |         26 |          4 |          4 |         34 |
+| d:\1 Software\Projects\Hunter\.github\workflows\doctrine-merge.yml                                       | YAML         |         33 |          3 |          4 |         40 |
+| d:\1 Software\Projects\Hunter\.github\workflows\doctrine.yml                                             | YAML         |         11 |          1 |          4 |         16 |
+| d:\1 Software\Projects\Hunter\CLAUDE.md                                                                  | Markdown     |          9 |          0 |          4 |         13 |
+| d:\1 Software\Projects\Hunter\campaigns\de-swe-berlin.toml                                               | TOML         |        103 |          5 |         15 |        123 |
+| d:\1 Software\Projects\Hunter\docs\case-studies\reading-sites-at-the-same-time.md                        | Markdown     |        207 |          0 |         54 |        261 |
+| d:\1 Software\Projects\Hunter\docs\discovery.md                                                          | Markdown     |        108 |          0 |         26 |        134 |
+| d:\1 Software\Projects\Hunter\docs\sources.md                                                            | Markdown     |         90 |          0 |         16 |        106 |
+| d:\1 Software\Projects\Hunter\doctrine.toml                                                              | TOML         |         15 |          3 |          4 |         22 |
+| d:\1 Software\Projects\Hunter\hunter.cmd                                                                 | Batch        |         12 |          2 |          1 |         15 |
+| d:\1 Software\Projects\Hunter\hunter.sh                                                                  | Shell Script |          8 |          3 |          1 |         12 |
+| d:\1 Software\Projects\Hunter\metrics\outcome.jsonl                                                      | JSON Lines   |          3 |          0 |          1 |          4 |
+| d:\1 Software\Projects\Hunter\pyproject.toml                                                             | TOML         |          9 |          0 |          2 |         11 |
+| d:\1 Software\Projects\Hunter\requirements.lock                                                          | YAML         |          6 |          2 |          1 |          9 |
+| d:\1 Software\Projects\Hunter\src\hunter\__init__.py                                                     | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\__main__.py                                                     | Python       |          4 |          1 |          4 |          9 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\__init__.py                                            | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\campaign_files.py                                      | Python       |         48 |          5 |         16 |         69 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\__init__.py                                        | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\alerts.py                                          | Python       |         12 |          2 |          4 |         18 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\boards_command.py                                  | Python       |         19 |          1 |          5 |         25 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\discover_command.py                                | Python       |         47 |          4 |         10 |         61 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\main.py                                            | Python       |         36 |          2 |          7 |         45 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\parallel_reading.py                                | Python       |         25 |          6 |         10 |         41 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\probe_command.py                                   | Python       |         39 |          3 |          8 |         50 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\probe_targets.py                                   | Python       |         24 |          2 |          5 |         31 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\project.py                                         | Python       |         31 |          4 |         14 |         49 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\report.py                                          | Python       |         39 |          5 |         15 |         59 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\cli\sources.py                                         | Python       |         30 |          5 |          8 |         43 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\credentials.py                                         | Python       |         11 |          1 |          6 |         18 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\html_text.py                                           | Python       |         39 |          2 |         10 |         51 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\mail\__init__.py                                       | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\mail\mailbox.py                                        | Python       |         58 |          8 |         16 |         82 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\outcome.py                                             | Python       |         38 |          7 |         16 |         61 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\places.py                                              | Python       |        109 |         14 |         26 |        149 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\__init__.py                                    | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\ashby.py                                       | Python       |         52 |          4 |         13 |         69 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feed_table.py                                  | Python       |         51 |          3 |          4 |         58 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\__init__.py                              | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\board_check.py                           | Python       |         23 |          4 |          8 |         35 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\coveto.py                                | Python       |         45 |          3 |          9 |         57 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\dvinci.py                                | Python       |         45 |          6 |         11 |         62 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\onlyfy.py                                | Python       |         70 |          7 |         17 |         94 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\softgarden.py                            | Python       |         82 |          6 |         18 |        106 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\teamtailor.py                            | Python       |         61 |          3 |          9 |         73 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\feeds\workday.py                               | Python       |         69 |          9 |         15 |         93 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\greenhouse.py                                  | Python       |         35 |          2 |          9 |         46 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\indeed_alerts.py                               | Python       |         85 |         10 |         25 |        120 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\lever.py                                       | Python       |         65 |          3 |         13 |         81 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\personio.py                                    | Python       |         69 |          4 |         13 |         86 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\reading.py                                     | Python       |         63 |         11 |         18 |         92 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\recruitee.py                                   | Python       |         46 |          2 |         11 |         59 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\searches\__init__.py                           | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\searches\bundesagentur.py                      | Python       |         87 |          6 |         18 |        111 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\searches\eures.py                              | Python       |         98 |         12 |         21 |        131 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\searches\nuts.json                             | JSON         |          1 |          0 |          1 |          2 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\searches\search_table.py                       | Python       |         24 |          4 |          6 |         34 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\smartrecruiters.py                             | Python       |         45 |          3 |          9 |         57 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\sources\workable.py                                    | Python       |         55 |          6 |         11 |         72 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\__init__.py                                    | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\database.py                                    | Python       |         64 |          4 |          5 |         73 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\job_links.py                                   | Python       |         24 |          4 |          8 |         36 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\mail_marks.py                                  | Python       |         20 |          3 |          7 |         30 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\matches.py                                     | Python       |         39 |          2 |          9 |         50 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\pool.py                                        | Python       |        107 |          8 |         23 |        138 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\probe_log.py                                   | Python       |         13 |          2 |          6 |         21 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\storage\registry.py                                    | Python       |         54 |          2 |         14 |         70 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\web_answers.py                                         | Python       |         19 |          6 |          7 |         32 |
+| d:\1 Software\Projects\Hunter\src\hunter\adapters\web_client.py                                          | Python       |        137 |         11 |         25 |        173 |
+| d:\1 Software\Projects\Hunter\src\hunter\application\__init__.py                                         | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\application\discover.py                                         | Python       |         97 |         15 |         26 |        138 |
+| d:\1 Software\Projects\Hunter\src\hunter\application\ports.py                                            | Python       |         39 |          9 |         26 |         74 |
+| d:\1 Software\Projects\Hunter\src\hunter\application\probe.py                                            | Python       |         35 |          8 |         15 |         58 |
+| d:\1 Software\Projects\Hunter\src\hunter\application\resolve.py                                          | Python       |         16 |          4 |          4 |         24 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\__init__.py                                              | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\__init__.py                                    | Python       |          0 |          0 |          1 |          1 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\boards.py                                      | Python       |         47 |          6 |         12 |         65 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\campaign.py                                    | Python       |         61 |         17 |         19 |         97 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\company.py                                     | Python       |         33 |          4 |         14 |         51 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\identity.py                                    | Python       |         20 |          6 |         13 |         39 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\location.py                                    | Python       |         39 |          5 |         13 |         57 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\pooled.py                                      | Python       |          5 |          1 |          4 |         10 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\posting.py                                     | Python       |         49 |         11 |         17 |         77 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\probing.py                                     | Python       |         27 |          8 |         10 |         45 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\discovery\resolution.py                                  | Python       |         15 |          4 |          9 |         28 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\outcome.py                                               | Python       |         38 |          6 |         15 |         59 |
+| d:\1 Software\Projects\Hunter\src\hunter\domain\pacing.py                                                | Python       |         41 |         10 |         16 |         67 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\ashby-enpal.json                                    | JSON         |          8 |          0 |          1 |          9 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\bundesagentur-software-engineer-berlin.json         | JSON         |          9 |          0 |          1 |         10 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\coveto-empiricus.xml                                | XML          |         31 |          0 |          1 |         32 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\dvinci-portals.json                                 | JSON         |          6 |          0 |          1 |          7 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\eures-software-engineer.json                        | JSON         |          9 |          0 |          1 |         10 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\greenhouse-n26.json                                 | JSON         |          5 |          0 |          1 |          6 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\lever-unzer.json                                    | JSON         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\onlyfy-magenta-2.html                               | HTML         |          7 |          0 |          1 |          8 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\onlyfy-magenta.html                                 | HTML         |          8 |          0 |          1 |          9 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\personio-zvoove.xml                                 | XML          |         19 |          0 |          0 |         19 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\recruitee-tellent.json                              | JSON         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\smartrecruiters-brainlab.json                       | JSON         |          5 |          0 |          1 |          6 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\softgarden-hypoport.html                            | HTML         |          8 |          0 |          1 |          9 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\softgarden-inform.html                              | HTML         |          7 |          0 |          1 |          8 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\teamtailor-career.xml                               | XML          |          4 |          0 |          0 |          4 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\workable-modash.json                                | JSON         |          9 |          0 |          1 |         10 |
+| d:\1 Software\Projects\Hunter\tests\fixtures\sources\workday-nvidia.json                                 | JSON         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\conftest.py                                          | Python       |         38 |          5 |         18 |         61 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_board_read_once.py                              | Python       |         13 |          0 |          5 |         18 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_cli_parts.py                                    | Python       |         56 |          0 |         14 |         70 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_discover_command.py                             | Python       |         48 |          0 |         19 |         67 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_parallel_reading.py                             | Python       |         61 |          1 |         21 |         83 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_probe_command.py                                | Python       |         73 |          2 |         17 |         92 |
+| d:\1 Software\Projects\Hunter\tests\integration\cli\test_progress.py                                     | Python       |         27 |          0 |         12 |         39 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\conftest.py                                      | Python       |         45 |          6 |         23 |         74 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_ashby.py                                    | Python       |         49 |          0 |         18 |         67 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_board_check.py                              | Python       |         25 |          0 |         14 |         39 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_bundesagentur.py                            | Python       |         60 |          0 |         20 |         80 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_coveto.py                                   | Python       |         37 |          0 |         14 |         51 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_dvinci.py                                   | Python       |         44 |          2 |         18 |         64 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_eures.py                                    | Python       |         62 |          0 |         22 |         84 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_feed_table.py                               | Python       |         12 |          2 |          9 |         23 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_greenhouse.py                               | Python       |         42 |          0 |         16 |         58 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_indeed_alerts.py                            | Python       |         77 |          0 |         28 |        105 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_lever.py                                    | Python       |         39 |          0 |         16 |         55 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_onlyfy.py                                   | Python       |         56 |          1 |         18 |         75 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_personio.py                                 | Python       |         46 |          0 |         18 |         64 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_reading.py                                  | Python       |         46 |          0 |         14 |         60 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_recruitee.py                                | Python       |         35 |          0 |         14 |         49 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_search_table.py                             | Python       |         19 |          0 |         10 |         29 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_smartrecruiters.py                          | Python       |         39 |          0 |         16 |         55 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_softgarden.py                               | Python       |         45 |          0 |         18 |         63 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_teamtailor.py                               | Python       |         35 |          0 |         14 |         49 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_workable.py                                 | Python       |         50 |          0 |         16 |         66 |
+| d:\1 Software\Projects\Hunter\tests\integration\sources\test_workday.py                                  | Python       |         51 |          0 |         18 |         69 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_campaign_files.py                                   | Python       |         91 |          0 |         26 |        117 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_html_text.py                                        | Python       |         17 |          0 |         11 |         28 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_job_links.py                                        | Python       |         59 |          0 |         12 |         71 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_mailbox.py                                          | Python       |         87 |          3 |         30 |        120 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_matches.py                                          | Python       |         29 |          0 |         11 |         40 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_outcome_command.py                                  | Python       |         55 |          0 |         18 |         73 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_places.py                                           | Python       |         72 |          0 |         24 |         96 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_pool.py                                             | Python       |        102 |          2 |         29 |        133 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_probe_log.py                                        | Python       |         17 |          0 |          9 |         26 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_registry.py                                         | Python       |         41 |          0 |         15 |         56 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_web_answers.py                                      | Python       |         21 |          0 |         13 |         34 |
+| d:\1 Software\Projects\Hunter\tests\integration\test_web_client.py                                       | Python       |        147 |          7 |         48 |        202 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_boards.py                                        | Python       |         39 |          0 |          8 |         47 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_campaign.py                                      | Python       |         76 |          0 |         37 |        113 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_company.py                                       | Python       |         27 |          0 |         14 |         41 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_identity.py                                      | Python       |         14 |          0 |          7 |         21 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_location.py                                      | Python       |         35 |          0 |         20 |         55 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_posting.py                                       | Python       |         37 |          0 |         19 |         56 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_probing.py                                       | Python       |         31 |          2 |         13 |         46 |
+| d:\1 Software\Projects\Hunter\tests\unit\discovery\test_resolution.py                                    | Python       |         44 |          1 |         23 |         68 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_board_owners.py                                            | Python       |         49 |          0 |         20 |         69 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_discover.py                                                | Python       |        122 |          0 |         42 |        164 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_feed_status.py                                             | Python       |         75 |          0 |         30 |        105 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_outcome.py                                                 | Python       |         33 |          0 |         28 |         61 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_pacing.py                                                  | Python       |         74 |          2 |         38 |        114 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_probe.py                                                   | Python       |         77 |          1 |         32 |        110 |
+| d:\1 Software\Projects\Hunter\tests\unit\test_resolve.py                                                 | Python       |         44 |          1 |         15 |         60 |
+| d:\1 Software\Projects\Hunter\work\1-define-the-outcome-metric-applications-per-running-hour.toml        | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\10-read-places-from-free-text.toml                                    | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\11-the-discover-use-case.toml                                         | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\12-jobs-open-in-several-places.toml                                   | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\13-campaign-files-and-the-pilot-campaign.toml                         | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\14-plain-text-from-job-description-html.toml                          | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\15-greenhouse-and-ashby-feeds.toml                                    | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\16-read-indeed-job-alerts.toml                                        | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\17-read-new-mails-from-the-inboxes.toml                               | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\18-group-the-adapters-by-responsibility.toml                          | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\19-the-discover-command.toml                                          | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\2-grant-the-gates-the-permissions-they-request.toml                   | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\20-indeed-alerts-as-a-source-and-cheap-database-commits.toml          | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\21-a-hunter-launcher.toml                                             | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\22-show-discovery-progress-and-launchers-that-work-in-powershell.toml | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\23-lever-workable-and-recruitee-feeds.toml                            | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\24-workable-and-recruitee-feeds.toml                                  | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\25-personio-and-smartrecruiters-feeds.toml                            | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\26-workable-job-links-don-t-name-a-board.toml                         | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\27-teamtailor-and-workday-feeds.toml                                  | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\28-mark-each-board-live-empty-or-gone.toml                            | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\29-read-different-sites-at-the-same-time.toml                         | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\3-document-the-job-sources-and-the-discovery-design.toml              | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\30-a-board-belongs-to-one-company.toml                                | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\31-probe-for-a-company-s-board.toml                                   | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\32-check-guessed-boards-and-keep-the-probe-log.toml                   | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\33-the-boards-probe-command.toml                                      | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\34-campaigns-name-their-searches.toml                                 | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\35-search-the-bundesagentur.toml                                      | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\36-document-campaign-searches.toml                                    | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\37-the-pilot-searches-more.toml                                       | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\38-resolve-job-board-jobs-to-the-employer-s-posting.toml              | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\39-pace-workable-slower.toml                                          | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\4-discovery-domain-postings-locations-and-job-identity.toml           | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\40-a-posting-another-source-already-showed-is-that-job.toml           | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\41-companies-keep-their-websites.toml                                 | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\42-measure-request-turns-where-the-site-sees-them.toml                | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\43-search-eures.toml                                                  | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\44-read-a-page-in-the-wrong-encoding.toml                             | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\45-wait-as-long-as-a-site-asks.toml                                   | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\46-a-case-study-of-reading-sites-at-the-same-time.toml                | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\47-keep-within-workable-s-limits.toml                                 | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\48-measure-gaps-on-a-clock-that-only-moves-forward.toml               | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\49-read-d-vinci-boards.toml                                           | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\5-http-client-with-per-site-pacing.toml                               | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\50-read-coveto-boards.toml                                            | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\51-read-softgarden-boards.toml                                        | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\52-read-onlyfy-boards.toml                                            | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\54-bring-the-case-study-up-to-date.toml                               | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\6-sources-follow-the-real-automation-rule-risk-not-principle.toml     | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\7-discovery-domain-companies-and-campaign-matching.toml               | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\8-the-job-pool-postings-and-sightings-in-sqlite.toml                  | TOML         |          4 |          0 |          1 |          5 |
+| d:\1 Software\Projects\Hunter\work\9-store-companies-and-campaign-matches.toml                           | TOML         |          4 |          0 |          1 |          5 |
+| Total                                                                                                    |              |      6,567 |        401 |      2,028 |      8,996 |
++----------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+

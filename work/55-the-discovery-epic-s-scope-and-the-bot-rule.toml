@@ -1,0 +1,4 @@
+id = "55"
+title = "The discovery epic's scope and the bot rule"
+kind = "chore"
+scope = ["docs/**"]
