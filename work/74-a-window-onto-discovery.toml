@@ -1,0 +1,4 @@
+id = "74"
+title = "A window onto discovery"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/**", "src/hunter/adapters/cli/main.py", "tests/integration/gui/**", "docs/discovery.md"]
