@@ -45,7 +45,7 @@ def test_every_job_on_the_portal_is_read_from_its_own_page(
 
 def test_the_place_comes_from_the_job_s_address(source_pages: Pages, web: WebClient) -> None:
     engineer, _ = postings(source_pages, web)
-    assert engineer.location.country == "DE"  # Hanau's GeoNames name is "Hanau am Main"
+    assert (engineer.location.country, engineer.location.city) == ("DE", "Hanau am Main")
 
 
 def test_a_job_page_that_cannot_be_read_leaves_the_others(

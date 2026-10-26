@@ -93,3 +93,19 @@ def test_several_cities_share_the_workplace() -> None:
 def test_text_with_no_place_is_an_unknown_place() -> None:
     assert place_from_text("") == Location()
     assert place_from_text("Multiple locations") == Location()
+
+
+@pytest.mark.parametrize(
+    ("text", "city"),
+    [
+        ("Hanau, DE", "Hanau am Main"),
+        ("Marburg", "Marburg an der Lahn"),
+        ("Rüsselsheim, Germany", "Rüsselsheim am Main"),
+        ("Halle, Deutschland", "Halle (Saale)"),
+        ("Frankfurt", "Frankfurt am Main"),
+    ],
+)
+def test_a_town_is_known_by_its_name_without_the_river_or_region(text: str, city: str) -> None:
+    """GeoNames calls Hanau "Hanau am Main"; job sources write "Hanau". Of several towns with one
+    short name the largest wins, as for any name: Frankfurt am Main, not Frankfurt (Oder)."""
+    assert place_from_text(text) == Location(country="DE", city=city)
