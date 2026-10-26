@@ -61,3 +61,9 @@ def test_other_systems_job_links_are_not_taken_for_a_career_site() -> None:
     )
     softgarden = "https://andrena.softgarden.io/job/62479624/Softwareentwickler-Java-w-m-d-"
     assert board_from_link(softgarden) == Board("softgarden", "andrena")
+
+
+def test_a_newer_job_link_on_a_career_site_names_its_host() -> None:
+    """Bundesdruckerei's career site links jobs as `/job/<title>/<number>-<locale>`."""
+    link = "https://jobs.bundesdruckerei.de/job/devops-engineer-im-bereich-digitale-identitaten-m-w-d/761-de_DE"
+    assert board_from_link(link) == Board(ats="successfactors", slug="jobs.bundesdruckerei.de")

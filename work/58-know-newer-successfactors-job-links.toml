@@ -1,0 +1,4 @@
+id = "58"
+title = "Know newer SuccessFactors job links"
+kind = "fix"
+scope = ["src/hunter/domain/discovery/boards.py", "tests/**"]
