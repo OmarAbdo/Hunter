@@ -110,3 +110,7 @@ def test_a_campaign_names_its_searches() -> None:
     assert PILOT.searches == ()
     assert Search(source="eures", query="software engineer").place == ""
     assert len({search, replace(search)}) == 1  # a value: the same search counts once
+
+
+def test_a_search_names_no_country_unless_it_says() -> None:
+    assert Search(source="bundesagentur", query="Softwareentwickler").country == ""

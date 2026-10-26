@@ -26,11 +26,13 @@ def mentions_any(title: str, patterns: Iterable[str]) -> bool:
 @dataclass(frozen=True)
 class Search:
     """One search the campaign runs on a search source: `query` in `place` ("Softwareentwickler"
-    in "Berlin"). The source decides what an empty place means, usually anywhere it covers."""
+    in "Berlin"), and in `country` (ISO 3166) for sources that cover several countries. The source
+    decides what an empty place or country means, usually anywhere it covers."""
 
     source: str
     query: str
     place: str = ""
+    country: str = ""
 
 
 @dataclass(frozen=True)

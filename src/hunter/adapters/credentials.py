@@ -3,6 +3,7 @@
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -15,3 +16,13 @@ class MailAccount:
 def accounts_from(path: Path) -> list[MailAccount]:
     settings = tomllib.loads(path.read_text(encoding="utf-8"))
     return [MailAccount(**entry) for entry in settings["mailbox"]]
+
+
+def keys_from(path: Path) -> dict[str, dict[str, Any]]:
+    """The API keys of the keyed search sources, by source: `[keys.<source>]` tables."""
+    if not path.is_file():
+        return {}
+    keys: dict[str, dict[str, Any]] = tomllib.loads(path.read_text(encoding="utf-8")).get(
+        "keys", {}
+    )
+    return keys
