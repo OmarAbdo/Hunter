@@ -1,0 +1,4 @@
+id = "66"
+title = "Campaigns can ask for a language"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/language.py", "src/hunter/domain/discovery/campaign.py", "src/hunter/adapters/campaign_files.py", "tests/unit/**", "tests/integration/test_campaign_files.py", "docs/discovery.md"]

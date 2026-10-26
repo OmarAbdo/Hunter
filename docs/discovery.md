@@ -127,6 +127,12 @@ before anything is read.
 gives no date is taken. A job is judged once, when it first comes in, so a job taken while fresh
 stays taken.
 
+`languages = ["en"]` turns down job ads written in another language, as "language". The language
+is told by counting each language's most common words in the title and description
+(`domain/discovery/language.py`, for de, en, nl, fr and es); an ad with too few of them, or
+evenly in two languages, is taken. Sources that give no description (the Bundesagentur's list,
+most alert mails) can't be told, so their jobs are taken.
+
 ## Build order (one item each)
 
 1. **Domain:** `Posting`, `Location`, job keys, `Company`, `Campaign` and matching.

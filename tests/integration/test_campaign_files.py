@@ -134,3 +134,8 @@ def test_a_campaign_can_limit_the_age_of_its_jobs(tmp_path: Path) -> None:
     assert load_campaign(tmp_path / "fresh.toml").max_age_days == 30
     (tmp_path / "plain.toml").write_text(DUBAI, encoding="utf-8")
     assert load_campaign(tmp_path / "plain.toml").max_age_days is None
+
+
+def test_a_campaign_can_name_its_languages(tmp_path: Path) -> None:
+    (tmp_path / "english.toml").write_text(DUBAI + 'languages = ["en"]', encoding="utf-8")
+    assert load_campaign(tmp_path / "english.toml").languages == frozenset({"en"})

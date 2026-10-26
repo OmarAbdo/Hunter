@@ -19,6 +19,7 @@ OPTIONAL = (
     "excluded_roles",
     "searches",
     "max_age_days",
+    "languages",
 )
 SEARCH_SETTINGS = ("source", "query", "place", "country")
 
@@ -63,6 +64,7 @@ def campaign_from(campaign_id: str, settings: dict[str, Any]) -> Campaign:
         roles=tuple(settings.get("roles", [])),
         excluded_roles=tuple(settings.get("excluded_roles", [])),
         max_age_days=settings.get("max_age_days"),
+        languages=frozenset(settings.get("languages", [])),
         searches=tuple(map(search_from, settings.get("searches", []))),
     )
 
