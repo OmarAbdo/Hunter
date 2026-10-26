@@ -51,6 +51,8 @@ asking for more than 10 minutes isn't asked again in that run.
 | rexx (list and job pages) | No limit published | No rate headers | 1 a second |
 | Adzuna | Plan limits shown in the account; free plans allow about 25 a minute and 250 a day | No rate headers | 1 per 3 seconds, 250 a day |
 | Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
+| Careerjet | No limit published | No rate headers | 1 a second |
+| USAJobs | No request rate published; at most 500 jobs a page and 10,000 a search | No rate headers | 1 a second |
 | EURES | No limit published | No rate headers | 1 a second |
 
 ## Access kinds
@@ -88,10 +90,10 @@ asking for more than 10 minutes isn't asked again in that run.
 | UN Careers | Search: `careers.un.org/api/public/opening/jo/list/filteredV2/en` | 200 | Culture, diplomacy, internships | |
 | Arbeitnow | Search: `www.arbeitnow.com/api/job-board-api` | 200 | DE | |
 | Himalayas, Remotive, We Work Remotely | Search (API or RSS) | 200 | Remote, US part-time | Remote only |
-| USAJobs | Keyed search: `data.usajobs.gov/api/search` | 401 without a key | US | US government jobs only |
+| USAJobs | Keyed search: `data.usajobs.gov/api/search`, headers `User-Agent: <account mail>` and `Authorization-Key` | 200 with Omar's key | US | Built. US government jobs, at home and at posts abroad. Last 30 days, the place as `LocationName`, 100 a page, up to 3 pages. Every place a job names, read by its city alone, since states share names with towns; remote where marked, hybrid where telework is allowed. Links go to the job's usajobs.gov page, where it's applied to |
 | Adzuna | Keyed search: `api.adzuna.com/v1/api/jobs/{country}/search/{page}` | 200 with Omar's key | Its countries: DE, GB, US, NL, FR, AT, CH, ... (not UAE) | Built. An aggregator; needs a country per search; last 30 days, 50 a page, up to 4 pages. Links go to Adzuna's page for the job, without the tracking query that carries the app id |
 | Jooble | Keyed search: `POST jooble.org/api/{key}` | 200 with Omar's key | US with this key; others need their own | Built. 20 a page, up to 5 pages. Keys are per country site: Omar's is for jooble.org, and `de.jooble.org` refuses it (403). A search for "Berlin" brings jobs placed only in "Germany", so a city campaign rejects them; a German key would fix that |
-| Careerjet | Keyed search | 200 with Omar's key | Many countries | An aggregator; key in `var/accounts.toml` |
+| Careerjet | Keyed search: `search.api.careerjet.net/v4/query`, Basic auth with the key and the key's referer | 200 with Omar's key | DE, GB, US, AE, NL, AT, CH, FR, ES and about 60 more | Built. An aggregator; needs a country per search, which picks its locale (`de_DE`). 50 a page (`pagesize`; the documented `page_size` is ignored), up to 6 pages. Jobs have no ids, and their `jobviewtrack.com` links change with every answer, so a job is known by company, title and place. A place it can't tell apart runs no search |
 | Indeed (Glassdoor is part of Indeed) | Alert mail from `donotreply@jobalert.indeed.com` | Arriving: several a day, up to about 20 jobs each | DE, US, UAE | Each job has title, company, place, salary, freshness, Indeed's job key and its quick-apply mark ("Schnellbewerbung") |
 | LinkedIn | Alert mail | None in the main inbox; check the jobs inbox | All | |
 | StepStone, XING | Alert mail | Not set up yet | DE | StepStone's `robots.txt` disallows its search pages |
