@@ -72,7 +72,8 @@ Ports, kept small: `JobSource` (fetch postings), `Pool` (store and find jobs, si
 
 - **One module per source.** Each is tested against a saved real response in `tests/fixtures/`.
 - **HTTP:** one client with a timeout on every call, a minimum gap and a daily cap per host, and
-  `robots.txt` checks for page reads.
+  `robots.txt` checks for page reads on sites that welcome bots. Sites that turn bots away are read
+  as a browser would ([sources.md](sources.md), "Rules every source follows").
 - **Mail:** IMAP with an app password for each of the two inboxes. Hunter keeps a mark per inbox and
   sender, so each mail is read once.
 - **Storage:** SQLite (standard library) in `var/hunter.db`. `var/` is gitignored because it's
@@ -131,3 +132,16 @@ before anything is read.
 8. **Searches:** Bundesagentur, EURES, UN Careers; then the keyed ones once there are keys.
 9. **Further alert parsers:** LinkedIn, StepStone, XING, Bayt and others, each when its mails
    arrive.
+10. **The German ATS feeds:** d.vinci, coveto, softgarden, onlyfy and SuccessFactors (done), then
+    rexx and SuccessFactors without Career Site Builder.
+11. **The rest of probing and campaigns:** a company's careers page, the web-search fallback, and
+    campaign filters for language and a job's age.
+12. **The GUI:** a Hunter window on the desktop, started from a desktop and Start-menu icon. It
+    runs discovery and shows it in real time: each source as it's read, each campaign's jobs, each
+    source's yield, the companies and their boards, and the sites holding Hunter off.
+
+Every epic includes its part of the GUI; it isn't done until the feature can be used and watched
+there.
+
+**Out of scope for this epic:** umantis (Haufe), whose pages are heavy and differ per customer; an
+optional addition later.

@@ -10,7 +10,13 @@ source before building its adapter, because access rules change.
   getting past a captcha are fine wherever they work and can't backfire. Where a harsh penalty is
   likely, they're out: an account ban, or a block on a site Omar depends on, LinkedIn above all.
   Those sites are read through their own channels: alert mails, and human-paced use.
-  `robots.txt` is respected wherever Hunter reads public pages.
+- **Sites that turn bots away are read anyway, by better means.** Where a site welcomes bots,
+  Hunter names itself (`Hunter/0.1 (personal job search)`) and follows its `robots.txt`. Where a
+  site turns bots away (its `robots.txt`, a 403, a challenge page), Hunter doesn't give up on its
+  jobs: it reads them with a browser's identity, through a real browser, or by another route. It
+  stays politely paced either way, and the penalty rule above still decides what's too risky.
+  Portals limiting what they get and Hunter trying to send more applications are both fair; the
+  conflict is solved with smarter methods, not by giving up.
 - **Sites without an API come in through their own job-alert emails.** The site sends them to the
   inbox; Hunter reads the inbox.
 - **Apply on the employer's own system where possible.** A job seen on a job board (LinkedIn, Indeed,
