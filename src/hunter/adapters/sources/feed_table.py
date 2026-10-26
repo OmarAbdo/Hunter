@@ -1,6 +1,7 @@
 """Every company feed Hunter can read, by applicant tracking system, and each one's web address.
 A board in the registry is read with the feed of its system. Sites that refuse Hunter's usual pace
-get their own."""
+get their own. One entry a line, in alphabetical order, so that sources added at the same time
+rarely touch the same line."""
 
 from collections.abc import Callable
 
@@ -27,37 +28,37 @@ from hunter.application.ports import JobSource
 from hunter.domain.pacing import PaceRule
 
 FEEDS: dict[str, Callable[..., JobSource]] = {
-    "greenhouse": greenhouse.GreenhouseFeed,
     "ashby": ashby.AshbyFeed,
-    "lever": lever.LeverFeed,
-    "workable": workable.WorkableFeed,
-    "recruitee": recruitee.RecruiteeFeed,
-    "personio": personio.PersonioFeed,
-    "smartrecruiters": smartrecruiters.SmartRecruitersFeed,
-    "teamtailor": teamtailor.TeamtailorFeed,
-    "workday": workday.WorkdayFeed,
-    "dvinci": dvinci.DvinciFeed,
     "coveto": coveto.CovetoFeed,
-    "softgarden": softgarden.SoftgardenFeed,
+    "dvinci": dvinci.DvinciFeed,
+    "greenhouse": greenhouse.GreenhouseFeed,
+    "lever": lever.LeverFeed,
     "onlyfy": onlyfy.OnlyfyFeed,
-    "successfactors": successfactors.SuccessFactorsFeed,
+    "personio": personio.PersonioFeed,
+    "recruitee": recruitee.RecruiteeFeed,
     "rexx": rexx.RexxFeed,
+    "smartrecruiters": smartrecruiters.SmartRecruitersFeed,
+    "softgarden": softgarden.SoftgardenFeed,
+    "successfactors": successfactors.SuccessFactorsFeed,
+    "teamtailor": teamtailor.TeamtailorFeed,
+    "workable": workable.WorkableFeed,
+    "workday": workday.WorkdayFeed,
 }
 APIS: dict[str, str | tuple[str, ...]] = {
-    "greenhouse": greenhouse.API,
     "ashby": ashby.API,
-    "lever": lever.HOSTS,
-    "workable": workable.API,
-    "recruitee": recruitee.API,
-    "personio": personio.API,
-    "smartrecruiters": smartrecruiters.API,
-    "teamtailor": teamtailor.API,
-    "workday": workday.API,
-    "dvinci": dvinci.API,
     "coveto": coveto.API,
-    "softgarden": softgarden.API,
+    "dvinci": dvinci.API,
+    "greenhouse": greenhouse.API,
+    "lever": lever.HOSTS,
     "onlyfy": onlyfy.API,
-    "successfactors": successfactors.API,
+    "personio": personio.API,
+    "recruitee": recruitee.API,
     "rexx": rexx.API,
+    "smartrecruiters": smartrecruiters.API,
+    "softgarden": softgarden.API,
+    "successfactors": successfactors.API,
+    "teamtailor": teamtailor.API,
+    "workable": workable.API,
+    "workday": workday.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}

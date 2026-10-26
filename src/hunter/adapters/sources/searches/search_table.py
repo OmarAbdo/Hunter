@@ -20,9 +20,9 @@ KEYED: dict[str, Callable[..., JobSource]] = {
     "jooble": jooble.JoobleSearch,
 }
 APIS: dict[str, str] = {
+    "adzuna": adzuna.API,
     "bundesagentur": bundesagentur.API,
     "eures": eures.API,
-    "adzuna": adzuna.API,
     "jooble": jooble.API,
 }
 PACES: dict[str, PaceRule] = {adzuna.HOST: adzuna.PACE}
