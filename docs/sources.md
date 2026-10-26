@@ -90,7 +90,8 @@ asking for more than 10 minutes isn't asked again in that run.
 | Himalayas, Remotive, We Work Remotely | Search (API or RSS) | 200 | Remote, US part-time | Remote only |
 | USAJobs | Keyed search: `data.usajobs.gov/api/search` | 401 without a key | US | US government jobs only |
 | Adzuna | Keyed search: `api.adzuna.com/v1/api/jobs/{country}/search/{page}` | 200 with Omar's key | Its countries: DE, GB, US, NL, FR, AT, CH, ... (not UAE) | Built. An aggregator; needs a country per search; last 30 days, 50 a page, up to 4 pages. Links go to Adzuna's page for the job, without the tracking query that carries the app id |
-| Jooble, Careerjet | Keyed search | 200 with Omar's keys | Many countries | Aggregators; keys in `var/accounts.toml` |
+| Jooble | Keyed search: `POST jooble.org/api/{key}` | 200 with Omar's key | US with this key; others need their own | Built. 20 a page, up to 5 pages. Keys are per country site: Omar's is for jooble.org, and `de.jooble.org` refuses it (403). A search for "Berlin" brings jobs placed only in "Germany", so a city campaign rejects them; a German key would fix that |
+| Careerjet | Keyed search | 200 with Omar's key | Many countries | An aggregator; key in `var/accounts.toml` |
 | Indeed (Glassdoor is part of Indeed) | Alert mail from `donotreply@jobalert.indeed.com` | Arriving: several a day, up to about 20 jobs each | DE, US, UAE | Each job has title, company, place, salary, freshness, Indeed's job key and its quick-apply mark ("Schnellbewerbung") |
 | LinkedIn | Alert mail | None in the main inbox; check the jobs inbox | All | |
 | StepStone, XING | Alert mail | Not set up yet | DE | StepStone's `robots.txt` disallows its search pages |

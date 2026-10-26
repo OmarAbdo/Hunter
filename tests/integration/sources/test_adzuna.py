@@ -69,3 +69,10 @@ def test_a_search_without_a_country_is_refused(web: WebClient) -> None:
 
 def test_a_search_is_named_by_its_query_place_and_country(web: WebClient) -> None:
     assert AdzunaSearch(web, BERLIN, KEY).name == "adzuna:software engineer@Berlin,DE"
+
+
+def test_a_failed_search_never_shows_the_key(source_pages: Pages, web: WebClient) -> None:
+    """Errors are printed in a run's report; the keys are in the address Adzuna is asked at."""
+    with pytest.raises(SourceUnavailableError) as raised:
+        AdzunaSearch(web, BERLIN, KEY, api=source_pages({})).fetch()
+    assert "app-key" not in str(raised.value) and "app-id" not in str(raised.value)

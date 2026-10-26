@@ -4,7 +4,7 @@ search for; a search two campaigns share is read once."""
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any
 
-from hunter.adapters.sources.searches import adzuna, bundesagentur, eures
+from hunter.adapters.sources.searches import adzuna, bundesagentur, eures, jooble
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import JobSource
 from hunter.domain.discovery.campaign import Campaign, Search
@@ -17,11 +17,13 @@ SEARCHES: dict[str, Callable[..., JobSource]] = {
 # Sources that need a key: `[keys.<source>]` in var/accounts.toml.
 KEYED: dict[str, Callable[..., JobSource]] = {
     "adzuna": adzuna.AdzunaSearch,
+    "jooble": jooble.JoobleSearch,
 }
 APIS: dict[str, str] = {
     "bundesagentur": bundesagentur.API,
     "eures": eures.API,
     "adzuna": adzuna.API,
+    "jooble": jooble.API,
 }
 PACES: dict[str, PaceRule] = {adzuna.HOST: adzuna.PACE}
 
