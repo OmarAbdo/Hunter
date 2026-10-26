@@ -1,0 +1,4 @@
+id = "62"
+title = "A briefing for parallel agents, and tables in order"
+kind = "chore"
+scope = ["docs/**", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/sources/searches/search_table.py"]
