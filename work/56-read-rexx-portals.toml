@@ -1,0 +1,4 @@
+id = "56"
+title = "Read rexx portals"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/feeds/**", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/sources/reading.py", "src/hunter/domain/discovery/boards.py", "tests/**", "docs/**"]

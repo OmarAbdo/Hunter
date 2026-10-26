@@ -42,6 +42,7 @@ LINK_PATTERNS = tuple(
         ("softgarden", r"//([a-z0-9-]+)\.softgarden\.io\b", "{0}"),
         ("coveto", r"//(k\d+)\.coveto\.de\b", "{0}"),
         ("onlyfy", r"//([a-z0-9-]+)\.onlyfy\.jobs\b", "{0}"),
+        ("rexx", r"//([a-z0-9-]+)-portal\.rexx-recruitment\.com\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
         # A SuccessFactors career site is on the company's own host, so it's known by the shape
         # of its job links, `/job/<title>/<id>/`; it comes last, after every system with a host
