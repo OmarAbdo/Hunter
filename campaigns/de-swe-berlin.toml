@@ -120,3 +120,28 @@ place = "Berlin"
 source = "bundesagentur"
 query = "Machine Learning"
 place = "Berlin"
+
+# Keyed aggregators; their keys are in var/accounts.toml. Each needs the country.
+[[searches]]
+source = "adzuna"
+query = "software engineer"
+place = "Berlin"
+country = "DE"
+
+[[searches]]
+source = "adzuna"
+query = "softwareentwickler"
+place = "Berlin"
+country = "DE"
+
+[[searches]]
+source = "careerjet"
+query = "software engineer"
+place = "Berlin"
+country = "DE"
+
+[[searches]]
+source = "careerjet"
+query = "softwareentwickler"
+place = "Berlin"
+country = "DE"

@@ -4,6 +4,7 @@ import pytest
 
 from hunter.adapters.sources.searches.search_table import searches_of
 from hunter.adapters.web_client import WebClient
+from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.campaign import Campaign, Search
 
 SOFTWARE = Search(source="bundesagentur", query="Softwareentwickler", place="Berlin")
@@ -28,9 +29,19 @@ def test_an_unknown_search_source_is_refused(web: WebClient) -> None:
         searches_of(web, [typo], {}, {})
 
 
-def test_a_keyed_search_source_needs_its_key(web: WebClient) -> None:
+def test_a_keyed_search_without_its_key_is_reported_and_the_run_goes_on(web: WebClient) -> None:
     keyed = replace(BERLIN, searches=(Search(source="adzuna", query="x", country="DE"),))
-    with pytest.raises(LookupError, match="no key for adzuna"):
-        searches_of(web, [keyed], {}, {})
+    [missing] = searches_of(web, [keyed], {}, {})
+    assert missing.name == "adzuna:x,DE"
+    with pytest.raises(SourceUnavailableError, match="no key for adzuna in var/accounts.toml"):
+        missing.fetch()
     [source] = searches_of(web, [keyed], {}, {"adzuna": {"app_id": "id", "app_key": "key"}})
     assert source.name == "adzuna:x,DE"
+
+
+def test_every_keyed_source_built_is_wired_in(web: WebClient) -> None:
+    key = {"api_key": "k", "app_id": "i", "app_key": "k", "referer": "r", "email": "e"}
+    for source in ("adzuna", "careerjet", "jooble", "usajobs"):
+        keyed = replace(BERLIN, searches=(Search(source=source, query="x", country="US"),))
+        [found] = searches_of(web, [keyed], {}, {source: key})
+        assert found.name.startswith(f"{source}:x")

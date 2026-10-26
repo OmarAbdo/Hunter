@@ -1,0 +1,4 @@
+id = "67"
+title = "Wire in Careerjet and USAJobs, and the pilot's keyed searches"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/search_table.py", "docs/sources.md", "campaigns/**", "tests/integration/sources/test_search_table.py", "tests/integration/test_campaign_files.py"]
