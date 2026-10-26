@@ -1,0 +1,4 @@
+id = "57"
+title = "Know towns by their short names"
+kind = "fix"
+scope = ["src/hunter/adapters/places.py", "tests/**"]

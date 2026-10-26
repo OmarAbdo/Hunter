@@ -49,6 +49,9 @@ COUNTRY_ALIASES = {
 ALTERNATE_NAMES_FROM = 100_000
 SHORTEST_CITY_NAME = 3
 CAPITAL_COUNTRY_CODE = re.compile(r"[A-Z]{2}")
+# What follows a town's own name in GeoNames: its river or region ("Hanau am Main", "Halle
+# (Saale)", "Freiburg im Breisgau"). Job sources mostly write the town's own name only.
+QUALIFIER = re.compile(r"\s+(?:am|an der|im|in der|ob der|bei)\s+.*$|\s*\(.*$")
 
 
 @dataclass(frozen=True)
@@ -85,9 +88,9 @@ def cities_by_name() -> dict[str, list[City]]:
 
 
 def city_keys(record: dict[str, Any]) -> set[str]:
-    """The city's GeoNames name and, for large cities, its other-language names. Airport codes
-    and names in other scripts are left out."""
-    names = [record["name"]]
+    """The city's GeoNames name, that name without its river or region, and, for large cities,
+    its other-language names. Airport codes and names in other scripts are left out."""
+    names = [record["name"], QUALIFIER.sub("", record["name"])]
     if int(record["population"]) >= ALTERNATE_NAMES_FROM:
         names += [name for name in record["alternatenames"] if not name.isupper()]
     return {key for key in map(text_key, names) if len(key) >= SHORTEST_CITY_NAME}
