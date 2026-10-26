@@ -1,0 +1,4 @@
+id = "64"
+title = "Search USAJobs"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/usajobs.py", "tests/integration/sources/test_usajobs.py", "tests/fixtures/sources/usajobs-*"]
