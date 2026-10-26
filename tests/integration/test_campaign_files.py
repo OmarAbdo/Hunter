@@ -111,11 +111,12 @@ source = "eures"
         load_campaign(tmp_path / "short.toml")
 
 
-def test_the_pilot_campaign_searches_the_bundesagentur_eures_and_the_keyed_aggregators() -> None:
+def test_the_pilot_campaign_searches_the_bundesagentur_eures_and_careerjet() -> None:
+    """Not Adzuna: its free plan is 25 test calls."""
     pilot = load_campaign(CAMPAIGNS / "de-swe-berlin.toml")
     sources = {search.source for search in pilot.searches}
-    assert sources == {"bundesagentur", "eures", "adzuna", "careerjet"}
-    keyed = [search for search in pilot.searches if search.source in {"adzuna", "careerjet"}]
+    assert sources == {"bundesagentur", "eures", "careerjet"}
+    keyed = [search for search in pilot.searches if search.source == "careerjet"]
     assert all(search.country == "DE" for search in keyed)
     assert {search.place for search in pilot.searches if search.source == "eures"} == {"de3"}
 

@@ -121,19 +121,8 @@ source = "bundesagentur"
 query = "Machine Learning"
 place = "Berlin"
 
-# Keyed aggregators; their keys are in var/accounts.toml. Each needs the country.
-[[searches]]
-source = "adzuna"
-query = "software engineer"
-place = "Berlin"
-country = "DE"
-
-[[searches]]
-source = "adzuna"
-query = "softwareentwickler"
-place = "Berlin"
-country = "DE"
-
+# Keyed aggregators; their keys are in var/accounts.toml. Each needs the country. Adzuna isn't
+# searched: its free plan is 25 test calls, and full access is paid (docs/sources.md).
 [[searches]]
 source = "careerjet"
 query = "software engineer"
