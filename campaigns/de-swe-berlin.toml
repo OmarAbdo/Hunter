@@ -145,3 +145,21 @@ source = "careerjet"
 query = "softwareentwickler"
 place = "Berlin"
 country = "DE"
+
+# EURES: in Germany these are the Bundesagentur's jobs again (they join them in the pool), but
+# EURES names the employer's website, which probing uses to find a company's board. Berlin is the
+# NUTS region de3.
+[[searches]]
+source = "eures"
+query = "software engineer"
+place = "de3"
+
+[[searches]]
+source = "eures"
+query = "entwickler"
+place = "de3"
+
+[[searches]]
+source = "eures"
+query = "developer"
+place = "de3"
