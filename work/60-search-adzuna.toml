@@ -1,0 +1,4 @@
+id = "60"
+title = "Search Adzuna"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/**", "src/hunter/adapters/cli/sources.py", "src/hunter/adapters/cli/project.py", "tests/**", "docs/**", "src/hunter/adapters/credentials.py"]

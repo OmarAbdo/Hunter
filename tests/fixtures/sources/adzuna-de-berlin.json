@@ -1,0 +1,99 @@
+{
+ "results": [
+  {
+   "description": "Bist du auf der Suche nach einem Arbeitsplatz, an dem positive Einstellung und Teamgeist groß geschrieben werden? Wir validieren und implementieren neue Technologien und entwickeln maßgeschneiderte Lösungen für unsere Kunden. Wir setzen uns für eine Kultur der Innovation und der Integration neuer Te",
+   "adref": "eyJhbGciOiJIUzI1NiJ9.eyJzIjoiN2tPU3ZVclI4UkcyWWR4X0Z3VURiUSIsImkiOiI1OTQwNDE4NTQzIn0.izF1MGKEirTlh2I93maab-s6QRk8OPL8B8WxphtEFu0",
+   "longitude": 13.40933,
+   "title": "Senior AI Software Engineer (all genders) in Berlin",
+   "latitude": 52.52219,
+   "id": "5940418543",
+   "location": {
+    "area": [
+     "Deutschland",
+     "Berlin",
+     "Mitte"
+    ],
+    "__CLASS__": "Adzuna::API::Response::Location",
+    "display_name": "Mitte, Berlin"
+   },
+   "redirect_url": "https://www.adzuna.de/land/ad/5940418543?se=7kOSvUrR8RG2Ydx_FwUDbQ&utm_medium=api&utm_source=app-id&v=28F68BDB09F742F3555CF548237DA5050BE6D076",
+   "company": {
+    "display_name": "Instaffo GmbH",
+    "__CLASS__": "Adzuna::API::Response::Company"
+   },
+   "category": {
+    "__CLASS__": "Adzuna::API::Response::Category",
+    "label": "Unknown",
+    "tag": "unknown"
+   },
+   "__CLASS__": "Adzuna::API::Response::Job",
+   "created": "2026-10-24T13:38:11Z",
+   "salary_is_predicted": "0"
+  },
+  {
+   "created": "2026-10-20T04:05:40Z",
+   "salary_is_predicted": "0",
+   "salary_max": 120000,
+   "company": {
+    "display_name": "Noir",
+    "__CLASS__": "Adzuna::API::Response::Company"
+   },
+   "category": {
+    "tag": "it-jobs",
+    "__CLASS__": "Adzuna::API::Response::Category",
+    "label": "IT-Stellen"
+   },
+   "__CLASS__": "Adzuna::API::Response::Job",
+   "title": ".NET Software Engineer",
+   "latitude": 52.507706,
+   "salary_min": 100000,
+   "longitude": 13.420806,
+   "contract_type": "permanent",
+   "id": "5934864458",
+   "location": {
+    "display_name": "Berlin, Deutschland",
+    "area": [
+     "Deutschland",
+     "Berlin"
+    ],
+    "__CLASS__": "Adzuna::API::Response::Location"
+   },
+   "redirect_url": "https://www.adzuna.de/details/5934864458?utm_medium=api&utm_source=app-id",
+   "description": ".NET Software Engineer, C# 14, WPF - Asset Management - Berlin, Germany (Tech stack: .NET Software Engineer, .NET 10.0, C# 14, WPF, Azure SQL, MVVM, Prism, TDD, Agile, Programmer, Developer, Architect, Softwareentwickler, Entwickler, .NET Software Engineer) Founded in 1930, our client is a leading i",
+   "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTkzNDg2NDQ1OCIsInMiOiI3a09TdlVyUjhSRzJZZHhfRndVRGJRIn0.SmrKRFsksO-SMorcvdlOKHFhIY4KKLEYMZqfkpyeWlg",
+   "contract_time": "full_time"
+  },
+  {
+   "latitude": 52.507706,
+   "title": "Senior Software Engineer (Payments) (m/f/d)",
+   "longitude": 13.420806,
+   "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoiNTkzOTY3Mjk2NyIsInMiOiI3a09TdlVyUjhSRzJZZHhfRndVRGJRIn0.VtJ9PvUE-ZxYejYOHeH0DHmIIlfSp5dnKDkzptJCILc",
+   "description": "Senior Software Engineer (Payments) (m/f/d) We are looking for a (unlimited, full-time) to join our team located in Tallinn, Berlin, Stockholm, or Varberg - flexible working conditions available You will join one of our product teams and daily you will: Design, develop, test, and ship robust, mainta",
+   "salary_is_predicted": "0",
+   "created": "2026-10-23T23:55:26Z",
+   "__CLASS__": "Adzuna::API::Response::Job",
+   "company": {
+    "__CLASS__": "Adzuna::API::Response::Company",
+    "display_name": "Riverty"
+   },
+   "category": {
+    "__CLASS__": "Adzuna::API::Response::Category",
+    "label": "Unknown",
+    "tag": "unknown"
+   },
+   "redirect_url": "https://www.adzuna.de/details/5939672967?utm_medium=api&utm_source=app-id",
+   "location": {
+    "display_name": "Berlin, Deutschland",
+    "__CLASS__": "Adzuna::API::Response::Location",
+    "area": [
+     "Deutschland",
+     "Berlin"
+    ]
+   },
+   "id": "5939672967"
+  }
+ ],
+ "count": 3,
+ "mean": 82325.58,
+ "__CLASS__": "Adzuna::API::Response::JobSearchResults"
+}

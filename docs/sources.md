@@ -49,6 +49,7 @@ asking for more than 10 minutes isn't asked again in that run.
 | onlyfy (list page) | `Crawl-delay: 1` in robots.txt | No rate headers | 1 a second |
 | SuccessFactors (RSS) | No limit published | No rate headers | 1 a second |
 | rexx (list and job pages) | No limit published | No rate headers | 1 a second |
+| Adzuna | Plan limits shown in the account; free plans allow about 25 a minute and 250 a day | No rate headers | 1 per 3 seconds, 250 a day |
 | Bundesagentur | Nothing official; a third-party listing says 1,000 an hour | No rate headers | 1 a second |
 | EURES | No limit published | No rate headers | 1 a second |
 
@@ -88,7 +89,8 @@ asking for more than 10 minutes isn't asked again in that run.
 | Arbeitnow | Search: `www.arbeitnow.com/api/job-board-api` | 200 | DE | |
 | Himalayas, Remotive, We Work Remotely | Search (API or RSS) | 200 | Remote, US part-time | Remote only |
 | USAJobs | Keyed search: `data.usajobs.gov/api/search` | 401 without a key | US | US government jobs only |
-| Adzuna, Jooble, Careerjet | Keyed search | 400 or 401 without a key | US, UAE, EU | Aggregators; keys pending |
+| Adzuna | Keyed search: `api.adzuna.com/v1/api/jobs/{country}/search/{page}` | 200 with Omar's key | Its countries: DE, GB, US, NL, FR, AT, CH, ... (not UAE) | Built. An aggregator; needs a country per search; last 30 days, 50 a page, up to 4 pages. Links go to Adzuna's page for the job, without the tracking query that carries the app id |
+| Jooble, Careerjet | Keyed search | 200 with Omar's keys | Many countries | Aggregators; keys in `var/accounts.toml` |
 | Indeed (Glassdoor is part of Indeed) | Alert mail from `donotreply@jobalert.indeed.com` | Arriving: several a day, up to about 20 jobs each | DE, US, UAE | Each job has title, company, place, salary, freshness, Indeed's job key and its quick-apply mark ("Schnellbewerbung") |
 | LinkedIn | Alert mail | None in the main inbox; check the jobs inbox | All | |
 | StepStone, XING | Alert mail | Not set up yet | DE | StepStone's `robots.txt` disallows its search pages |
@@ -110,6 +112,6 @@ without a known board, Hunter looks in this order:
 
 ## What's still to do outside the code
 
-- **Free API keys** for Adzuna, Jooble, Careerjet and USAJobs (Omar signs up).
+- **Free API keys** for Adzuna, Jooble, Careerjet and USAJobs: done; they're in `var/accounts.toml`.
 - **App passwords for both inboxes**, for Hunter's mail reader (IMAP).
 - **Job alerts on each site:** set up by hand, from a list Hunter generates for each campaign.

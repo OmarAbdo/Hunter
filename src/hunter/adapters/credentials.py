@@ -18,11 +18,12 @@ def accounts_from(path: Path) -> list[MailAccount]:
     return [MailAccount(**entry) for entry in settings["mailbox"]]
 
 
-def keys_from(path: Path) -> dict[str, dict[str, Any]]:
+Keys = dict[str, dict[str, Any]]  # each keyed source's settings, by source
+
+
+def keys_from(path: Path) -> Keys:
     """The API keys of the keyed search sources, by source: `[keys.<source>]` tables."""
     if not path.is_file():
         return {}
-    keys: dict[str, dict[str, Any]] = tomllib.loads(path.read_text(encoding="utf-8")).get(
-        "keys", {}
-    )
+    keys: Keys = tomllib.loads(path.read_text(encoding="utf-8")).get("keys", {})
     return keys
