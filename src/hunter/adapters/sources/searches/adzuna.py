@@ -6,9 +6,9 @@ allows few requests a day, so a search reads at most 4 pages."""
 
 from datetime import timedelta
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
 
 from hunter.adapters.sources.reading import employment_from, parsed_time, place_at, read_json
+from hunter.adapters.sources.searches.keyed import keeping_keys_out, without_tracking
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.campaign import Search
@@ -60,7 +60,8 @@ class AdzunaSearch:
             "max_days_old": DAYS,
             "content-type": "application/json",
         }
-        answer = read_json(self.web, f"{self.api}/{country}/search/{page}", params)
+        url = f"{self.api}/{country}/search/{page}"
+        answer = keeping_keys_out(lambda: read_json(self.web, url, params), self.key.values())
         jobs: list[dict[str, Any]] = answer.get("results") or [] if isinstance(answer, dict) else []
         return jobs
 
@@ -87,9 +88,3 @@ class AdzunaSearch:
             if place.city:
                 return place
         return Location(country=self.search.country or None)
-
-
-def without_tracking(link: str) -> str:
-    """Adzuna's link without its query, which carries tracking and the app id."""
-    parts = urlsplit(link)
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))

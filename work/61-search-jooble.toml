@@ -1,0 +1,4 @@
+id = "61"
+title = "Search Jooble"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/**", "tests/**", "docs/**"]
