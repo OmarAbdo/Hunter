@@ -1,0 +1,4 @@
+id = "63"
+title = "Search Careerjet"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/careerjet.py", "tests/integration/sources/test_careerjet.py", "tests/fixtures/sources/careerjet-*"]
