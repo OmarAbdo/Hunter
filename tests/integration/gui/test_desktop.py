@@ -16,6 +16,13 @@ def test_the_icon_opens_hunter_without_a_console() -> None:
     assert "WorkingDirectory = 'D:\\1 Software\\Projects\\Hunter'" in script
 
 
+def test_the_icon_shows_hunter_s_own_picture() -> None:
+    script = shortcut_script(ROOT, Path("C:/Users/Someone/Desktop/Hunter.lnk"))
+    assert "IconLocation = 'D:\\1 Software\\Projects\\Hunter\\assets\\hunter.ico'" in script
+    icon = (Path(__file__).resolve().parents[3] / "assets" / "hunter.ico").read_bytes()
+    assert icon[:4] == b"\x00\x00\x01\x00"  # a Windows icon file
+
+
 def test_a_quote_in_a_path_cannot_end_the_script_s_strings() -> None:
     script = shortcut_script(Path("D:/O'Brien/Hunter"), Path("C:/Desktop/Hunter.lnk"))
     assert "'D:\\O''Brien\\Hunter'" in script

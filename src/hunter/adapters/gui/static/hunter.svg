@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Hunter</title>
+  <defs>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a6f9f"/>
+      <stop offset="1" stop-color="#244a70"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="52" fill="url(#ground)"/>
+  <circle cx="128" cy="128" r="68" fill="none" stroke="#ffffff" stroke-width="18"/>
+  <g stroke="#ffffff" stroke-width="18" stroke-linecap="round">
+    <line x1="128" y1="34" x2="128" y2="74"/>
+    <line x1="128" y1="182" x2="128" y2="222"/>
+    <line x1="34" y1="128" x2="74" y2="128"/>
+    <line x1="182" y1="128" x2="222" y2="128"/>
+  </g>
+  <circle cx="128" cy="128" r="22" fill="#f2b134"/>
+</svg>

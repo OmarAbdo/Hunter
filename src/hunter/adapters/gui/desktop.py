@@ -9,7 +9,6 @@ from pathlib import Path, PureWindowsPath
 
 LIMIT_SECONDS = 30.0  # the page says it's open every 5 seconds
 FIRST_OPEN_SECONDS = 120.0  # how long Edge may take to show the page at all
-ICON = "%SystemRoot%\\System32\\imageres.dll,-5323"  # Windows' own magnifying glass
 
 
 @dataclass
@@ -46,7 +45,7 @@ def shortcut_script(project: Path, shortcut_path: Path) -> str:
             f"$link.TargetPath = {quoted(str(target))}",
             f"$link.Arguments = {quoted(launcher)}",
             f"$link.WorkingDirectory = {quoted(str(root))}",
-            f"$link.IconLocation = {quoted(ICON)}",
+            f"$link.IconLocation = {quoted(str(root / 'assets' / 'hunter.ico'))}",
             "$link.Description = 'Hunter: find jobs and apply'",
             "$link.Save()",
         ]

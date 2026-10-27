@@ -38,6 +38,12 @@ def test_the_page_is_served(address: str) -> None:
     assert "<title>Hunter</title>" in page
 
 
+def test_hunter_s_icon_is_served_for_the_window(address: str) -> None:
+    status, kind, icon = read(f"{address}/hunter.svg")
+    assert (status, kind) == (200, "image/svg+xml")
+    assert icon.startswith("<svg")
+
+
 def test_the_campaigns_come_as_json(address: str) -> None:
     status, kind, body = read(f"{address}/api/campaigns")
     assert (status, kind) == (200, "application/json")

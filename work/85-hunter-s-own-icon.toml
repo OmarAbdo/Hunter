@@ -1,0 +1,4 @@
+id = "85"
+title = "Hunter's own icon"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/**", "tests/integration/gui/**", "assets/**", "README.md"]

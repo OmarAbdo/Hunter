@@ -37,7 +37,12 @@ def test_the_page_has_light_and_dark_colours() -> None:
 
 
 def test_nothing_else_lives_next_to_the_page() -> None:
-    assert {path.name for path in Path(STATIC).iterdir()} == {"index.html", "app.js", "style.css"}
+    names = {path.name for path in Path(STATIC).iterdir()}
+    assert names == {"index.html", "app.js", "style.css", "hunter.svg"}
+
+
+def test_the_window_shows_hunter_s_icon() -> None:
+    assert '<link rel="icon" href="/hunter.svg" type="image/svg+xml">' in PAGE
 
 
 def test_the_page_keeps_saying_it_is_open() -> None:
