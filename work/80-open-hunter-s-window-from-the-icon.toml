@@ -1,0 +1,4 @@
+id = "80"
+title = "Open Hunter's window from the icon"
+kind = "fix"
+scope = ["hunter-gui.pyw", "src/hunter/adapters/gui/launch.py", "tests/integration/gui/test_launch.py"]
