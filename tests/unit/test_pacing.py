@@ -111,3 +111,15 @@ def test_a_cap_of_one_allows_one_again_the_next_day() -> None:
 
 def test_a_moment_is_a_value() -> None:
     assert len({at(0), at(0)}) == 1
+
+
+def test_a_pause_kept_from_an_earlier_run_holds_from_the_start() -> None:
+    hosts = Pacing({}, default=DEFAULT, held={"apply.workable.com": NOON + HOUR})
+    assert hosts.wait("apply.workable.com", at(0)) == HOUR
+
+
+def test_each_new_pause_is_passed_on_to_be_kept() -> None:
+    kept: list[tuple[str, datetime]] = []
+    hosts = Pacing({}, default=DEFAULT, keep=lambda host, until: kept.append((host, until)))
+    hosts.hold("apply.workable.com", NOON + HOUR)
+    assert kept == [("apply.workable.com", NOON + HOUR)]

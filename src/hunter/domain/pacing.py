@@ -5,7 +5,7 @@ Time comes from two clocks. Gaps are measured on a steady one that only moves fo
 corrected wall clock can't stretch or shorten them; the day and a site's pause, which name times
 of day, are read on the wall clock."""
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
@@ -37,15 +37,26 @@ class HostUse:
 
 
 class Pacing:
-    def __init__(self, rules: Mapping[str, PaceRule], default: PaceRule) -> None:
+    def __init__(
+        self,
+        rules: Mapping[str, PaceRule],
+        default: PaceRule,
+        held: Mapping[str, datetime] | None = None,
+        keep: Callable[[str, datetime], None] | None = None,
+    ) -> None:
+        """`held` are the pauses sites asked for that haven't ended yet, kept from earlier runs;
+        `keep` is told each new pause, so later runs can be held by it too."""
         self.rules = dict(rules)
         self.default = default
         self.used: dict[str, HostUse] = {}
-        self.held: dict[str, datetime] = {}
+        self.held: dict[str, datetime] = dict(held or {})
+        self.keep = keep
 
     def hold(self, host: str, until: datetime) -> None:
         """No request to `host` before `until`: the site asked for the pause."""
         self.held[host] = max(until, self.held.get(host, until))
+        if self.keep:
+            self.keep(host, until)
 
     def wait(self, host: str, now: Moment) -> timedelta:
         """How long to wait before the next request to `host`; refuses once today's cap is used."""
