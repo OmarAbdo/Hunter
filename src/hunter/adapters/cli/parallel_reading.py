@@ -3,15 +3,67 @@ probing for boards. Each site still takes its turns: the web client paces every 
 threads. Results come back in the items' order, so what's stored never depends on which site
 answered first; storing stays on the calling thread."""
 
-from collections.abc import Callable, Iterator, Sequence
+import threading
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 
 from hunter.application.discover import Fetched, fetched
 from hunter.application.ports import JobSource
+from hunter.domain.discovery.posting import Posting
 
 WORKERS = 8  # things done at the same time
 WAIT_STEP_SECONDS = 0.5
 WAIT_STEPS = 7200  # an hour of steps: far longer than any one thing takes
+
+
+class RunStoppedError(Exception):
+    """A run was stopped from Hunter's window."""
+
+
+class RunControl:
+    """Pausing and stopping a run from another thread. A source that hasn't started waits while
+    the run is paused, and isn't read once it's stopped; a source being read is read to its end,
+    so what's kept is always whole."""
+
+    def __init__(self) -> None:
+        self.going = threading.Event()
+        self.going.set()
+        self.stopped = False
+
+    @property
+    def paused(self) -> bool:
+        return not self.going.is_set()
+
+    def pause(self) -> None:
+        self.going.clear()
+
+    def resume(self) -> None:
+        self.going.set()
+
+    def stop(self) -> None:
+        self.stopped = True
+        self.going.set()
+
+    def gated(self, sources: Sequence[JobSource]) -> list[JobSource]:
+        return [Gated(source, self) for source in sources]
+
+    def wait_turn(self) -> None:
+        self.going.wait()
+        if self.stopped:
+            raise RunStoppedError
+
+
+class Gated:
+    """A source read only when its run may go on."""
+
+    def __init__(self, source: JobSource, control: RunControl) -> None:
+        self.source = source
+        self.control = control
+        self.name = source.name
+
+    def fetch(self) -> Iterable[Posting]:
+        self.control.wait_turn()
+        return self.source.fetch()
 
 
 def read_in_parallel(sources: Sequence[JobSource]) -> Iterator[tuple[JobSource, Fetched]]:

@@ -103,9 +103,11 @@ The window is an Edge app window on a page Hunter serves on this computer only. 
 pool's size, each campaign's jobs (filtered as you type) with where they were seen, and the
 companies with their boards. Its Runs tab starts a discovery run, shows each source as it's read
 (the same lines `hunter discover` prints), and lists the latest runs with what they brought and
-which sources failed; one run at a time. It also lists the sites holding Hunter off: each site that
-asked for a long pause, and when the pause ends. Closing the window stops Hunter about half a
-minute later.
+which sources failed; one run at a time. A run can be paused, resumed and stopped there: no new
+source starts while it's paused or once it's stopped, and the sources being read are read to their
+end, so what's kept is whole. It also lists the sites holding Hunter off: each site that asked for
+a long pause, and when the pause ends. Closing the window stops Hunter about half a minute later,
+or, while a run is reading, once that run ends; a paused run is stopped.
 
 ## Campaigns
 

@@ -38,6 +38,12 @@ def test_the_counts_say_what_they_count() -> None:
     assert "match the filter" in SCRIPT
 
 
+def test_a_run_can_be_paused_resumed_and_stopped_from_the_page() -> None:
+    for action in ("pause", "resume", "stop"):
+        assert f'runAction("{action}")' in SCRIPT
+    assert "`/api/runs/${action}`" in SCRIPT
+
+
 def test_the_page_has_light_and_dark_colours() -> None:
     style = (STATIC / "style.css").read_text(encoding="utf-8")
     assert "prefers-color-scheme: dark" in style

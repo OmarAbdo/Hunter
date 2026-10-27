@@ -43,12 +43,21 @@ class GuiRequests(BaseHTTPRequestHandler):
             self.answer(404, "text/plain; charset=utf-8", b"not found")
 
     def answer_post(self) -> None:
-        """`/api/runs` starts a discovery run: 202 when it started, 409 when one is going."""
-        if urlsplit(self.path).path != "/api/runs":
+        """`/api/runs` starts a discovery run: 202 when it started, 409 when one is going.
+        `/api/runs/pause`, `resume` and `stop` act on the run going on: 200, or 409 without one."""
+        actions = {
+            "/api/runs": (self.live.start, 202),
+            "/api/runs/pause": (self.live.pause, 200),
+            "/api/runs/resume": (self.live.resume, 200),
+            "/api/runs/stop": (self.live.stop, 200),
+        }
+        path = urlsplit(self.path).path
+        if path not in actions:
             self.answer(404, "text/plain; charset=utf-8", b"not found")
             return
-        started = self.live.start()
-        self.answer(202 if started else 409, "application/json", json.dumps(started).encode())
+        action, done = actions[path]
+        acted = action()
+        self.answer(done if acted else 409, "application/json", json.dumps(acted).encode())
 
     def alive(self) -> bool:
         """The page saying it's still open."""
@@ -87,9 +96,11 @@ setattr(GuiRequests, "do_" + "GET", GuiRequests.answer_get)
 setattr(GuiRequests, "do_" + "POST", GuiRequests.answer_post)
 
 
-def gui_server(project: Project, watch: Watch | None = None) -> ThreadingHTTPServer:
+def gui_server(
+    project: Project, watch: Watch | None = None, live: LiveRun | None = None
+) -> ThreadingHTTPServer:
     """A server for the project on a free port; `serve_forever` starts it."""
     seen = watch or Watch(started=time.monotonic())
-    attributes = {"project": project, "watch": seen, "live": LiveRun(project)}
+    attributes = {"project": project, "watch": seen, "live": live or LiveRun(project)}
     requests = type("ProjectRequests", (GuiRequests,), attributes)
     return ThreadingHTTPServer(("127.0.0.1", 0), requests)

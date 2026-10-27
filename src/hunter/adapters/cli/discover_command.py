@@ -15,7 +15,7 @@ from hunter.adapters.cli.report import progress_line, report_text
 from hunter.adapters.cli.sources import sources_of
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.run_log import DiscoveryRun, RunLog
-from hunter.adapters.cli.parallel_reading import read_in_parallel
+from hunter.adapters.cli.parallel_reading import RunControl, RunStoppedError, read_in_parallel
 from hunter.application.discover import SourceReport, take_each
 from hunter.application.ports import JobSource
 from hunter.domain.discovery.campaign import Campaign
@@ -23,13 +23,18 @@ from hunter.domain.discovery.campaign import Campaign
 STOPPED = 130  # the exit status of a program stopped with Ctrl+C
 
 
-def run_discovery(project: Project, campaign_ids: Sequence[str], out: TextIO) -> int:
+def run_discovery(
+    project: Project, campaign_ids: Sequence[str], out: TextIO, control: RunControl | None = None
+) -> int:
+    """`control` lets Hunter's window pause and stop the run."""
     try:
         campaigns = chosen(load_campaigns(project.campaigns_folder), campaign_ids)
         sources = sources_of(project, project.database(), campaigns)
     except (CampaignFileError, LookupError) as error:
         out.write(f"{error}\n")
         return 1
+    if control:
+        sources = control.gated(sources)
     out.write(reading_line(sources, campaigns))
     runs = RunLog(project.database())
     run = runs.start([campaign.id for campaign in campaigns])
@@ -40,7 +45,7 @@ def run_discovery(project: Project, campaign_ids: Sequence[str], out: TextIO) ->
             out.write(progress_line(report) + "\n")
             out.flush()
             reports.append(report)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, RunStoppedError):
         out.write("Stopped. Everything read until now is kept.\n")
         return STOPPED
     linked = linked_jobs(project.database())

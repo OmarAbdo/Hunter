@@ -1,0 +1,4 @@
+id = "90"
+title = "Pause and stop a run from the window"
+kind = "feature"
+scope = ["src/hunter/adapters/cli/parallel_reading.py", "src/hunter/adapters/cli/discover_command.py", "tests/integration/cli/test_parallel_reading.py", "src/hunter/adapters/gui/**", "tests/integration/gui/**", "docs/discovery.md", "tests/integration/cli/test_discover_command.py"]

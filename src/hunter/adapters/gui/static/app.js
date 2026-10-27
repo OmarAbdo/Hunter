@@ -149,7 +149,10 @@ async function followRun() {
   lines.textContent = live.lines.join("\n");
   lines.scrollTop = lines.scrollHeight;
   byId("run").disabled = live.running;
-  byId("run-state").textContent = live.running ? "Running…" : "";
+  byId("pause").hidden = !live.running || live.paused || live.stopping;
+  byId("resume").hidden = !live.running || !live.paused || live.stopping;
+  byId("stop").hidden = !live.running || live.stopping;
+  byId("run-state").textContent = runState(live);
   if (live.running) {
     setTimeout(followRun, 1000);
   } else if (live.lines.length) {
@@ -160,6 +163,20 @@ async function followRun() {
 async function startRun() {
   await fetch("/api/runs", { method: "POST" });
   followRun();
+}
+
+function runState(live) {
+  // Sources already being read are read to their end, so pausing and stopping take a moment.
+  if (!live.running) return "";
+  if (live.stopping) return "Stopping: finishing the sources being read…";
+  if (live.paused) return "Paused: no new source starts; those being read finish.";
+  return "Running…";
+}
+
+async function runAction(action) {
+  await fetch(`/api/runs/${action}`, { method: "POST" });
+  const live = await getJson("/api/runs/live");
+  byId("run-state").textContent = runState(live);
 }
 
 function showTab(name) {
@@ -173,6 +190,9 @@ byId("show-jobs").addEventListener("click", () => showTab("jobs"));
 byId("show-companies").addEventListener("click", () => showTab("companies"));
 byId("show-runs").addEventListener("click", () => showTab("runs"));
 byId("run").addEventListener("click", startRun);
+byId("pause").addEventListener("click", () => runAction("pause"));
+byId("resume").addEventListener("click", () => runAction("resume"));
+byId("stop").addEventListener("click", () => runAction("stop"));
 showRuns();
 followRun();
 byId("campaign").addEventListener("change", loadCampaign);

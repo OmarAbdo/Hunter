@@ -5,10 +5,11 @@ import threading
 import time
 import traceback
 from pathlib import Path
-from typing import TextIO
+from typing import Protocol, TextIO
 
 from hunter.adapters.cli.project import Project
 from hunter.adapters.gui.desktop import Watch
+from hunter.adapters.gui.runner import LiveRun
 from hunter.adapters.gui.server import gui_server
 from hunter.adapters.gui.window import open_window
 
@@ -18,21 +19,32 @@ WATCH_STEP_SECONDS = 2.0
 def run_gui(project: Project, out: TextIO) -> int:
     """`gui`: serves the page and opens it in Hunter's window, until the window is closed (or
     Ctrl+C in a console)."""
-    watch = Watch(started=time.monotonic())
-    server = gui_server(project, watch)
+    watch, live = Watch(started=time.monotonic()), LiveRun(project)
+    server = gui_server(project, watch, live)
     url = f"http://127.0.0.1:{server.server_address[1]}/"
     out.write(f"Hunter is open at {url} (closing its window, or Ctrl+C here, stops it)\n")
     out.flush()
     threading.Thread(target=server.serve_forever, daemon=True).start()
     open_window(url)
     try:
-        while not watch.closed(time.monotonic()):
+        while not should_close(watch, live, time.monotonic()):
             time.sleep(WATCH_STEP_SECONDS)
     except KeyboardInterrupt:
         pass
+    live.stop()  # a paused run, or one stopped with Ctrl+C: what was read is kept
     server.shutdown()
     out.write("Closed.\n")
     return 0
+
+
+class Reading(Protocol):
+    def reading(self) -> bool: ...
+
+
+def should_close(watch: Watch, live: Reading, now: float) -> bool:
+    """Once the window is closed, Hunter stops, but not halfway through a run that's reading: it
+    stops when the run ends. A paused run isn't waited for."""
+    return watch.closed(now) and not live.reading()
 
 
 def without_console(root: Path) -> int:

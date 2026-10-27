@@ -1,8 +1,10 @@
 import threading
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 
-from hunter.adapters.cli.parallel_reading import read_in_parallel
+import pytest
+
+from hunter.adapters.cli.parallel_reading import RunControl, RunStoppedError, read_in_parallel
 from hunter.application.discover import Stores, take_each
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.boards import Board
@@ -67,6 +69,60 @@ class Verdicts:
         self, job_id: int, campaign_id: str, rejection: Rejection | None, decided_at: datetime
     ) -> None:
         return
+
+
+class Counted:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.reads = 0
+
+    def fetch(self) -> Iterable[Posting]:
+        self.reads += 1
+        return [posting(self.name)]
+
+
+def test_a_stopped_run_reads_no_source_it_had_not_started() -> None:
+    control = RunControl()
+    source = Counted("greenhouse:later")
+    control.stop()
+    [gated] = control.gated([source])
+    with pytest.raises(RunStoppedError):
+        list(read_in_parallel([gated]))
+    assert (gated.name, source.reads) == ("greenhouse:later", 0)
+
+
+def test_a_paused_run_starts_no_source_until_it_goes_on() -> None:
+    control = RunControl()
+    source = Counted("greenhouse:later")
+    control.pause()
+    [gated] = control.gated([source])
+    reading = threading.Thread(target=gated.fetch)
+    reading.start()
+    reading.join(timeout=0.3)
+    assert (control.paused, source.reads) == (True, 0)
+    control.resume()
+    reading.join(timeout=5)
+    assert (control.paused, source.reads) == (False, 1)
+
+
+def test_stopping_a_paused_run_lets_its_waiting_sources_go() -> None:
+    control = RunControl()
+    control.pause()
+    [gated] = control.gated([Counted("greenhouse:later")])
+    errors: list[Exception] = []
+    reading = threading.Thread(target=lambda: errors.append(stopped(gated.fetch)))
+    reading.start()
+    control.stop()
+    reading.join(timeout=5)
+    assert [type(error) for error in errors] == [RunStoppedError]
+
+
+def stopped(fetch: Callable[[], object]) -> Exception:
+    try:
+        fetch()
+    except RunStoppedError as error:
+        return error
+    raise AssertionError("the source was read")
 
 
 def test_sources_are_read_at_the_same_time_and_reported_in_their_order() -> None:

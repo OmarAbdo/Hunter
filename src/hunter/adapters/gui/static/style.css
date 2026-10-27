@@ -69,6 +69,16 @@ button.primary {
   cursor: pointer;
 }
 button.primary:disabled { opacity: 0.5; cursor: default; }
+button.secondary {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+button[hidden] { display: none; }
 ul.plain { list-style: none; padding: 0; margin: 0 0 8px; }
 pre {
   background: var(--surface);

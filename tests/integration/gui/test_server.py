@@ -72,8 +72,15 @@ def post(url: str) -> int:
         return int(answer.status)
 
 
+def test_without_a_run_there_is_nothing_to_pause_or_stop(address: str) -> None:
+    for action in ("pause", "resume", "stop"):
+        with pytest.raises(urllib.error.HTTPError) as refused:
+            post(f"{address}/api/runs/{action}")
+        assert refused.value.code == 409
+
+
 def test_a_run_can_be_started_and_followed(address: str) -> None:
     assert post(f"{address}/api/runs") == 202
     live = json.loads(read(f"{address}/api/runs/live")[2])
-    assert set(live) == {"running", "lines"}
+    assert set(live) == {"running", "paused", "stopping", "lines"}
     assert isinstance(json.loads(read(f"{address}/api/runs")[2]), list)

@@ -1,9 +1,12 @@
+import io
 from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
 from hunter.adapters.cli import discover_command
+from hunter.adapters.cli.parallel_reading import RunControl
+from hunter.adapters.cli.project import Project
 from hunter.adapters.cli.sources import sources_of
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.pool import Pool
@@ -97,6 +100,17 @@ def test_a_site_that_asked_for_a_long_pause_is_not_asked_again_in_the_next_run(
     assert len(busy_requests) == 1
     assert "HTTP 429" in first
     assert "asked Hunter to wait until" in second
+
+
+def test_a_run_stopped_from_the_window_says_so_and_keeps_no_end(project: Path) -> None:
+    control = RunControl()
+    control.stop()
+    out = io.StringIO()
+    status = discover_command.run_discovery(Project(project, {}), [], out, control)
+    [kept] = RunLog(open_database(project / "var" / "hunter.db")).latest(1)
+    assert status == 130
+    assert out.getvalue().splitlines()[-1] == "Stopped. Everything read until now is kept."
+    assert kept.ended_at is None
 
 
 class Interrupted:

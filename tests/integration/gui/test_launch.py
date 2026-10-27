@@ -28,6 +28,24 @@ def test_hunter_stops_once_its_window_never_opened(
     ]
 
 
+class Reading:
+    def __init__(self, reading: bool) -> None:
+        self.is_reading = reading
+
+    def reading(self) -> bool:
+        return self.is_reading
+
+
+def test_hunter_stays_while_a_run_is_reading_even_with_its_window_closed() -> None:
+    """Closing the window doesn't end a run halfway; a paused run isn't waited for."""
+    closed = desktop.Watch(started=0.0)
+    closed.touch(0.0)
+    late = desktop.LIMIT_SECONDS + 1
+    assert not launch.should_close(closed, Reading(reading=True), late)
+    assert launch.should_close(closed, Reading(reading=False), late)
+    assert not launch.should_close(closed, Reading(reading=False), 1.0)
+
+
 def test_without_a_console_what_hunter_says_goes_to_its_log(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
