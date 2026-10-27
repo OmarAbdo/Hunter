@@ -101,7 +101,25 @@ const localTime = (moment) => new Date(moment).toLocaleString([], {
   year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
 });
 
+async function showHeld() {
+  // A site that asked for a long pause isn't asked again until it ends, in any run.
+  const held = await getJson("/api/held");
+  const items = held.map((pause) => {
+    const item = document.createElement("li");
+    item.textContent = `${pause.host} until ${localTime(pause.until)}`;
+    return item;
+  });
+  if (items.length === 0) {
+    const none = document.createElement("li");
+    none.className = "muted";
+    none.textContent = "None right now.";
+    items.push(none);
+  }
+  byId("held-sites").replaceChildren(...items);
+}
+
 async function showRuns() {
+  showHeld();
   const runs = await getJson("/api/runs");
   byId("run-rows").replaceChildren(...runs.map((run) => {
     const failed = run.sources.filter((source) => source.error);

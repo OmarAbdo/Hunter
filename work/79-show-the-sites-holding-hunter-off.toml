@@ -1,0 +1,4 @@
+id = "79"
+title = "Show the sites holding Hunter off"
+kind = "feature"
+scope = ["src/hunter/adapters/gui", "tests/integration/gui", "docs/discovery.md", "src/hunter/adapters/gui/views.py", "src/hunter/adapters/gui/server.py", "src/hunter/adapters/gui/static/index.html", "src/hunter/adapters/gui/static/app.js", "src/hunter/adapters/gui/static/style.css", "tests/integration/gui/test_views.py", "tests/integration/gui/test_server.py", "tests/integration/gui/test_page.py", "src/hunter/adapters/gui/run_views.py"]
