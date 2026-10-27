@@ -3,6 +3,8 @@ been closed for a while, or at Ctrl+C in a console."""
 
 import threading
 import time
+import traceback
+from pathlib import Path
 from typing import TextIO
 
 from hunter.adapters.cli.project import Project
@@ -31,3 +33,15 @@ def run_gui(project: Project, out: TextIO) -> int:
     server.shutdown()
     out.write("Closed.\n")
     return 0
+
+
+def without_console(root: Path) -> int:
+    """`gui` for the icons, which start Hunter with pythonw: it has no console, so what Hunter
+    says, and why it stopped if it crashed, go to var/hunter-gui.log."""
+    (root / "var").mkdir(exist_ok=True)
+    with (root / "var" / "hunter-gui.log").open("a", encoding="utf-8") as log:
+        try:
+            return run_gui(Project(root), log)
+        except Exception:
+            traceback.print_exc(file=log)
+            raise
