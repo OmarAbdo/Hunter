@@ -1,0 +1,4 @@
+id = "87"
+title = "Search the web through Edge for a company's board"
+kind = "feature"
+scope = ["src/hunter/application/probe.py", "src/hunter/application/ports.py", "tests/unit/test_probe.py", "src/hunter/adapters/edge_search.py", "tests/integration/test_edge_search.py", "tests/fixtures/sources/edge-search-*.html", "src/hunter/adapters/storage/search_log.py", "tests/integration/test_search_log.py", "src/hunter/adapters/storage/database.py"]

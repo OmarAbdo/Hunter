@@ -150,3 +150,66 @@ def test_a_company_probed_with_its_website_is_marked_so() -> None:
     assert isinstance(kept_stores.log, Log)
     assert set(kept_stores.log.probed) == set(probe_marks(ACME)) == {"acme", "acme website"}
     assert probe_marks(Company(name="Acme")) == ["acme"]
+
+
+class Search:
+    """A web search that gives the same links for every query, and remembers what it was asked."""
+
+    def __init__(self, *links: str, down: bool = False) -> None:
+        self.found = list(links)
+        self.down = down
+        self.queries: list[str] = []
+
+    def links(self, query: str) -> list[str]:
+        self.queries.append(query)
+        if self.down:
+            raise SourceUnavailableError("search: no answer")
+        return self.found
+
+
+LABS = Board(ats="ashby", slug="acme-labs")
+
+
+def results() -> Search:
+    return Search(
+        "https://acme.example/about",
+        "https://jobs.lever.co/acme-old",
+        "https://jobs.ashbyhq.com/acme-labs/1234",
+        "https://jobs.ashbyhq.com/acme-labs",
+        "https://boards.greenhouse.io/acme-two",
+    )
+
+
+def test_without_a_board_elsewhere_the_web_is_searched_for_one() -> None:
+    boards = Boards(LABS, Board(ats="greenhouse", slug="acme-two"))
+    search = results()
+    assert find_board(Company(name="Acme"), boards, search=search) == LABS
+    assert search.queries == ['"Acme" careers jobs']
+    assert boards.asked[-2:] == [Board(ats="lever", slug="acme-old"), LABS]  # in result order
+
+
+def test_the_web_is_not_searched_when_a_board_was_found_otherwise() -> None:
+    search = results()
+    assert find_board(ACME, Boards(Board(ats="ashby", slug="acme")), SITE, search)
+    assert find_board(ACME, Boards(Board(ats="lever", slug="acme")), Pages({}), search)
+    assert search.queries == []
+
+
+def test_search_results_naming_no_board_that_exists_find_none() -> None:
+    boards = Boards()
+    assert find_board(Company(name="Acme"), boards, search=Search("https://acme.example")) is None
+    assert find_board(Company(name="Acme"), boards, search=results()) is None
+    assert boards.asked.count(LABS) == 1  # a board named twice is tried once
+
+
+def test_a_board_already_tried_is_not_tried_again_from_the_search() -> None:
+    boards = Boards()
+    find_board(ACME, boards, SITE, Search("https://jobs.ashbyhq.com/acme"))
+    assert boards.asked.count(Board(ats="ashby", slug="acme")) == 1
+    assert len(boards.asked) == len(set(boards.asked))
+
+
+def test_a_search_that_fails_says_why_the_board_could_not_be_found() -> None:
+    found = find_board(Company(name="Acme"), Boards(), search=Search(down=True))
+    assert isinstance(found, SourceUnavailableError)
+    assert str(found) == "search: no answer"

@@ -1,5 +1,5 @@
 """Hunter's database: one SQLite file in var/ for the pool, the company registry, the campaign
-matches and the discovery runs' reports. var/ is personal data and never committed
+matches, the discovery runs' reports and the web searches. var/ is personal data and never committed
 (docs/discovery.md)."""
 
 import sqlite3
@@ -84,6 +84,16 @@ CREATE TABLE IF NOT EXISTS holds (
     host TEXT PRIMARY KEY,
     until TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS searches (
+    id INTEGER PRIMARY KEY,
+    engine TEXT NOT NULL,
+    query TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    links INTEGER NOT NULL,
+    at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS searches_by_time ON searches (at);
 """
 
 

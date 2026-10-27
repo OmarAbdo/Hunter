@@ -78,3 +78,9 @@ class CareersPages(Protocol):
         """Every link on the website's home page and on its own careers pages; none when the site
         can't be read."""
         ...
+
+
+class WebSearch(Protocol):
+    def links(self, query: str) -> list[str]:
+        """The links a web search finds, best first. Raises SourceUnavailableError."""
+        ...
