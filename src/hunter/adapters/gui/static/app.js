@@ -4,7 +4,8 @@
 
 const byId = (id) => document.getElementById(id);
 const getJson = async (path) => (await fetch(path)).json();
-const isWebLink = (link) => typeof link === "string" && /^https?:\/\//i.test(link);
+const counted = (number) => Number(number).toLocaleString();
+const isWebLink =(link) => typeof link === "string" && /^https?:\/\//i.test(link);
 let jobs = [];
 let companies = [];
 
@@ -55,7 +56,9 @@ function showJobs() {
     cell(job.sources.join(", ")),
     cell(job.employer_system ?? "", job.employer_system ? job.apply_url : null),
   )));
-  byId("job-count").textContent = `${shown.length} of ${jobs.length} jobs`;
+  byId("job-count").textContent = filter.trim()
+    ? `${counted(shown.length)} of these ${counted(jobs.length)} match the filter`
+    : "";
 }
 
 function showCompanies() {
@@ -74,22 +77,28 @@ function showCompanies() {
 async function loadCampaign() {
   const chosen = byId("campaign").selectedOptions[0];
   if (!chosen) return;
+  // Every job in the pool is judged by every campaign: taken, or turned down for a reason.
   const reasons = JSON.parse(chosen.dataset.turnedDown);
+  const [taken, judged] = [counted(chosen.dataset.taken), counted(chosen.dataset.judged)];
+  const turnedDown = Object.values(reasons).reduce((sum, count) => sum + count, 0);
   const summary = Object.entries(reasons).sort((one, other) => other[1] - one[1])
-    .map(([reason, count]) => `${reason} ${count}`).join(", ");
-  byId("turned-down").textContent = summary ? `Turned down: ${summary}` : "";
+    .map(([reason, count]) => `${reason} ${counted(count)}`).join(", ");
+  byId("turned-down").textContent = `This campaign took ${taken} of the ${judged} jobs in the pool`
+    + (turnedDown ? `, and turned down ${counted(turnedDown)}: ${summary}.` : ".");
   jobs = await getJson(`/api/jobs?campaign=${encodeURIComponent(chosen.value)}`);
   showJobs();
 }
 
 async function loadAll() {
   const pool = await getJson("/api/pool");
-  byId("pool").textContent =
-    `${pool.jobs} jobs in the pool · ${pool.companies} companies · ${pool.boards} boards`;
+  byId("pool").textContent = `${counted(pool.jobs)} jobs found in all · `
+    + `${counted(pool.companies)} companies · ${counted(pool.boards)} boards`;
   const campaigns = await getJson("/api/campaigns");
   byId("campaign").replaceChildren(...campaigns.map((campaign) => {
-    const option = new Option(`${campaign.title} (${campaign.taken} taken)`, campaign.id);
+    const option = new Option(`${campaign.title} (${counted(campaign.taken)} taken)`, campaign.id);
     option.dataset.turnedDown = JSON.stringify(campaign.turned_down);
+    option.dataset.taken = campaign.taken;
+    option.dataset.judged = campaign.judged;
     return option;
   }));
   companies = await getJson("/api/companies");

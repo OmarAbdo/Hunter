@@ -72,6 +72,7 @@ def test_each_campaign_shows_what_it_took_and_why_it_turned_jobs_down(database_p
     assert berlin == {
         "id": "berlin",
         "title": "Software in Berlin",
+        "judged": 2,
         "taken": 1,
         "turned_down": {"role": 1},
     }

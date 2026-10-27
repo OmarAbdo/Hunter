@@ -31,6 +31,13 @@ def test_the_page_reads_every_view_the_server_has() -> None:
         assert view in SCRIPT
 
 
+def test_the_counts_say_what_they_count() -> None:
+    """The pool holds every job found; a campaign takes some of them and turns the rest down."""
+    assert "jobs found in all" in SCRIPT
+    assert "of the ${judged} jobs in the pool" in SCRIPT
+    assert "match the filter" in SCRIPT
+
+
 def test_the_page_has_light_and_dark_colours() -> None:
     style = (STATIC / "style.css").read_text(encoding="utf-8")
     assert "prefers-color-scheme: dark" in style

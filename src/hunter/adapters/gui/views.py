@@ -15,18 +15,22 @@ from hunter.domain.discovery.posting import Posting
 
 
 def campaigns_view(database: sqlite3.Connection, campaigns: Sequence[Campaign]) -> list[Any]:
+    """`judged` is every job the campaign looked at: those it took and those it turned down."""
     matches = Matches(database)
-    return [
-        {
-            "id": campaign.id,
-            "title": campaign.title,
-            "taken": len(matches.matched(campaign.id)),
-            "turned_down": {
-                reason.value: count for reason, count in matches.rejections(campaign.id).items()
-            },
-        }
-        for campaign in campaigns
-    ]
+    shown = []
+    for campaign in campaigns:
+        taken = len(matches.matched(campaign.id))
+        rejections = matches.rejections(campaign.id)
+        shown.append(
+            {
+                "id": campaign.id,
+                "title": campaign.title,
+                "judged": taken + sum(rejections.values()),
+                "taken": taken,
+                "turned_down": {reason.value: count for reason, count in rejections.items()},
+            }
+        )
+    return shown
 
 
 TAKEN = "SELECT job_id FROM matches WHERE campaign_id = ? AND rejection IS NULL"

@@ -1,0 +1,4 @@
+id = "89"
+title = "Say what the pool and a campaign's counts mean"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/**", "tests/integration/gui/**"]
