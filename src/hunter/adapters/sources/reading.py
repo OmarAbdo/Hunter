@@ -51,10 +51,15 @@ def read_posted_json(web: WebClient, url: str, body: object) -> Any:
         raise SourceUnavailableError(f"{url}: not JSON ({error})") from error
 
 
-def read_text(web: WebClient, url: str, params: Mapping[str, str] | None = None) -> str:
+def read_text(
+    web: WebClient,
+    url: str,
+    params: Mapping[str, str] | None = None,
+    headers: Mapping[str, str] | None = None,
+) -> str:
     """For sources that answer in XML or RSS."""
     try:
-        return web.get_text(url, params)
+        return web.get_text(url, params, headers)
     except WebError as error:
         raise SourceUnavailableError(str(error), gone=error.status in GONE_STATUSES) from error
 

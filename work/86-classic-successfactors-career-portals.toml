@@ -1,0 +1,4 @@
+id = "86"
+title = "Classic SuccessFactors career portals"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/feeds/successfactors.py", "src/hunter/adapters/sources/reading.py", "tests/integration/sources/test_successfactors_classic.py", "tests/fixtures/sources/successfactors-beiersdorf.xml", "tests/fixtures/sources/successfactors-welthungerhilfe.xml", "tests/fixtures/sources/successfactors-aiib.xml"]
