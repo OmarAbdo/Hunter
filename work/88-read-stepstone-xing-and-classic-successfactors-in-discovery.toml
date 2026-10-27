@@ -1,0 +1,4 @@
+id = "88"
+title = "Read StepStone, XING and classic SuccessFactors in discovery"
+kind = "feature"
+scope = ["src/hunter/domain/discovery/boards.py", "tests/unit/discovery/test_boards.py", "src/hunter/adapters/cli/alerts.py", "tests/integration/cli/test_cli_parts.py", "docs/sources.md"]

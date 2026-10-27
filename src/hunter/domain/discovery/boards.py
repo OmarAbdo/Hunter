@@ -44,6 +44,13 @@ LINK_PATTERNS = tuple(
         ("onlyfy", r"//([a-z0-9-]+)\.onlyfy\.jobs\b", "{0}"),
         ("rexx", r"//([a-z0-9-]+)-portal\.rexx-recruitment\.com\b", "{0}"),
         ("join", r"join\.com/companies/([\w-]+)", "{0}"),
+        # SuccessFactors' own career portals, without Career Site Builder: the host and the
+        # company's id (case matters), `career5.successfactors.eu/beiersdorfP`.
+        (
+            "successfactors",
+            r"//(career\d*\.successfactors\.(?:com|eu))/career\?(?:[^#]*?&)?company=([\w-]+)",
+            "{0}/{1}",
+        ),
         # A SuccessFactors career site is on the company's own host, so it's known by the shape
         # of its job links, `/job/<title>/<id>/` or `/job/<title>/<number>-<locale>`; it comes
         # last, after every system with a host of its own.

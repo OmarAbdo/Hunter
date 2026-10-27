@@ -21,6 +21,16 @@ from hunter.domain.discovery.boards import Board, board_from_link
             "nvidia/wd5/NVIDIAExternalCareerSite",
         ),
         ("https://join.com/companies/momox/12345-engineer", "join", "momox"),
+        (
+            "https://career5.successfactors.eu/career?company=beiersdorfP&career_ns=job_listing",
+            "successfactors",
+            "career5.successfactors.eu/beiersdorfP",
+        ),
+        (
+            "https://career4.successfactors.com/career?career_ns=job_listing&company=AIIB&x=1",
+            "successfactors",
+            "career4.successfactors.com/AIIB",
+        ),
     ],
 )
 def test_a_link_names_the_board(link: str, ats: str, slug: str) -> None:
