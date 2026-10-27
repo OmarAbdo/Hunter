@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -8,8 +8,9 @@ from hunter.adapters.gui.views import (
     companies_view,
     jobs_view,
     pool_view,
-    runs_view,
 )
+from hunter.adapters.gui.run_views import held_view, runs_view
+from hunter.adapters.storage.holds import Holds
 from hunter.adapters.storage.run_log import RunLog
 from hunter.application.discover import SourceReport
 from hunter.adapters.storage.database import open_database
@@ -116,4 +117,13 @@ def test_the_latest_runs_come_with_what_each_source_brought(database_path: Path)
     assert shown["sources"] == [
         {"source": "greenhouse:n26", "fetched": 3, "new": 2, "taken": 1, "error": None},
         {"source": "greenhouse:gone", "fetched": 0, "new": 0, "taken": 0, "error": "HTTP 404"},
+    ]
+
+
+def test_the_sites_holding_hunter_off_come_with_when_their_pause_ends(database_path: Path) -> None:
+    database = open_database(database_path)
+    Holds(database).save("api.lever.co", NOW - timedelta(hours=1))
+    Holds(database).save("apply.workable.com", NOW + timedelta(hours=21))
+    assert held_view(database, clock=lambda: NOW) == [
+        {"host": "apply.workable.com", "until": "2026-10-27T09:00:00+00:00"}
     ]

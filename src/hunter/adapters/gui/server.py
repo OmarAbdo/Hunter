@@ -15,7 +15,7 @@ from hunter.adapters.campaign_files import load_campaigns
 from hunter.adapters.cli.project import Project
 from hunter.adapters.gui.desktop import Watch
 from hunter.adapters.gui.runner import LiveRun
-from hunter.adapters.gui import views
+from hunter.adapters.gui import run_views, views
 
 STATIC = Path(__file__).parent / "static"
 FILES = {
@@ -76,7 +76,8 @@ VIEWS: dict[str, View] = {
     ),
     "/api/companies": lambda requests, _: views.companies_view(requests.project.database()),
     "/api/pool": lambda requests, _: views.pool_view(requests.project.database()),
-    "/api/runs": lambda requests, _: views.runs_view(requests.project.database()),
+    "/api/held": lambda requests, _: run_views.held_view(requests.project.database()),
+    "/api/runs": lambda requests, _: run_views.runs_view(requests.project.database()),
     "/api/runs/live": lambda requests, _: requests.live.state(),
 }
 
