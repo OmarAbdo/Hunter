@@ -1,0 +1,4 @@
+id = "91"
+title = "Search through Edge, politely and with captchas counted"
+kind = "feature"
+scope = ["src/hunter/adapters/edge_search.py", "tests/integration/test_edge_search.py", "tests/fixtures/sources/edge-search-*.html"]
