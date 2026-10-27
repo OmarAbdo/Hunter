@@ -1,0 +1,4 @@
+id = "81"
+title = "StepStone job-alert mails"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/alerts/__init__.py", "src/hunter/adapters/sources/alerts/stepstone.py", "tests/integration/sources/test_stepstone_alerts.py", "tests/fixtures/sources/stepstone-alert-a.txt", "tests/fixtures/sources/stepstone-alert-b.txt"]
