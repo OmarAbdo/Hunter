@@ -1,13 +1,14 @@
 """What the GUI shows of discovery runs, as plain JSON-ready values: the latest runs with what each
-source brought, and the sites holding Hunter off."""
+source brought, the sites holding Hunter off, and how probing's web searches went."""
 
 import sqlite3
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from hunter.adapters.storage.holds import Holds
 from hunter.adapters.storage.run_log import RunLog, utc_now
+from hunter.adapters.storage.search_log import SearchLog
 from hunter.application.discover import SourceReport
 
 
@@ -41,6 +42,14 @@ def source_of(report: SourceReport) -> dict[str, Any]:
         "taken": sum(report.taken.values()),
         "error": report.error,
     }
+
+
+def searches_view(
+    database: sqlite3.Connection, clock: Callable[[], datetime] = utc_now
+) -> dict[str, dict[str, int]]:
+    """How probing's web searches went in the last 30 days: per engine, how many brought links,
+    nothing, a captcha, or failed."""
+    return SearchLog(database).summary(clock() - timedelta(days=30))
 
 
 def held_view(

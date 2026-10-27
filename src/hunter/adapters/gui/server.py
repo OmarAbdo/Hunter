@@ -87,6 +87,7 @@ VIEWS: dict[str, View] = {
     "/api/companies": lambda requests, _: views.companies_view(requests.project.database()),
     "/api/pool": lambda requests, _: views.pool_view(requests.project.database()),
     "/api/held": lambda requests, _: run_views.held_view(requests.project.database()),
+    "/api/searches": lambda requests, _: run_views.searches_view(requests.project.database()),
     "/api/runs": lambda requests, _: run_views.runs_view(requests.project.database()),
     "/api/runs/live": lambda requests, _: requests.live.state(),
 }

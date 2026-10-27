@@ -9,7 +9,8 @@ from hunter.adapters.gui.views import (
     jobs_view,
     pool_view,
 )
-from hunter.adapters.gui.run_views import held_view, runs_view
+from hunter.adapters.gui.run_views import held_view, runs_view, searches_view
+from hunter.adapters.storage.search_log import SearchLog, Searched
 from hunter.adapters.storage.holds import Holds
 from hunter.adapters.storage.run_log import RunLog
 from hunter.application.discover import SourceReport
@@ -128,3 +129,15 @@ def test_the_sites_holding_hunter_off_come_with_when_their_pause_ends(database_p
     assert held_view(database, clock=lambda: NOW) == [
         {"host": "apply.workable.com", "until": "2026-10-27T09:00:00+00:00"}
     ]
+
+
+def test_the_web_searches_of_the_last_30_days_are_counted_by_outcome(database_path: Path) -> None:
+    database = open_database(database_path)
+    log = SearchLog(database)
+    log.record(Searched("duckduckgo", "N26", "captcha", 0, NOW - timedelta(days=40)))
+    log.record(Searched("duckduckgo", "N26", "links", 10, NOW - timedelta(days=1)))
+    log.record(Searched("bing", "N26", "nothing", 0, NOW))
+    assert searches_view(database, clock=lambda: NOW) == {
+        "duckduckgo": {"links": 1},
+        "bing": {"nothing": 1},
+    }

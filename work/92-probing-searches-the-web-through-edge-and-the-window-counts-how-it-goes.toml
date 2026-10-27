@@ -1,0 +1,4 @@
+id = "92"
+title = "Probing searches the web through Edge, and the window counts how it goes"
+kind = "feature"
+scope = ["src/hunter/adapters/probing.py", "tests/integration/test_probing.py", "src/hunter/adapters/cli/probe_command.py", "tests/integration/cli/test_probe_command.py", "src/hunter/adapters/gui/**", "tests/integration/gui/**", "docs/sources.md"]

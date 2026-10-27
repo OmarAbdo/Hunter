@@ -2,6 +2,9 @@ import io
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
+from hunter.adapters import probing
 from hunter.adapters.cli.main import main
 from hunter.adapters.cli.probe_command import result_line
 from hunter.adapters.cli.probe_targets import companies_to_probe
@@ -18,6 +21,7 @@ from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting, SourceRef
 
 NOW = datetime(2026, 10, 25, 9, 0, tzinfo=UTC)
+REPOSITORY = Path(__file__).resolve().parents[3]
 
 
 def taken(project: Project, company: str, times: int = 1) -> None:
@@ -44,6 +48,44 @@ def probe(project: Path, greenhouse: str, *arguments: str) -> tuple[int, str]:
     return status, out.getvalue()
 
 
+SEARCHED = (REPOSITORY / "tests/fixtures/sources/edge-search-duckduckgo-zalando.html").read_text(
+    encoding="utf-8"
+)
+NOTHING = (REPOSITORY / "tests/fixtures/sources/edge-search-duckduckgo-nothing.html").read_text(
+    encoding="utf-8"
+)
+
+
+class PretendEdge:
+    """Edge as the web search sees it, without starting Edge: `page` is every page it shows."""
+
+    page = NOTHING
+
+    def __init__(self, profile: Path) -> None:
+        self.profile = profile
+
+    def dom(self, url: str) -> str:
+        return self.page
+
+
+@pytest.fixture(autouse=True)
+def no_real_edge(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(probing, "Edge", PretendEdge)
+    monkeypatch.setattr(PretendEdge, "page", NOTHING)
+
+
+def test_a_board_only_the_web_search_finds_is_taken(project: Path, greenhouse: str) -> None:
+    """Neither a guess nor a website names it; a search result links to N26's Greenhouse board."""
+    taken(Project(project), "N26 Bank")
+    page = SEARCHED.replace(
+        "zalando.wd3.myworkdayjobs.com%2FZalandoSiteWD%2F", "job-boards.greenhouse.io%2Fn26"
+    )
+    PretendEdge.page = page
+    _, out = probe(project, greenhouse)
+    assert "  N26 Bank: greenhouse:n26" in out
+    assert out.splitlines()[-1] == "Web searches: duckduckgo links 1"
+
+
 def test_a_company_whose_jobs_were_taken_gets_its_board(project: Path, greenhouse: str) -> None:
     taken(Project(project), "N26")
     status, out = probe(project, greenhouse)
@@ -52,7 +94,7 @@ def test_a_company_whose_jobs_were_taken_gets_its_board(project: Path, greenhous
     assert company is not None
     assert company.boards == (Board(ats="greenhouse", slug="n26"),)
     assert "  N26: greenhouse:n26" in out
-    assert out.splitlines()[-1] == "1 of 1 found a board"
+    assert out.splitlines()[-2:] == ["1 of 1 found a board", "Web searches: none"]
 
 
 def test_a_company_without_a_board_is_probed_once(project: Path, greenhouse: str) -> None:

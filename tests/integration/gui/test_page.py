@@ -27,7 +27,7 @@ def test_only_web_links_are_followed() -> None:
 
 def test_the_page_reads_every_view_the_server_has() -> None:
     views = ("/api/campaigns", "/api/jobs", "/api/companies", "/api/pool", "/api/held")
-    for view in (*views, "/api/runs/live", "/api/runs"):
+    for view in (*views, "/api/searches", "/api/runs/live", "/api/runs"):
         assert view in SCRIPT
 
 

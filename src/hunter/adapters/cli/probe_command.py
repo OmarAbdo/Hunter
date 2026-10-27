@@ -8,12 +8,9 @@ from typing import TextIO
 from hunter.adapters.cli.parallel_reading import in_parallel
 from hunter.adapters.cli.probe_targets import companies_to_probe
 from hunter.adapters.cli.project import Project
-from hunter.adapters.sources.feed_table import APIS, PACE, PACES
-from hunter.adapters.sources.feeds import board_check, careers_pages
-from hunter.adapters.storage.holds import kept_pacing
+from hunter.adapters.probing import probe_tools, searches_line
 from hunter.adapters.storage.probe_log import ProbeLog
 from hunter.adapters.storage.registry import Registry
-from hunter.adapters.web_client import WebClient
 from hunter.application.probe import ProbeResult, ProbeStores, find_board, kept
 
 STOPPED = 130  # the exit status of a program stopped with Ctrl+C
@@ -25,15 +22,14 @@ def run_probe(project: Project, limit: int, out: TextIO) -> int:
     out.write(
         f"Probing {len(companies)} compan{'y' if len(companies) == 1 else 'ies'} for their boards\n"
     )
-    web = WebClient(kept_pacing(PACES, PACE, project.database))
-    check = board_check.FeedCheck(web, {**APIS, **project.apis})
-    pages = careers_pages.CareersPages(web)
+    profile = project.root / "var" / "edge-search"
+    check, pages, search = probe_tools(project.database, project.apis, profile)
     stores = ProbeStores(companies=Registry(database), log=ProbeLog(database))
     now = datetime.now(UTC)
     found = 0
     try:
         for company, finding in in_parallel(
-            lambda company: find_board(company, check, pages), companies
+            lambda company: find_board(company, check, pages, search), companies
         ):
             result = kept(company, finding, stores, now)
             found += result.board is not None
@@ -43,6 +39,7 @@ def run_probe(project: Project, limit: int, out: TextIO) -> int:
         out.write("Stopped. Every company probed until now is kept.\n")
         return STOPPED
     out.write(f"{found} of {len(companies)} found a board\n")
+    out.write(searches_line(database, now) + "\n")
     return 0
 
 

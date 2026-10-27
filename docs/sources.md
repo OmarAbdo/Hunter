@@ -121,7 +121,14 @@ without a known board, Hunter looks in this order:
 3. **Likely board names:** Hunter tries them on every system that answers a missing board with a
    404: Greenhouse, Ashby, Lever, Recruitee, Teamtailor, softgarden, onlyfy, Personio and
    SmartRecruiters. Workable isn't guessed.
-4. **A web search:** an AI step using Claude's own WebSearch, last.
+4. **A web search** (built), last, only when nothing else found a board: `"<company>" careers
+   jobs`, searched like a person through Edge (headless, Hunter's own profile in
+   `var/edge-search`, an ordinary Edge user agent). DuckDuckGo's HTML results first, then Bing;
+   each result link that names a board is checked like a guess. One search every 5 seconds, at
+   most 50 per engine a day, both read from the search log so they hold across runs. Every search
+   is logged with how it went (links, nothing, captcha, failed), so whether captchas make this
+   worthwhile is decided on numbers: `boards probe` prints them, and the window's Companies tab
+   shows the last 30 days. No paid search API (Brave's needs a card; Google's is closed).
 
 ## What's still to do outside the code
 

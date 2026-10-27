@@ -74,6 +74,15 @@ function showCompanies() {
   byId("company-count").textContent = `${shown.length} of ${companies.length} companies`;
 }
 
+function showSearches(engines) {
+  // Probing's last resort searches the web through Edge; captchas count against an engine.
+  const lines = Object.entries(engines).map(([engine, outcomes]) => `${engine}: `
+    + Object.entries(outcomes).map(([outcome, count]) => `${counted(count)} ${outcome}`).join(", "));
+  byId("searches").textContent = lines.length
+    ? `Web searches for boards, last 30 days: ${lines.join(" · ")}`
+    : "No web searches for boards in the last 30 days.";
+}
+
 async function loadCampaign() {
   const chosen = byId("campaign").selectedOptions[0];
   if (!chosen) return;
@@ -103,6 +112,7 @@ async function loadAll() {
   }));
   companies = await getJson("/api/companies");
   showCompanies();
+  showSearches(await getJson("/api/searches"));
   await loadCampaign();
 }
 
