@@ -1,0 +1,4 @@
+id = "82"
+title = "XING job-alert mails"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/alerts/__init__.py", "src/hunter/adapters/sources/alerts/xing.py", "tests/integration/sources/test_xing_alerts.py", "tests/fixtures/sources/xing-alert-a.txt", "tests/fixtures/sources/xing-alert-b.txt"]
