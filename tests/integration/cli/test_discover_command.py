@@ -88,6 +88,17 @@ def test_a_discover_run_keeps_its_report_in_the_database(project: Path, run: Run
     assert "HTTP 404" in str(reports["bundesagentur:Softwareentwickler@Berlin"].error)
 
 
+def test_a_site_that_asked_for_a_long_pause_is_not_asked_again_in_the_next_run(
+    run: Run, busy_requests: list[str]
+) -> None:
+    run("boards", "add", "https://job-boards.greenhouse.io/busy", "--company", "Busy")
+    _, first = run("discover")
+    _, second = run("discover")
+    assert len(busy_requests) == 1
+    assert "HTTP 429" in first
+    assert "asked Hunter to wait until" in second
+
+
 class Interrupted:
     name = "greenhouse:slow"
 

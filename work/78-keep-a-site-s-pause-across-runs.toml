@@ -1,0 +1,4 @@
+id = "78"
+title = "Keep a site's pause across runs"
+kind = "fix"
+scope = ["src/hunter/domain/pacing.py", "tests/unit/test_pacing.py", "src/hunter/adapters/storage/holds.py", "tests/integration/test_holds.py", "src/hunter/adapters/cli", "tests/integration/cli", "docs/sources.md", "src/hunter/adapters/storage/database.py", "src/hunter/adapters/cli/discover_command.py", "src/hunter/adapters/cli/probe_command.py", "src/hunter/adapters/cli/sources.py", "tests/integration/cli/conftest.py", "tests/integration/cli/test_discover_command.py", "tests/integration/cli/test_progress.py", "tests/integration/cli/test_cli_parts.py", "tests/integration/cli/test_board_read_once.py", "src/hunter/adapters/sources/feed_table.py"]

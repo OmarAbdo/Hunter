@@ -79,6 +79,11 @@ CREATE TABLE IF NOT EXISTS run_sources (
     error TEXT
 );
 CREATE INDEX IF NOT EXISTS run_sources_by_run ON run_sources (run_id);
+
+CREATE TABLE IF NOT EXISTS holds (
+    host TEXT PRIMARY KEY,
+    until TEXT NOT NULL
+);
 """
 
 

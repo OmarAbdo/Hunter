@@ -19,7 +19,17 @@ Run = Callable[..., tuple[int, str]]
 
 
 class Greenhouse(BaseHTTPRequestHandler):
+    """The `busy` board asks Hunter to come back in an hour; `asked` counts the requests to it."""
+
+    asked: list[str] = []
+
     def answer_get(self) -> None:
+        if self.path.startswith("/v1/boards/busy/"):
+            self.asked.append(self.path)
+            self.send_response(429)
+            self.send_header("Retry-After", "3600")
+            self.end_headers()
+            return
         found = self.path == "/v1/boards/n26/jobs?content=true"
         self.send_response(200 if found else 404)
         self.end_headers()
@@ -39,6 +49,14 @@ def greenhouse() -> Iterator[str]:
     threading.Thread(target=server.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{server.server_address[1]}"
     server.shutdown()
+
+
+@pytest.fixture
+def busy_requests() -> Iterator[list[str]]:
+    """The requests to the `busy` board during one test."""
+    Greenhouse.asked.clear()
+    yield Greenhouse.asked
+    Greenhouse.asked.clear()
 
 
 @pytest.fixture

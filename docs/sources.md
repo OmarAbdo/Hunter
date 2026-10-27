@@ -30,7 +30,9 @@ source before building its adapter, because access rules change.
 What each source publishes about how often it may be asked, checked on 2026-10-25 in its docs and
 in its answers' headers. Hunter's own pace is in `PACES` (`adapters/sources/feed_table.py`): one
 request a second per host unless a source needs less. A `Retry-After` is always honoured; a site
-asking for more than 10 minutes isn't asked again in that run.
+asking for more than 10 minutes isn't asked again until the pause ends, in that run or any later
+run or probe (the pause is kept in the database as soon as it's asked for). Until then its sources
+are reported as "asked Hunter to wait until" the time the pause ends.
 
 | Source | What it publishes | Seen | Hunter's pace |
 |---|---|---|---|

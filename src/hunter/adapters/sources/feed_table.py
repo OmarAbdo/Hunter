@@ -4,6 +4,7 @@ get their own. One entry a line, in alphabetical order, so that sources added at
 rarely touch the same line."""
 
 from collections.abc import Callable
+from datetime import timedelta
 
 from hunter.adapters.sources import (
     ashby,
@@ -62,3 +63,4 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "workday": workday.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}
+PACE = PaceRule(min_gap=timedelta(seconds=1))  # every other site's
