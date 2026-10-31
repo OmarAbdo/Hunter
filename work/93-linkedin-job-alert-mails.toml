@@ -1,0 +1,4 @@
+id = "93"
+title = "LinkedIn job-alert mails"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/alerts/linkedin.py", "tests/integration/sources/test_linkedin_alerts.py", "tests/fixtures/sources/linkedin-alert-*.txt"]
