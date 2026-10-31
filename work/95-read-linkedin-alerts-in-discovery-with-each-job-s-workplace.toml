@@ -1,0 +1,4 @@
+id = "95"
+title = "Read LinkedIn alerts in discovery, with each job's workplace"
+kind = "feature"
+scope = ["src/hunter/adapters/cli/alerts.py", "tests/integration/cli/test_cli_parts.py", "src/hunter/adapters/mail/mailbox.py", "tests/integration/test_mailbox.py", "src/hunter/adapters/sources/alerts/linkedin.py", "tests/integration/sources/test_linkedin_alerts.py", "docs/sources.md"]

@@ -27,6 +27,7 @@ class Mail:
     validity: int
     received_at: datetime
     text: str
+    html: str = ""  # the mail's HTML part, for what its plain text leaves out
 
 
 class Mailbox:
@@ -69,7 +70,13 @@ class Mailbox:
 def read_mail(connection: Any, uid: int, validity: int) -> Mail:
     raw = connection.uid("FETCH", str(uid), "(RFC822)")[1][0][1]
     message = BytesParser(policy=policy.default).parsebytes(raw)
-    return Mail(uid, validity, parsedate_to_datetime(message["Date"]), text_of(message))
+    received = parsedate_to_datetime(message["Date"])
+    return Mail(uid, validity, received, text_of(message), html_of(message))
+
+
+def html_of(message: EmailMessage) -> str:
+    body = message.get_body(preferencelist=("html",))
+    return str(body.get_content()) if body else ""
 
 
 def text_of(message: EmailMessage) -> str:

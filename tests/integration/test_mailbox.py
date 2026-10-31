@@ -117,3 +117,15 @@ def test_accounts_come_from_the_credentials_file(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert accounts_from(tmp_path / "accounts.toml") == [ACCOUNT]
+
+
+def test_a_mail_keeps_its_html_next_to_its_plain_text(tmp_path: Path) -> None:
+    both = message(INDEED, "Backend Engineer", "<p>Backend <b>Engineer</b></p>")
+    [mail] = mailbox(tmp_path, StandInImap({1: both})).new_mails(INDEED)
+    assert mail.text.strip() == "Backend Engineer"
+    assert "<b>Engineer</b>" in mail.html
+
+
+def test_a_plain_mail_has_no_html(tmp_path: Path) -> None:
+    [mail] = mailbox(tmp_path, StandInImap({1: message(INDEED, "Jobs")})).new_mails(INDEED)
+    assert mail.html == ""

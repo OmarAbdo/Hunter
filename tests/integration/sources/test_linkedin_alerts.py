@@ -146,3 +146,71 @@ def test_an_inbox_that_cannot_be_read_makes_the_source_unavailable() -> None:
     with pytest.raises(SourceUnavailableError, match="connection refused"):
         LinkedInAlerts([StandInMailbox([], down=True)]).fetch()
     assert LinkedInAlerts([]).name == "linkedin-alert"
+
+
+def html_of(*jobs: tuple[str, str, str]) -> str:
+    """The HTML part's shape: a job's links, then its title, and "Company · Place (Workplace)"."""
+    return "".join(
+        f'<a href="https://www.linkedin.com/comm/jobs/view/{job_id}/?midToken=the-token">logo</a>'
+        f'<a href="https://www.linkedin.com/comm/jobs/view/{job_id}/?midToken=the-token">'
+        f"<p>{title}</p><p>{place}</p></a>"
+        for job_id, title, place in jobs
+    )
+
+
+def alert(job_id: str, place: str) -> str:
+    return (
+        f"Backend Engineer\nLegalhero\n{place}\n"
+        f"View job: https://www.linkedin.com/comm/jobs/view/{job_id}/?midToken=the-token\n"
+        f"{'-' * 40}\n"
+    )
+
+
+@pytest.mark.parametrize(
+    ("shown", "workplace"),
+    [
+        ("Legalhero &middot; Berlin (Hybrid)", Workplace.HYBRID),
+        ("Legalhero &middot; Berlin (On-site)", Workplace.ONSITE),
+        ("Legalhero · Berlin (Remote)", Workplace.REMOTE),
+    ],
+)
+def test_a_job_s_workplace_comes_from_the_mail_s_html(shown: str, workplace: Workplace) -> None:
+    html = html_of(("111", "Backend Engineer", shown))
+    [posting] = postings_from_alert(alert("111", "Berlin"), html)
+    assert posting.location.workplace is workplace
+    assert posting.location.city == "Berlin"
+
+
+def test_each_job_gets_its_own_workplace() -> None:
+    html = html_of(
+        ("111", "Hybrid Cloud Engineer", "Legalhero &middot; Berlin (On-site)"),
+        ("222", "Backend Engineer", "CHECK24 &middot; Germany (Remote)"),
+    )
+    first, second = postings_from_alert(alert("111", "Berlin") + alert("222", "Germany"), html)
+    assert first.location.workplace is Workplace.ONSITE
+    assert second.location.workplace is Workplace.REMOTE
+
+
+def test_a_job_the_html_says_nothing_about_keeps_what_the_plain_text_says() -> None:
+    [posting] = postings_from_alert(alert("111", "Berlin"), html_of(("222", "x", "y (Remote)")))
+    assert posting.location.workplace is None
+
+
+def test_the_workplace_is_read_from_real_mails_through_the_source() -> None:
+    mail = Mail(
+        1,
+        7,
+        RECEIVED,
+        alert("111", "Berlin"),
+        html_of(("111", "Backend Engineer", "Legalhero &middot; Berlin (Hybrid)")),
+    )
+
+    class OneMail:
+        def new_mails(self, sender: str) -> list[Mail]:
+            return [mail]
+
+        def remember(self, sender: str, mails: list[Mail]) -> None:
+            return
+
+    [posting] = LinkedInAlerts([OneMail()]).fetch()
+    assert posting.location.workplace is Workplace.HYBRID

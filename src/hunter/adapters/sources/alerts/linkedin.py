@@ -1,5 +1,6 @@
 """LinkedIn job-alert mails (docs/sources.md): the jobs LinkedIn sends to the inbox for a saved
-search, read from the mail's plain text. Hunter never visits linkedin.com for them and never
+search, read from the mail's plain text, with each job's workplace from its HTML, the only part
+that has it ("Berlin (Hybrid)"). Hunter never visits linkedin.com for them and never
 requests a link in the mail, not even to resolve it: those links can log in as their reader. Only
 the job's id is taken from them, and the job's page is built from that id, offline.
 
@@ -9,14 +10,13 @@ reader's ties to it, and "View job: " with its link. The first block starts with
 lines. The same sender's other mails ("Do you still want job alerts ...") have no job link, so they
 give no jobs.
 
-What the plain text can't give: the salary, and the workplace the mail's HTML shows after the place
-("Berlin (Hybrid)"), so a workplace is only read where the plain text has one. Neither part says
-when a job was posted. And a mail shows only its first few jobs: the rest of its "30+ new jobs" are
-behind "See all jobs", which Hunter doesn't follow."""
+What isn't read: the salary, which only the HTML has. Neither part says when a job was posted. And
+a mail shows only its first few jobs: the rest of its "30+ new jobs" are behind "See all jobs",
+which Hunter doesn't follow."""
 
 import imaplib
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 
 from hunter.adapters.mail.mailbox import Mail
@@ -39,6 +39,12 @@ ALERT_LINE = re.compile(r"^(?:your job alert for\b|\d+\+? new jobs?\b)", re.IGNO
 QUICK_APPLY = re.compile(r"^(?:apply with resume\b|easy apply\b)", re.IGNORECASE)
 ON_SITE = re.compile(r"\s*\(?\bon-?site\b\)?", re.IGNORECASE)
 JOB_LINES = ("title", "company", "place")
+# In the HTML: a job's link, then, before the next job's, "Company &middot; Place (Workplace)".
+SHOWN_WORKPLACE = re.compile(
+    r"jobs/view/(?P<job_id>\d+)(?:(?!jobs/view/).)*?(?:&middot;|·)[^<]*"
+    r"\((?P<workplace>Remote|Hybrid|On-site)\)",
+    re.DOTALL,
+)
 
 
 class LinkedInAlerts:
@@ -55,7 +61,7 @@ class LinkedInAlerts:
         for inbox in self.inboxes:
             mails = self._new_mails(inbox)
             for mail in mails:
-                postings += postings_from_alert(mail.text)
+                postings += postings_from_alert(mail.text, mail.html)
             inbox.remember(SENDER, mails)
         return postings
 
@@ -66,11 +72,13 @@ class LinkedInAlerts:
             raise SourceUnavailableError(f"{self.name}: {error}") from error
 
 
-def postings_from_alert(text: str) -> list[Posting]:
-    return [posting for block in RULE.split(text) if (posting := posting_from(block))]
+def postings_from_alert(text: str, html: str = "") -> list[Posting]:
+    workplaces = {found["job_id"]: found["workplace"] for found in SHOWN_WORKPLACE.finditer(html)}
+    blocks = RULE.split(text)
+    return [posting for block in blocks if (posting := posting_from(block, workplaces))]
 
 
-def posting_from(block: str) -> Posting | None:
+def posting_from(block: str, workplaces: Mapping[str, str]) -> Posting | None:
     """A job's block, or None for the mail's other blocks: they have no job link, or nothing above
     it. Lines after the place are facts, whatever they say, so a new one can't shift the job."""
     link = JOB_LINK.search(block)
@@ -81,7 +89,8 @@ def posting_from(block: str) -> Posting | None:
     if len(job) < len(JOB_LINES):
         return None
     title, company, place_text, *facts = job
-    place, *other_places = places_in(place_text)
+    workplace = workplaces.get(link["job_id"])
+    place, *other_places = places_in(f"{place_text} ({workplace})" if workplace else place_text)
     return Posting(
         title=title,
         company=company,

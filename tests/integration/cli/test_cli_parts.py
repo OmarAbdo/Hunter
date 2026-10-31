@@ -74,4 +74,4 @@ def test_the_inboxes_are_read_for_every_alert_mail_hunter_knows(tmp_path: Path) 
     accounts = '[[mailbox]]\naddress = "someone@example.com"\napp_password = "the-password"\n'
     (tmp_path / "var" / "accounts.toml").write_text(accounts, encoding="utf-8")
     names = [source.name for source in alert_sources_of(Project(tmp_path))]
-    assert names == ["indeed-alert", "stepstone-alert", "xing-alert"]
+    assert names == ["indeed-alert", "linkedin-alert", "stepstone-alert", "xing-alert"]
