@@ -40,7 +40,7 @@ are reported as "asked Hunter to wait until" the time the pause ends.
 | Ashby (posting API) | No limit published | No rate headers | 1 a second |
 | Lever (postings API) | No limit for reading; 2 applications a second; its key API allows 10 a second | No rate headers | 1 a second |
 | Workable (public widget API) | No limit published; its key API allows 10 per 10 seconds | 429 after about 16 requests a second apart; after a day of probing, `Retry-After: 75335` (21 hours) for the whole host | 1 per 10 seconds, 100 a day; never guessed when probing |
-| Personio (XML feed) | No limit for the feed; 100 applications a minute per IP | No rate headers | 1 a second |
+| Personio (XML feed) | No limit for the feed; 100 applications a minute per IP | No rate headers; 429 while probing with several of its companies' addresses at once (2026-10-27), so it limits across them | 1 a second across all its addresses |
 | SmartRecruiters | 10 requests a second and 8 at once (its customer API) | No rate headers | 1 a second |
 | Recruitee (careers site API) | No limit published | No rate headers | 1 a second |
 | Teamtailor | 50 requests per 10 seconds (its key API; the RSS feed says nothing) | No rate headers | 1 a second |

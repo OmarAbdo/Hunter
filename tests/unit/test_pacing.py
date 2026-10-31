@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from hunter.domain.pacing import CapReachedError, Moment, Pacing, PaceRule
+from hunter.domain.pacing import CapReachedError, Moment, Pacing, PaceRule, site_of
 
 NOON = datetime(2026, 10, 24, 12, 0, tzinfo=UTC)
 DEFAULT = PaceRule(min_gap=timedelta(seconds=1))
@@ -123,3 +123,20 @@ def test_each_new_pause_is_passed_on_to_be_kept() -> None:
     hosts = Pacing({}, default=DEFAULT, keep=lambda host, until: kept.append((host, until)))
     hosts.hold("apply.workable.com", NOON + HOUR)
     assert kept == [("apply.workable.com", NOON + HOUR)]
+
+
+def test_personio_counts_its_companies_addresses_as_one_site() -> None:
+    """Personio limits across the subdomains it gives its companies."""
+    hosts = pacing()
+    hosts.record("zvoove.jobs.personio.de", at(10))
+    assert hosts.wait("idnow.jobs.personio.de", at(10)) == timedelta(seconds=1)
+    assert hosts.wait("idnow.jobs.personio.com", at(10)) == timedelta(seconds=1)
+    assert hosts.wait("api.ashbyhq.com", at(10)) == timedelta(0)
+
+
+def test_a_pause_personio_asks_for_holds_for_all_its_addresses() -> None:
+    hosts = pacing()
+    hosts.hold("zvoove.jobs.personio.de", NOON + HOUR)
+    assert hosts.wait("idnow.jobs.personio.de", at(0)) == HOUR
+    assert site_of("zvoove.jobs.personio.com") == site_of("idnow.jobs.personio.de")
+    assert site_of("api.ashbyhq.com") == "api.ashbyhq.com"

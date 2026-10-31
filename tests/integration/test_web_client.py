@@ -199,3 +199,10 @@ def test_a_host_s_daily_cap_ends_its_requests_for_the_day(site: str) -> None:
         client.get_json(f"{site}/jobs?page=2")
     assert not raised.value.retryable
     assert Site.hits.get("/jobs?page=2") is None
+
+
+def test_a_site_s_addresses_take_their_turns_together() -> None:
+    """Without one turn, threads on two Personio addresses would pass the gap at the same time."""
+    client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=1))))
+    assert client._turn_of("a.jobs.personio.de") is client._turn_of("b.jobs.personio.de")
+    assert client._turn_of("a.jobs.personio.de") is not client._turn_of("api.ashbyhq.com")

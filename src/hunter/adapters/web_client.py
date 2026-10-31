@@ -17,7 +17,7 @@ from typing import Any
 from urllib.robotparser import RobotFileParser
 
 from hunter.adapters.web_answers import NO_ANSWER, decoded, retry_after
-from hunter.domain.pacing import CapReachedError, Moment, Pacing
+from hunter.domain.pacing import CapReachedError, Moment, Pacing, site_of
 
 USER_AGENT = "Hunter/0.1 (personal job search)"
 TIMEOUT_SECONDS = 30
@@ -153,7 +153,7 @@ class WebClient:
             raise WebError(f"{request.host}: no answer ({error})") from error
 
     def _wait_turn(self, host: str) -> None:
-        """One request at a time per host, also when several threads read the same site."""
+        """One request at a time per site, also when several threads read the same one."""
         with self._turn_of(host):
             now = self.clock()
             try:
@@ -169,4 +169,4 @@ class WebClient:
 
     def _turn_of(self, host: str) -> threading.Lock:
         with self.turns_lock:
-            return self.turns.setdefault(host, threading.Lock())
+            return self.turns.setdefault(site_of(host), threading.Lock())

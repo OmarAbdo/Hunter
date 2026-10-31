@@ -1,0 +1,4 @@
+id = "94"
+title = "Pace Personio as one site"
+kind = "fix"
+scope = ["src/hunter/domain/pacing.py", "tests/unit/test_pacing.py", "src/hunter/adapters/web_client.py", "tests/integration/test_web_client.py", "docs/sources.md"]
