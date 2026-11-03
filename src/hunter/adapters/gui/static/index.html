@@ -15,6 +15,7 @@
 <nav>
   <button id="show-jobs" class="tab active">Jobs</button>
   <button id="show-companies" class="tab">Companies</button>
+  <button id="show-ads" class="tab">Ads</button>
   <button id="show-runs" class="tab">Runs</button>
 </nav>
 <main>
@@ -27,7 +28,7 @@
     <p id="turned-down" class="muted"></p>
     <table>
       <thead><tr><th>Posted</th><th>Job</th><th>Company</th><th>Place</th><th>Work</th>
-        <th>Seen on</th><th>Employer's system</th></tr></thead>
+        <th>Seen on</th><th>Employer's system</th><th>Ad</th></tr></thead>
       <tbody id="job-rows"></tbody>
     </table>
   </section>
@@ -41,6 +42,16 @@
     <table>
       <thead><tr><th>Company</th><th>Boards</th><th>Website</th></tr></thead>
       <tbody id="company-rows"></tbody>
+    </table>
+  </section>
+  <section id="ads" hidden>
+    <p id="ads-summary"></p>
+    <p class="muted">Whole: the ad as the employer wrote it. Snippet: the few lines a search shows.
+      None: no text yet.</p>
+    <table>
+      <thead><tr><th>Source</th><th>Taken</th><th>Whole</th><th>Snippet</th><th>None</th>
+        <th>Whole %</th></tr></thead>
+      <tbody id="ad-rows"></tbody>
     </table>
   </section>
   <section id="runs" hidden>

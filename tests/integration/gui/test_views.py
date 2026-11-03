@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from hunter.adapters.gui.views import (
+    ads_view,
     campaigns_view,
     companies_view,
     jobs_view,
@@ -97,6 +98,21 @@ def test_companies_show_their_boards_and_website(database_path: Path) -> None:
         "name": "N26",
         "website": "https://n26.com",
         "boards": [{"board": "greenhouse:n26", "status": "live"}],
+    }
+
+
+def test_a_campaign_s_jobs_say_how_much_of_their_ad_hunter_has(database_path: Path) -> None:
+    [job] = jobs_view(open_database(database_path), "berlin")
+    assert job["ad"] == "none"
+
+
+def test_the_taken_jobs_are_counted_by_how_much_of_their_ad_hunter_has(
+    database_path: Path,
+) -> None:
+    counts = {"taken": 1, "whole": 0, "snippet": 0, "none": 1}
+    assert ads_view(open_database(database_path)) == {
+        "sources": [{"source": "greenhouse", **counts}],
+        "total": counts,
     }
 
 

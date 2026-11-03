@@ -56,6 +56,8 @@ def test_a_campaign_s_jobs_and_the_companies_and_the_pool_come_as_json(address: 
     assert json.loads(read(f"{address}/api/pool")[2]) == {"jobs": 0, "companies": 0, "boards": 0}
     assert json.loads(read(f"{address}/api/held")[2]) == []
     assert json.loads(read(f"{address}/api/searches")[2]) == {}
+    nothing = {"taken": 0, "whole": 0, "snippet": 0, "none": 0}
+    assert json.loads(read(f"{address}/api/ads")[2]) == {"sources": [], "total": nothing}
 
 
 def test_anything_else_is_not_found(address: str) -> None:

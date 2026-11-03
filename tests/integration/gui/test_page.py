@@ -27,7 +27,7 @@ def test_only_web_links_are_followed() -> None:
 
 def test_the_page_reads_every_view_the_server_has() -> None:
     views = ("/api/campaigns", "/api/jobs", "/api/companies", "/api/pool", "/api/held")
-    for view in (*views, "/api/searches", "/api/runs/live", "/api/runs"):
+    for view in (*views, "/api/searches", "/api/runs/live", "/api/runs", "/api/ads"):
         assert view in SCRIPT
 
 
@@ -36,6 +36,11 @@ def test_the_counts_say_what_they_count() -> None:
     assert "jobs found in all" in SCRIPT
     assert "of the ${judged} jobs in the pool" in SCRIPT
     assert "match the filter" in SCRIPT
+
+
+def test_the_ads_tab_says_how_many_taken_jobs_have_their_whole_ad() -> None:
+    assert '<button id="show-ads" class="tab">Ads</button>' in PAGE
+    assert "taken jobs have their whole ad" in SCRIPT
 
 
 def test_a_run_can_be_paused_resumed_and_stopped_from_the_page() -> None:

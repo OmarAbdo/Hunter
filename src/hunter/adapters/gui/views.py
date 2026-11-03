@@ -1,14 +1,16 @@
 """What the GUI shows, read from the pool and the registry as plain JSON-ready values: each campaign
 with what it took and why it turned jobs down, a campaign's jobs, the companies with their boards,
-and the size of the pool."""
+the size of the pool, and how many taken jobs have their whole ad."""
 
 import sqlite3
+from collections import Counter
 from collections.abc import Sequence
 from typing import Any
 
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool, decoded
 from hunter.adapters.storage.registry import Registry
+from hunter.domain.ads.coverage import AdState, ad_state, coverage
 from hunter.domain.discovery.campaign import Campaign
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting
@@ -58,6 +60,7 @@ def job_of(job_id: int, posting: Posting, sources: list[str]) -> dict[str, Any]:
         "employment": posting.employment.value if posting.employment else None,
         "posted_at": f"{posting.posted_at:%Y-%m-%d}" if posting.posted_at else None,
         "url": posting.url,
+        "ad": ad_state(posting).value,
         "apply_url": posting.apply_url,
         "employer_system": posting.employer.ats if posting.employer else None,
         "sources": list(dict.fromkeys(sources)),
@@ -89,3 +92,18 @@ def pool_view(database: sqlite3.Connection) -> dict[str, int]:
         "companies": len(companies),
         "boards": sum(len(company.boards) for company in companies),
     }
+
+
+def ads_view(database: sqlite3.Connection) -> dict[str, Any]:
+    """The jobs any campaign took, by source, the biggest first, counted by how much of their ad
+    Hunter has."""
+    counts = coverage(Pool(database).taken())
+    bysize = sorted(counts.items(), key=lambda item: (-item[1].total(), item[0]))
+    return {
+        "sources": [{"source": source, **ad_counts(states)} for source, states in bysize],
+        "total": ad_counts(sum(counts.values(), Counter())),
+    }
+
+
+def ad_counts(states: Counter[AdState]) -> dict[str, int]:
+    return {"taken": states.total(), **{state.value: states[state] for state in AdState}}

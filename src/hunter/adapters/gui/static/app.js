@@ -55,6 +55,7 @@ function showJobs() {
     cell([job.workplace, job.employment].filter(Boolean).join(", ")),
     cell(job.sources.join(", ")),
     cell(job.employer_system ?? "", job.employer_system ? job.apply_url : null),
+    cell(job.ad),
   )));
   byId("job-count").textContent = filter.trim()
     ? `${counted(shown.length)} of these ${counted(jobs.length)} match the filter`
@@ -81,6 +82,19 @@ function showSearches(engines) {
   byId("searches").textContent = lines.length
     ? `Web searches for boards, last 30 days: ${lines.join(" · ")}`
     : "No web searches for boards in the last 30 days.";
+}
+
+const percent = (part, whole) => (whole ? `${Math.round((100 * part) / whole)}%` : "");
+
+async function showAds() {
+  // How much of each taken job's ad Hunter has, by source: epic 2's measure.
+  const ads = await getJson("/api/ads");
+  const counts = (named, ad) => row(cell(named), ...[ad.taken, ad.whole, ad.snippet, ad.none]
+    .map((number) => cell(counted(number))), cell(percent(ad.whole, ad.taken)));
+  byId("ad-rows").replaceChildren(
+    ...ads.sources.map((ad) => counts(ad.source, ad)), counts("total", ads.total));
+  byId("ads-summary").textContent = `${counted(ads.total.whole)} of ${counted(ads.total.taken)} `
+    + `taken jobs have their whole ad (${percent(ads.total.whole, ads.total.taken) || "0%"}).`;
 }
 
 async function loadCampaign() {
@@ -113,6 +127,7 @@ async function loadAll() {
   companies = await getJson("/api/companies");
   showCompanies();
   showSearches(await getJson("/api/searches"));
+  await showAds();
   await loadCampaign();
 }
 
@@ -190,7 +205,7 @@ async function runAction(action) {
 }
 
 function showTab(name) {
-  for (const tab of ["jobs", "companies", "runs"]) {
+  for (const tab of ["jobs", "companies", "ads", "runs"]) {
     byId(tab).hidden = tab !== name;
     byId(`show-${tab}`).classList.toggle("active", tab === name);
   }
@@ -198,6 +213,7 @@ function showTab(name) {
 
 byId("show-jobs").addEventListener("click", () => showTab("jobs"));
 byId("show-companies").addEventListener("click", () => showTab("companies"));
+byId("show-ads").addEventListener("click", () => showTab("ads"));
 byId("show-runs").addEventListener("click", () => showTab("runs"));
 byId("run").addEventListener("click", startRun);
 byId("pause").addEventListener("click", () => runAction("pause"));
