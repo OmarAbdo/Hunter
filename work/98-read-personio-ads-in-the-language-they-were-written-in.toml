@@ -1,0 +1,4 @@
+id = "98"
+title = "Read Personio ads in the language they were written in"
+kind = "fix"
+scope = ["src/hunter/adapters/sources/personio.py", "tests/integration/sources/test_personio.py", "tests/fixtures/sources/personio-zollsoft.xml", "tests/fixtures/sources/personio-zollsoft-en.xml"]

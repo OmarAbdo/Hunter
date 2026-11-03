@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workzag-jobs>
+
+<position>
+    <id>2476569</id>
+    <office>Thüringen</office>
+    <additionalOffices>
+        <office>Hamburg</office>
+        <office>Berlin</office>
+        <office>Baden-Württemberg</office>
+        <office>Hessen</office>
+        <office>Bayern</office>
+        <office>Nordrhein-Westfalen</office>
+        <office>Niedersachsen</office>
+        <office>Brandenburg</office>
+        <office>Bremen</office>
+        <office>Mecklenburg-Vorpommern</office>
+        <office>Rheinland-Pfalz</office>
+        <office>Saarland</office>
+        <office>Sachsen</office>
+        <office>Sachsen-Anhalt</office>
+        <office>Schleswig-Holstein</office>
+    </additionalOffices>
+    <department>Entwicklung</department>
+    <recruitingCategory>Entwicklung</recruitingCategory>
+    <name>Berufseinstieg Softwareentwicklung für Absolvent:innen</name>
+    <jobDescriptions></jobDescriptions>
+    <employmentType>permanent</employmentType>
+    <seniority>entry-level</seniority>
+    <schedule>full-or-part-time</schedule>
+    <yearsOfExperience>lt-1</yearsOfExperience>
+    <keywords>softwareentwicklung,berufseinstieg</keywords>
+    <occupation>software_and_web_development</occupation>
+    <occupationCategory>it_software</occupationCategory>
+    <createdAt>2026-01-05T11:38:23+00:00</createdAt>
+</position>
+</workzag-jobs>

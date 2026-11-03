@@ -39,7 +39,9 @@ class PersonioFeed:
         return f"personio:{self.board}"
 
     def fetch(self) -> list[Posting]:
-        text = read_text(self.web, f"{self.api}/xml", {"language": "en"})
+        # No language asked for: each ad comes in its own. Asked for English, Personio leaves out
+        # the text of every ad written only in German.
+        text = read_text(self.web, f"{self.api}/xml")
         try:
             positions = ElementTree.fromstring(text).findall("position")
         except ElementTree.ParseError as error:

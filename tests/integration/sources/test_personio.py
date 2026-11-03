@@ -9,7 +9,7 @@ from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting
 
-POSITIONS = "/xml?language=en"
+POSITIONS = "/xml"
 SourceApi = Callable[[str, str | None], str]
 
 
@@ -61,3 +61,13 @@ def test_a_board_that_is_gone_makes_the_source_unavailable(
 def test_the_feed_is_named_after_its_board_on_its_domain(web: WebClient) -> None:
     feed = PersonioFeed(web, "zvoove.de", "zvoove")
     assert (feed.name, feed.api) == ("personio:zvoove.de", "https://zvoove.jobs.personio.de")
+
+
+def test_a_german_ad_is_read_in_german(source_pages: Callable[..., str], web: WebClient) -> None:
+    """Asked for English, Personio leaves out the text of every ad written only in German."""
+    api = source_pages(
+        {"/xml": "personio-zollsoft.xml", "/xml?language=en": "personio-zollsoft-en.xml"}
+    )
+    graduate = PersonioFeed(web, "zollsoft.de", "zollsoft", api=api).fetch()[0]
+    assert graduate.description.startswith("Wo Du mit anpacken kannst")
+    assert "Du verwandelst Dein theoretisches Wissen" in graduate.description

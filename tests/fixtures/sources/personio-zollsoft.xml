@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workzag-jobs>
+
+<position>
+    <id>2476569</id>
+    <office>Thüringen</office>
+    <additionalOffices>
+        <office>Hamburg</office>
+        <office>Berlin</office>
+        <office>Baden-Württemberg</office>
+        <office>Hessen</office>
+        <office>Bayern</office>
+        <office>Nordrhein-Westfalen</office>
+        <office>Niedersachsen</office>
+        <office>Brandenburg</office>
+        <office>Bremen</office>
+        <office>Mecklenburg-Vorpommern</office>
+        <office>Rheinland-Pfalz</office>
+        <office>Saarland</office>
+        <office>Sachsen</office>
+        <office>Sachsen-Anhalt</office>
+        <office>Schleswig-Holstein</office>
+    </additionalOffices>
+    <department>Entwicklung</department>
+    <recruitingCategory>Entwicklung</recruitingCategory>
+    <name>Berufseinstieg Softwareentwicklung für Absolvent:innen</name>
+    <jobDescriptions>
+        <jobDescription>
+            <name>Wo Du mit anpacken kannst</name>
+            <value>
+                <![CDATA[<ul><li><p>Du verwandelst Dein theoretisches Wissen in intelligente Softwarelösungen, die Ärzten den Rücken freihalten, damit mehr Zeit für die Arbeit am Menschen bleibt. Gemeinsam treiben wir so die Vernetzung von Arztpraxen und die moderne Patientenkommunikation voran.</p></li><li><p>Unsere Senior-Entwickler begleiten Deine persönliche und fachliche Weiterentwicklung durch regelmäßige Code-Reviews, Pair-Programming und direktes Feedback. So verinnerlichst Du essenzielle Prinzipien wie Clean Code, Design Patterns und skalierbare Software-Architektur.</p></li><li><p>Du übernimmst zügig Verantwortung für eigene Module oder Features und entwickelst Lösungen, die den Arbeitsalltag in tausenden Arztpraxen jeden Tag spürbar verbessern.</p></li><li><p> Unser Technologie-Stack ist vielseitig. Ob native Client-Entwicklung, intuitive User Interfaces, skalierbare Backend-Logik oder Schnittstellen-Management – wir finden im Bewerbungsprozess gemeinsam heraus, wo Deine Stärken liegen und in welchem Team Du Dein Potenzial am besten entfalten kannst.</p></li><li><p>Diese Position kann zu 100% aus dem Home-Office ausgeübt werden. Du kannst also selbst bestimmen, wann Du wo deutschlandweit arbeiten willst. Einer Teilzeitanstellung steht auch grundsätzlich nichts im Wege, allerdings wäre es ideal, wenn Du wöchentlich mindestens 30h Deiner Zeit mit uns verbringst.</p></li></ul>]]>
+            </value>
+        </jobDescription>
+        <jobDescription>
+            <name>Was Du mitbringen solltest</name>
+            <value>
+                <![CDATA[<ul><li>Du verfügst über ein gut abgeschlossenes Studium der Informatik (oder verwandter MINT-Fächer) oder hast Dir vergleichbare Fähigkeiten durch intensive private Projekte angeeignet.</li><li>Du bringst ein grundlegendes Verständnis für die fundamentalen Konzepte der Softwareentwicklung und Objektorientierung mit. Bereits von Dir entwickelter Code geht über reine Übungsaufgaben hinaus – sei es in Praktika, als Werkstudent oder in ambitionierten privaten Projekten.</li><li>Erste Erfahrungen in Sprachen wie C#, C++, Swift oder Java sind ein Plus.</li><li>Du hast den Anspruch, sauberen, wartbaren und performanten Code zu schreiben und möchtest lernen, wie man dies in einer großen Codebasis nachhaltig umsetzt.</li><li>Du eignest Dir schnell komplexe Problemstellungen an, denkst logisch und kreativ, findest innovative Lösungen und nutzt neue Frameworks sowie Tools gezielt, um Dein Wissen unmittelbar im Produkt umzusetzen.</li><li>Deine ersten Erfahrungen mit agentischer Softwareentwicklung (z. B. CLI-basierte KI-Programmierung via Claude Code / Codex) oder im Bereich Vibecoding dürfen bei uns praktisch angewandt werden.</li><li>Um bei uns richtig Fuß fassen zu können, ist es zwingend notwendig, dass Du Deutsch mindestens auf C1-Niveau beherrschst.</li></ul>]]>
+            </value>
+        </jobDescription>
+        <jobDescription>
+            <name>Warum wir?</name>
+            <value>
+                <![CDATA[<p>Wir sind ein offenes und ambitioniertes Team von über 600 Mitarbeitern, das Kundenorientierung wirklich lebt und gleichzeitig Spaß hat. Bei uns herrscht auch nach über 10 Jahren eine Startup-Atmosphäre, die neben dem legendären Obstkorb auch vielseitige Perks wie eine steuerfreie Shoppingkarte, Dienstrad-Leasing und Gesundheitskurse (z.B. Yoga, Rückentraining und mental Health) anbietet - sowohl online als auch im Büro.</p><p>Je nach Einsatzgebiet (und das sind mindestens 75% aller Unternehmensbereiche) bieten wir all unseren Kollegen flexible Arbeitszeiten und Home Office an. Wir verstehen uns als eng zusammenhaltendes Team mit Kooperations- statt Wettbewerbs-Atmosphäre. Außerhalb der Arbeit organisieren wir Events wie Beachvolleyball im Sommer, Grillfeste, Kochabende oder Paddeltouren.<span><br></span><span><br></span><span><strong>Deine Vorteile bei uns:</strong></span></p><ul><li><span>Super Team und flache Hierarchien</span></li><li><span>Job Crafting/individuelle Arbeitsgestaltung</span></li><li><span>Flexible Arbeitszeiten</span></li><li><span>Weiterentwicklung</span></li><li><span>Homeoffice/Mobiles Arbeiten</span></li><li><span>Team Events</span></li><li><span>Förderung der physischen und psychischen Gesundheit</span></li><li><span>Betriebliche Altersvorsorge</span></li><li><span>Betriebliche Krankenversicherung</span></li><li><span>Dienstradleasing/Jobrad</span></li><li><span>Hardwareleasing</span></li><li><span>Mitarbeiterrabatte</span></li><li><span>Betreuungkostenzuschuss/ Kita-Zuschuss</span></li><li><span>Erholungsbeihilfe</span></li><li><span>Essenszuschuss</span></li><li><span>Fahrtkostenzuschuss</span></li><li><span>Auslandsarbeit</span></li></ul>]]>
+            </value>
+        </jobDescription>
+        <jobDescription>
+            <name>Überzeugt? Dann bewirb Dich jetzt bei uns!</name>
+            <value>
+                <![CDATA[<p>Lade Deine aussagekräftige Bewerbung inklusive Anschreiben, Lebenslauf und der relevanten Zeugnisse (Schul-, Ausbildungs-, Uni- und Arbeitszeugnisse) ganz einfach online auf unserer Homepage hoch. Sobald Deine Bewerbung bei uns angekommen bist, erhältst Du eine automatisch Bestätigung per Mail.</p><p><strong>Du hast noch Fragen?</strong> Dann wende Dich ganz einfach an unsere Personalabteilung. Unser Recruitingteam steht Dir gerne bei Rückfragen zur Verfügung. Du erreichst sie unter <a href="mailto:jobs@zollsoft.de"><span>jobs@zollsoft.de</span></a>. Weitere Informationen findest du auch auf unserer <a href="https://zollsoft.de/jobs/"><span>Website</span></a>.</p>]]>
+            </value>
+        </jobDescription>
+    </jobDescriptions>
+    <employmentType>permanent</employmentType>
+    <seniority>entry-level</seniority>
+    <schedule>full-or-part-time</schedule>
+    <yearsOfExperience>lt-1</yearsOfExperience>
+    <keywords>softwareentwicklung,berufseinstieg</keywords>
+    <occupation>software_and_web_development</occupation>
+    <occupationCategory>it_software</occupationCategory>
+    <createdAt>2026-01-05T11:38:23+00:00</createdAt>
+</position>
+</workzag-jobs>
