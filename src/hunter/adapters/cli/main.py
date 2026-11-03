@@ -1,4 +1,4 @@
-"""`python -m hunter boards add <link>... [--company NAME]`, `boards probe [--limit N]`,
+"""`python -m hunter ads`, `boards add <link>... [--company NAME]`, `boards probe [--limit N]`,
 `discover [--campaign ID]...`, `gui` and `shortcuts`, run from the project folder."""
 
 import argparse
@@ -11,6 +11,7 @@ from hunter.adapters.cli.boards_command import add_boards
 from hunter.adapters.cli.discover_command import run_discovery
 from hunter.adapters.cli.probe_command import run_probe
 from hunter.adapters.cli.project import Project
+from hunter.adapters.cli.report import ads_text
 from hunter.adapters.gui.desktop import make_shortcuts
 from hunter.adapters.gui.launch import run_gui
 
@@ -18,6 +19,7 @@ from hunter.adapters.gui.launch import run_gui
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(prog="python -m hunter")
     commands = root.add_subparsers(dest="command", required=True)
+    commands.add_parser("ads", help="how many taken jobs have their whole ad, by source")
     boards = commands.add_parser("boards", help="the company registry").add_subparsers(
         dest="action", required=True
     )
@@ -41,6 +43,9 @@ def main(
 ) -> int:
     chosen = parser().parse_args(arguments)
     project = Project(root, apis or {})
+    if chosen.command == "ads":
+        out.write(ads_text(project.database()))
+        return 0
     if chosen.command == "boards" and chosen.action == "probe":
         return run_probe(project, chosen.limit, out)
     if chosen.command == "boards":

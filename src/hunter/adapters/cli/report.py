@@ -1,11 +1,17 @@
-"""The report a discovery run prints: what each source brought, what each campaign took, and why
-the campaigns turned the other jobs down."""
+"""The reports Hunter prints: a discovery run's (what each source brought, what each campaign took,
+and why the campaigns turned the other jobs down), and how many taken jobs have their whole ad."""
 
+import sqlite3
+from collections import Counter
 from collections.abc import Sequence
 
 from hunter.adapters.storage.matches import Matches
+from hunter.adapters.storage.pool import Pool
 from hunter.application.discover import SourceReport
+from hunter.domain.ads.coverage import AdState, coverage
 from hunter.domain.discovery.campaign import Campaign
+
+STATES = (AdState.WHOLE, AdState.SNIPPET, AdState.NONE)
 
 
 def report_text(
@@ -44,6 +50,24 @@ def turned_down(campaign_id: str, matches: Matches) -> str:
     reasons = sorted(matches.rejections(campaign_id).items(), key=lambda item: -item[1])
     summary = ", ".join(f"{reason.value} {count}" for reason, count in reasons) or "nothing"
     return f"{campaign_id} turned down: {summary}"
+
+
+def ads_text(database: sqlite3.Connection) -> str:
+    """The taken jobs by source, counted by how much of their ad Hunter has; biggest first."""
+    counts = coverage(Pool(database).taken())
+    if not counts:
+        return "No campaign has taken a job yet.\n"
+    bysize = sorted(counts.items(), key=lambda item: (-item[1].total(), item[0]))
+    rows = [["source", "taken", *(state.value for state in STATES), "whole %"]]
+    rows += [ad_counts(source, states) for source, states in bysize]
+    rows.append(ad_counts("total", sum(counts.values(), Counter())))
+    return "\n".join(table(rows)) + "\n"
+
+
+def ad_counts(name: str, states: Counter[AdState]) -> list[str]:
+    taken = states.total()
+    whole = round(100 * states[AdState.WHOLE] / taken)
+    return [name, *map(str, [taken, *(states[state] for state in STATES), whole])]
 
 
 def table(rows: list[list[str]]) -> list[str]:

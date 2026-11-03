@@ -42,6 +42,14 @@ class Pool:
         )
         return [SourceRef(source=source, native_id=native_id) for source, native_id in rows]
 
+    def taken(self) -> list[Posting]:
+        """Every job at least one campaign took, once each."""
+        rows = self.database.execute(
+            "SELECT posting FROM jobs WHERE id IN "
+            "(SELECT job_id FROM matches WHERE rejection IS NULL) ORDER BY id"
+        )
+        return [decoded(text) for (text,) in rows]
+
     def job_count(self) -> int:
         return int(self.database.execute("SELECT count(*) FROM jobs").fetchone()[0])
 

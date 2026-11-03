@@ -1,0 +1,4 @@
+id = "96"
+title = "Count how many taken jobs have their whole ad"
+kind = "feature"
+scope = ["src/hunter/domain/ads/**", "src/hunter/adapters/storage/pool.py", "src/hunter/adapters/cli/ads_command.py", "src/hunter/adapters/cli/main.py", "tests/unit/ads/**", "tests/integration/cli/test_ads_command.py", "tests/integration/test_pool.py", "src/hunter/adapters/cli/report.py"]

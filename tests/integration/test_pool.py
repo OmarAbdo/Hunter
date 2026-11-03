@@ -3,7 +3,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from hunter.adapters.storage.database import open_database
+from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool
+from hunter.domain.discovery.campaign import Rejection
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
 
@@ -130,3 +132,14 @@ def test_a_job_keeps_the_company_s_website(tmp_path: Path) -> None:
     pool = Pool(open_database(tmp_path / "hunter.db"))
     named = replace(INDEED, company_website="https://nextcloud.com")
     assert pool.posting(pool.add(named, SEEN).job_id) == named
+
+
+def test_the_taken_jobs_are_those_a_campaign_took_each_once(tmp_path: Path) -> None:
+    database = open_database(tmp_path / "hunter.db")
+    pool, matches = Pool(database), Matches(database)
+    other = replace(INDEED, title="Data Engineer", source=SourceRef("indeed-alert", "2"))
+    taken, turned_down = pool.add(GREENHOUSE, SEEN).job_id, pool.add(other, SEEN).job_id
+    matches.record(taken, "berlin", None, SEEN)
+    matches.record(taken, "remote", None, SEEN)
+    matches.record(turned_down, "berlin", Rejection.PLACE, SEEN)
+    assert pool.taken() == [GREENHOUSE]
