@@ -11,6 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+from hunter.domain.ads.coverage import fuller
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.pooled import Pooled
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -29,6 +30,7 @@ class Pool:
             else:
                 job_id = known
                 self._learn_employer(job_id, posting)
+                self._learn_ad(job_id, posting)
             self._record_sighting(job_id, posting.source, seen_at)
         return Pooled(job_id=job_id, is_new=known is None)
 
@@ -90,6 +92,18 @@ class Pool:
                 "UPDATE jobs SET exact_key = ?, posting = ? WHERE id = ? AND exact_key IS NULL",
                 (posting.exact_key, encoded(posting), job_id),
             )
+
+    def _learn_ad(self, job_id: int, posting: Posting) -> None:
+        """A job without its whole ad takes a fuller one from any source, unless that would cost it
+        the employer's posting: that is where Hunter applies."""
+        exact_key, text = self.database.execute(
+            "SELECT exact_key, posting FROM jobs WHERE id = ?", (job_id,)
+        ).fetchone()
+        if exact_key not in {None, posting.exact_key} or not fuller(posting, decoded(text)):
+            return
+        self.database.execute(
+            "UPDATE jobs SET posting = ? WHERE id = ?", (encoded(posting), job_id)
+        )
 
     def _record_sighting(self, job_id: int, source: SourceRef, seen_at: datetime) -> None:
         self.database.execute(

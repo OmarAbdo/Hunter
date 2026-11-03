@@ -1,0 +1,4 @@
+id = "97"
+title = "A known job takes a fuller ad when a source shows one"
+kind = "fix"
+scope = ["src/hunter/adapters/storage/pool.py", "tests/integration/test_pool.py", "src/hunter/domain/ads/coverage.py", "tests/unit/ads/**"]

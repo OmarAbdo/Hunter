@@ -143,3 +143,42 @@ def test_the_taken_jobs_are_those_a_campaign_took_each_once(tmp_path: Path) -> N
     matches.record(taken, "remote", None, SEEN)
     matches.record(turned_down, "berlin", Rejection.PLACE, SEEN)
     assert pool.taken() == [GREENHOUSE]
+
+
+def test_a_job_without_its_ad_takes_the_ad_another_source_shows(tmp_path: Path) -> None:
+    """The Bundesagentur gives no text; EURES shows the same job with the whole ad."""
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    agency = replace(INDEED, source=SourceRef(source="bundesagentur", native_id="10001-1-S"))
+    eures = replace(
+        agency,
+        source=SourceRef(source="eures", native_id="MTAwMDEtMS1TIDE"),
+        description="Build the backend.",
+        same_as=(agency.source,),
+    )
+    job_id = pool.add(agency, SEEN).job_id
+    pool.add(eures, SEEN)
+    assert pool.posting(job_id) == eures
+
+
+def test_an_employer_posting_read_again_with_its_ad_keeps_it(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    job_id = pool.add(replace(GREENHOUSE, description=""), SEEN).job_id
+    pool.add(GREENHOUSE, SEEN)
+    assert pool.posting(job_id) == GREENHOUSE
+
+
+def test_a_snippet_never_replaces_the_whole_ad(tmp_path: Path) -> None:
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    job_id = pool.add(GREENHOUSE, SEEN).job_id
+    pool.add(replace(INDEED, description="Build the..."), SEEN)
+    assert pool.posting(job_id) == GREENHOUSE
+
+
+def test_a_job_board_s_ad_never_replaces_the_employer_s_posting(tmp_path: Path) -> None:
+    """The employer's posting is where Hunter applies; losing it costs more than the text."""
+    pool = Pool(open_database(tmp_path / "hunter.db"))
+    bare = replace(GREENHOUSE, description="")
+    job_id = pool.add(bare, SEEN).job_id
+    eures = replace(INDEED, source=SourceRef("eures", "MTAw"), description="Build the backend.")
+    pool.add(eures, SEEN)
+    assert pool.posting(job_id) == bare

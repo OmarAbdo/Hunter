@@ -26,6 +26,14 @@ def ad_state(posting: Posting) -> AdState:
     return AdState.WHOLE
 
 
+FULLNESS = (AdState.NONE, AdState.SNIPPET, AdState.WHOLE)
+
+
+def fuller(posting: Posting, than: Posting) -> bool:
+    """The posting has more of the ad: a snippet over nothing, the whole ad over a snippet."""
+    return FULLNESS.index(ad_state(posting)) > FULLNESS.index(ad_state(than))
+
+
 def coverage(postings: Iterable[Posting]) -> dict[str, Counter[AdState]]:
     """Each source's jobs, counted by how much of their ad Hunter has."""
     counts: dict[str, Counter[AdState]] = {}

@@ -1,4 +1,4 @@
-from hunter.domain.ads.coverage import AdState, ad_state, coverage
+from hunter.domain.ads.coverage import AdState, ad_state, coverage, fuller
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting, SourceRef
 
@@ -41,3 +41,11 @@ def test_coverage_counts_each_source_s_jobs_by_state() -> None:
         "adzuna": {AdState.SNIPPET: 1},
         "stepstone-alert": {AdState.NONE: 1},
     }
+
+
+def test_a_posting_is_fuller_when_it_has_more_of_the_ad() -> None:
+    whole, snippet, bare = posting("greenhouse", "ad"), posting("adzuna", "ad"), posting("lever")
+    assert fuller(whole, snippet)
+    assert fuller(snippet, bare)
+    assert not fuller(snippet, whole)
+    assert not fuller(whole, posting("eures", "another ad"))
