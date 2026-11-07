@@ -9,6 +9,7 @@ from dataclasses import replace
 from datetime import datetime
 
 from hunter.application.ports import AdReader, AdStore, SourceUnavailableError
+from hunter.domain.discovery.posting import Posting
 
 
 def read_ads(
@@ -18,17 +19,22 @@ def read_ads(
     outcomes: dict[str, Counter[str]] = {}
     for job_id, posting in store.wanting():
         reader = readers.get(posting.source.source)
-        if reader is None:
-            continue
-        counts = outcomes.setdefault(posting.source.source, Counter())
-        try:
-            text = reader.read(posting)
-        except SourceUnavailableError as error:
-            if error.gone:
-                store.mark_gone(job_id, now)
-            counts["gone" if error.gone else "failed"] += 1
-            continue
-        if text.strip():
-            store.keep_ad(job_id, replace(posting, description=text))
-        counts["read" if text.strip() else "failed"] += 1
+        if reader is not None:
+            outcome = read_one(store, reader, (job_id, posting), now)
+            outcomes.setdefault(posting.source.source, Counter()).update((outcome,))
     return outcomes
+
+
+def read_one(store: AdStore, reader: AdReader, job: tuple[int, Posting], now: datetime) -> str:
+    job_id, posting = job
+    try:
+        text = reader.read(posting)
+    except SourceUnavailableError as error:
+        if not error.gone:
+            return "failed"
+        store.mark_gone(job_id, now)
+        return "gone"
+    if not text.strip():
+        return "failed"
+    store.keep_ad(job_id, replace(posting, description=text))
+    return "read"
