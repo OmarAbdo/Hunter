@@ -142,7 +142,9 @@ def test_the_taken_jobs_are_those_a_campaign_took_each_once(tmp_path: Path) -> N
     matches.record(taken, "berlin", None, SEEN)
     matches.record(taken, "remote", None, SEEN)
     matches.record(turned_down, "berlin", Rejection.PLACE, SEEN)
-    assert pool.taken() == [GREENHOUSE]
+    assert pool.taken() == [(GREENHOUSE, False)]
+    Ads(database).mark_gone(taken, SEEN)
+    assert pool.taken() == [(GREENHOUSE, True)]
 
 
 def test_a_job_without_its_ad_takes_the_ad_another_source_shows(tmp_path: Path) -> None:

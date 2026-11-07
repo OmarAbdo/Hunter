@@ -29,17 +29,23 @@ def test_no_text_is_no_ad_wherever_it_came_from() -> None:
     assert ad_state(posting("adzuna", "  ")) == AdState.NONE
 
 
+def test_a_job_its_source_no_longer_has_is_gone_whatever_text_it_has() -> None:
+    assert ad_state(posting("bundesagentur", "Wir suchen Dich."), gone=True) == AdState.GONE
+    assert ad_state(posting("bundesagentur"), gone=True) == AdState.GONE
+
+
 def test_coverage_counts_each_source_s_jobs_by_state() -> None:
     jobs = [
-        posting("greenhouse", "text"),
-        posting("greenhouse", "text"),
-        posting("adzuna", "a few lines"),
-        posting("stepstone-alert"),
+        (posting("greenhouse", "text"), False),
+        (posting("greenhouse", "text"), False),
+        (posting("adzuna", "a few lines"), False),
+        (posting("stepstone-alert"), False),
+        (posting("stepstone-alert"), True),
     ]
     assert coverage(jobs) == {
         "greenhouse": {AdState.WHOLE: 2},
         "adzuna": {AdState.SNIPPET: 1},
-        "stepstone-alert": {AdState.NONE: 1},
+        "stepstone-alert": {AdState.NONE: 1, AdState.GONE: 1},
     }
 
 

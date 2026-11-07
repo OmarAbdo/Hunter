@@ -41,6 +41,8 @@ def test_the_counts_say_what_they_count() -> None:
 def test_the_ads_tab_says_how_many_taken_jobs_have_their_whole_ad() -> None:
     assert '<button id="show-ads" class="tab">Ads</button>' in PAGE
     assert "taken jobs have their whole ad" in SCRIPT
+    assert "<th>Gone</th>" in PAGE
+    assert "of the open ones" in SCRIPT
 
 
 def test_a_run_can_be_paused_resumed_and_stopped_from_the_page() -> None:

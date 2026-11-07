@@ -89,12 +89,15 @@ const percent = (part, whole) => (whole ? `${Math.round((100 * part) / whole)}%`
 async function showAds() {
   // How much of each taken job's ad Hunter has, by source: epic 2's measure.
   const ads = await getJson("/api/ads");
-  const counts = (named, ad) => row(cell(named), ...[ad.taken, ad.whole, ad.snippet, ad.none]
-    .map((number) => cell(counted(number))), cell(percent(ad.whole, ad.taken)));
+  // The share that counts is of the jobs still open: a gone job needs no ad.
+  const ofOpen = (ad) => percent(ad.whole, ad.taken - ad.gone);
+  const counts = (named, ad) => row(cell(named), ...[ad.taken, ad.whole, ad.snippet, ad.none,
+    ad.gone].map((number) => cell(counted(number))), cell(ofOpen(ad)));
   byId("ad-rows").replaceChildren(
     ...ads.sources.map((ad) => counts(ad.source, ad)), counts("total", ads.total));
   byId("ads-summary").textContent = `${counted(ads.total.whole)} of ${counted(ads.total.taken)} `
-    + `taken jobs have their whole ad (${percent(ads.total.whole, ads.total.taken) || "0%"}).`;
+    + `taken jobs have their whole ad: ${ofOpen(ads.total) || "0%"} of the open ones, `
+    + `with ${counted(ads.total.gone)} gone.`;
 }
 
 async function loadCampaign() {

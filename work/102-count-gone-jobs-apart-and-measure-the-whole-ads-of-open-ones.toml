@@ -1,0 +1,4 @@
+id = "102"
+title = "Count gone jobs apart and measure the whole ads of open ones"
+kind = "feature"
+scope = ["src/hunter/domain/ads/coverage.py", "src/hunter/adapters/storage/pool.py", "src/hunter/adapters/cli/report.py", "src/hunter/adapters/gui/views.py", "src/hunter/adapters/gui/static/**", "tests/unit/ads/**", "tests/integration/test_pool.py", "tests/integration/cli/test_ads_command.py", "tests/integration/gui/test_views.py", "tests/integration/gui/test_server.py", "tests/integration/gui/test_page.py"]

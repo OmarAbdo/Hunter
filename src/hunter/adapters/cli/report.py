@@ -8,10 +8,10 @@ from collections.abc import Sequence
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Pool
 from hunter.application.discover import SourceReport
-from hunter.domain.ads.coverage import AdState, coverage
+from hunter.domain.ads.coverage import AdState, coverage, open_jobs
 from hunter.domain.discovery.campaign import Campaign
 
-STATES = (AdState.WHOLE, AdState.SNIPPET, AdState.NONE)
+STATES = (AdState.WHOLE, AdState.SNIPPET, AdState.NONE, AdState.GONE)
 
 
 def report_text(
@@ -59,16 +59,18 @@ def ads_text(database: sqlite3.Connection) -> str:
     if not counts:
         return "No campaign has taken a job yet.\n"
     bysize = sorted(counts.items(), key=lambda item: (-item[1].total(), item[0]))
-    rows = [["source", "taken", *(state.value for state in STATES), "whole %"]]
+    rows = [["source", "taken", *(state.value for state in STATES), "whole % of open"]]
     rows += [ad_counts(source, states) for source, states in bysize]
     rows.append(ad_counts("total", sum(counts.values(), Counter())))
     return "\n".join(table(rows)) + "\n"
 
 
 def ad_counts(name: str, states: Counter[AdState]) -> list[str]:
-    taken = states.total()
-    whole = round(100 * states[AdState.WHOLE] / taken)
-    return [name, *map(str, [taken, *(states[state] for state in STATES), whole])]
+    """The share is of the jobs still open; none is shown when all of them are gone."""
+    numbers = [states.total(), *(states[state] for state in STATES)]
+    still = open_jobs(states)
+    whole = str(round(100 * states[AdState.WHOLE] / still)) if still else ""
+    return [name, *map(str, numbers), whole]
 
 
 def table(rows: list[list[str]]) -> list[str]:
