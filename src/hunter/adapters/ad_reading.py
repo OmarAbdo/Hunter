@@ -7,6 +7,7 @@ from datetime import datetime
 
 from hunter.adapters.cli.project import Project
 from hunter.adapters.sources.feed_table import PACE
+from hunter.adapters.sources import smartrecruiters
 from hunter.adapters.sources.searches import bundesagentur
 from hunter.adapters.storage.holds import kept_pacing
 from hunter.adapters.storage.pool import Ads
@@ -24,8 +25,12 @@ def read_taken_ads(project: Project, now: datetime) -> dict[str, Counter[str]]:
 
 def readers_of(project: Project) -> dict[str, AdReader]:
     web = WebClient(kept_pacing({}, PACE, project.database))
-    api = project.apis.get("bundesagentur", bundesagentur.API)
-    return {"bundesagentur": bundesagentur.BundesagenturAds(web, api=api)}
+    apis = {"bundesagentur": bundesagentur.API, "smartrecruiters": smartrecruiters.API}
+    apis.update({source: api for source, api in project.apis.items() if source in apis})
+    return {
+        "bundesagentur": bundesagentur.BundesagenturAds(web, api=apis["bundesagentur"]),
+        "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
+    }
 
 
 def ads_line(outcomes: Mapping[str, Counter[str]]) -> str:

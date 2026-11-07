@@ -3,7 +3,7 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 
-from hunter.adapters.ad_reading import ads_line, read_taken_ads
+from hunter.adapters.ad_reading import ads_line, read_taken_ads, readers_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Ads, Pool
@@ -44,3 +44,7 @@ def test_the_line_says_what_each_source_s_ads_came_to() -> None:
         "Ads: bundesagentur 230 read, 8 gone, 3 failed; xing-alert 2 gone\n"
     )
     assert ads_line({}) == "Ads: nothing to read\n"
+
+
+def test_the_sources_read_one_job_at_a_time(tmp_path: Path) -> None:
+    assert sorted(readers_of(Project(tmp_path))) == ["bundesagentur", "smartrecruiters"]

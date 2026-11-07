@@ -1,0 +1,4 @@
+id = "103"
+title = "Read SmartRecruiters ads from each posting's details"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/smartrecruiters.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_smartrecruiters.py", "tests/integration/sources/test_ad_reading.py", "tests/fixtures/sources/smartrecruiters-posting-deliveryhero.json"]

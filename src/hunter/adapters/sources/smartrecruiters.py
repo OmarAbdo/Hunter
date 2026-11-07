@@ -1,9 +1,10 @@
 """One company's SmartRecruiters board (docs/sources.md): its postings, 100 at a time. The board is
 the company's case-sensitive identifier, like `Brainlab`. The list holds no descriptions; they
-come with a posting's own page."""
+come with a posting's own details (`SmartRecruitersAds`)."""
 
 from typing import Any
 
+from hunter.adapters.html_text import plain_text
 from hunter.adapters.sources.reading import employment_from, parsed_time, place_at, read_json
 from hunter.adapters.web_client import WebClient
 from hunter.domain.discovery.location import Workplace
@@ -12,6 +13,7 @@ from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef
 API = "https://api.smartrecruiters.com"
 PAGE = 100
 MOST = 1000  # postings read from one board in one run
+SECTIONS = ("companyDescription", "jobDescription", "qualifications", "additionalInformation")
 
 
 class SmartRecruitersFeed:
@@ -53,4 +55,26 @@ class SmartRecruitersFeed:
             url=page,
             apply_url=page,
             posted_at=parsed_time(job.get("releasedDate")),
+        )
+
+
+class SmartRecruitersAds:
+    """A posting's whole ad, from its details: each section of the ad under its own title. A
+    posting the company took down answers 404."""
+
+    def __init__(self, web: WebClient, api: str = API) -> None:
+        self.web = web
+        self.api = api
+
+    def read(self, posting: Posting) -> str:
+        employer = posting.employer
+        if employer is None:
+            return ""
+        url = f"{self.api}/v1/companies/{employer.board}/postings/{employer.job_id}"
+        sections = (read_json(self.web, url).get("jobAd") or {}).get("sections") or {}
+        parts = (sections.get(name) or {} for name in SECTIONS)
+        return "\n\n".join(
+            f"{part.get('title') or ''}\n\n{plain_text(part.get('text'))}".strip()
+            for part in parts
+            if part.get("text")
         )
