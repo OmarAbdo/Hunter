@@ -1,0 +1,117 @@
+{
+ "stellenangebotsart": "ARBEIT",
+ "stellenangebotsTitel": "Lead Expert Business Integration / DevSecOps Engineer (m/w/d)",
+ "quereinstiegGeeignet": false,
+ "stellenangebotsBeschreibung": "Sorge gemeinsam mit uns für die digitale Zukunftsfähigkeit der Bundeswehr.\n\nLead Expert Business Integration / DevSecOps Engineer (m/w/d)\n\nab sofort und in Vollzeit in Nürnberg, alternativ bundesweit an einem unserer BWI Standorte.\n\nAls primärer Digitalisierungspartner der Bundeswehr erbringen wir stabile, sichere und effiziente IT-Services im In- und Ausland, vom Grundbetrieb bis in den einsatznahen Bereich und tragen so zur kontinuierlichen Erhöhung der Führungs- und Einsatzfähigkeit der Bundeswehr bei. Mit über 8.000 Kolleg*innen betreiben und modernisieren wir eine der größten und komplexesten IT-Infrastrukturen in Deutschland. Wir suchen verantwortungsvolle IT-Spezialist*innen, die die Bundeswehr-IT aus Überzeugung in herausfordernden Digitalisierungsvorhaben weiterentwickeln und so einen Beitrag zur Sicherheit Deutschlands leisten wollen.\n\nDer Bereich Customer Solutions unterstützt die Digitalisierung der Bundeswehr durch Projekte mit einsatznaher IT.\n\nDein Profil:\n\n-\n\nErfolgreich abgeschlossene Studium im Bereich IT bzw. vergleichbares Studium oder mindestens 6 Jahre Berufserfahrung\n\n-\n\nAutodiaktisches Aneignen von neuen Themen und Sachverhalten\n\n-\n\nFachkenntnisse im Bereich Linux Containerisierung, Kubernetes sowie CI/CD-Pipelines, deklarative Deployments (z. B. Git, Helm Charts)\n\n-\n\nCloud-Plattformen, Virtualisierung und Automatisierung (z. B. Ansible)\n\n-\n\nVertiefte Fachkenntnisse in einer umfassenden Disziplin, insbesondere in Spezialgebieten, oder vielseitig ausgeprägte Kenntnisse über das Zusammenwirken eines breiten Spektrums an Disziplinen\n\n-\n\nTestautomatisierung und Code Audits\n\n-\n\nOpen Source Entwicklung (z. B. GitHub, GitLab)\n\n-\n\nVertiefte theoretische und praktische Kenntnisse in der Anwendung weiterführender Prinzipien, Methoden und Tools\n\n-\n\nTeamfähigkeit und Qualitätsbewusstsein sowie analytisches Denkvermögen und strukturierte Arbeitsweise\n\n-\n\nKommunikationsstärke und Fähigkeit, komplexe Sachverhalte verständlich darzustellen\n\n-\n\nSehr gute Deutsch- und gute Englischkenntnisse in Wort und Schrift\n\n-\n\nReisebereitschaft\n\nDeine Aufgaben:\n\n- Entwicklung und Integration von Softwarekomponenten\n- Aufbau und Pflege von Build-, Test- und Deploymentpipelines\n- Umsetzung von Sicherheitsanforderungen\n- Unterstützung von Nachweisführung und Einsatzfähigkeit\n- Verantwortung für Plattform- und Pipeline-Architektur über Projekte hinweg\n- Definition von DevSecOps-Standards\n- Technische Entscheidungen über Projektgrenzen hinweg\n- Erstellen von Dokumentation und Schulungsmaterial\n- Enge Zusammenarbeit im Team\n\nWir bieten:\n\n- Durch abwechslungsreiche und gesellschaftlich relevante Aufgaben gewährleisten wir den reibungslosen IT-Betrieb und die Digitalisierung der Bundeswehr\n- Das Ziel eint uns. Dabei sind für uns ein wertschätzender Umgang miteinander sowie ein großer Teamgeist elementar\n- Wir bieten 30 Tage Jahresurlaub, 1 Brauchtumstag plus Optionen auf individuelle Anpassungen\n- Über unsere Benefit-App erhält man ein monatliches Guthaben und kann sich zusätzlich Steuervergünstigungen auf Tickets für den ÖPNV sichern\n- Wir ermöglichen Flexibilität, um Beruf und Privatleben in Einklang zu bringen, etwa durch mobiles Arbeiten oder Vertrauensarbeitszeit\n- Wir unterstützen die berufliche und persönliche Weiterbildung durch individuelle Maßnahmen sowie einen kostenfreien Zugriff auf LinkedIn Learning\n- Unser Jobradangebot ermöglicht das Leasing von bis zu 2 Fahrrädern\n- Die Einstiegsvergütung liegt im Regelfall zwischen 87.700 € und 113.150 € brutto p.a. Die konkrete Höhe wird basierend auf Kriterien wie z.B. Qualifikation, Verantwortungsbereich und den Anforderungen der Position festgelegt. Gerechtfertigte Abweichungen sind im Einzelfall möglich\n\nSag's gerne weiter!\n\nFrankfurt, Hamburg, München, Nürnberg, Ulm, Berlin, Bonn, Leipzig",
+ "arbeitszeitSchichtNachtWochenende": false,
+ "arbeitszeitTeilzeitAbend": false,
+ "arbeitszeitTeilzeitNachmittag": false,
+ "arbeitszeitTeilzeitVormittag": false,
+ "arbeitszeitTeilzeitFlexibel": false,
+ "arbeitszeitVollzeit": true,
+ "eintrittszeitraum": {
+  "von": "2027-02-01"
+ },
+ "verguetungsangabe": "KEINE_ANGABEN",
+ "vertragsdauer": "UNBEFRISTET",
+ "istGeringfuegigeBeschaeftigung": false,
+ "istBehinderungGefordert": false,
+ "stellenlokationen": [
+  {
+   "adresse": {
+    "plz": "10115",
+    "ort": "Berlin",
+    "region": "BERLIN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 52.5319761,
+   "laenge": 13.3867379
+  },
+  {
+   "adresse": {
+    "plz": "80331",
+    "ort": "München",
+    "region": "BAYERN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 48.1355827,
+   "laenge": 11.5739758
+  },
+  {
+   "adresse": {
+    "plz": "60486",
+    "ort": "Frankfurt am Main",
+    "region": "HESSEN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 50.1143251,
+   "laenge": 8.629914
+  },
+  {
+   "adresse": {
+    "plz": "89075",
+    "ort": "Ulm, Donau",
+    "region": "BADEN_WUERTTEMBERG",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 48.3906475,
+   "laenge": 9.9558042
+  },
+  {
+   "adresse": {
+    "plz": "90402",
+    "ort": "Nürnberg, Mittelfranken",
+    "region": "BAYERN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 49.4508466,
+   "laenge": 11.0896213
+  },
+  {
+   "adresse": {
+    "plz": "04109",
+    "ort": "Leipzig",
+    "region": "SACHSEN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 51.3390296,
+   "laenge": 12.3665008
+  },
+  {
+   "adresse": {
+    "plz": "22587",
+    "ort": "Hamburg",
+    "region": "HAMBURG",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 53.5662274,
+   "laenge": 9.8038402
+  },
+  {
+   "adresse": {
+    "plz": "53119",
+    "ort": "Bonn",
+    "region": "NORDRHEIN_WESTFALEN",
+    "land": "DEUTSCHLAND"
+   },
+   "breite": 50.7469676,
+   "laenge": 7.0640968
+  }
+ ],
+ "homeofficemoeglich": true,
+ "homeofficetyp": "NACH_VEREINBARUNG",
+ "chiffrenummer": "71232",
+ "istPrivateArbeitsvermittlung": false,
+ "istArbeitnehmerUeberlassung": false,
+ "veroeffentlichungszeitraum": {
+  "von": "2026-11-03"
+ },
+ "datumErsteVeroeffentlichung": "2026-11-03",
+ "aenderungsdatum": "2026-11-03T16:57:24.204",
+ "istBetreut": true,
+ "hauptberuf": "IT-Manager/in",
+ "firma": "BWI GmbH",
+ "allianzpartnerUrl": "www.bwi.de",
+ "allianzpartnerName": "BWI GmbH",
+ "referenznummer": "13509-00002111764001-S"
+}

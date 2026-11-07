@@ -15,8 +15,9 @@ STATES = (AdState.WHOLE, AdState.SNIPPET, AdState.NONE)
 
 
 def report_text(
-    reports: Sequence[SourceReport], campaigns: Sequence[Campaign], matches: Matches
+    reports: Sequence[SourceReport], campaigns: Sequence[Campaign], database: sqlite3.Connection
 ) -> str:
+    matches = Matches(database)
     ids = [campaign.id for campaign in campaigns]
     rows = [["source", "fetched", "new", *ids]]
     rows += [[report.source, *counts(report, ids)] for report in reports]

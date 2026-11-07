@@ -5,12 +5,12 @@ from urllib.parse import urlencode
 import pytest
 
 from hunter.adapters.sources.searches import bundesagentur
-from hunter.adapters.sources.searches.bundesagentur import BundesagenturSearch
+from hunter.adapters.sources.searches.bundesagentur import BundesagenturAds, BundesagenturSearch
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.campaign import Search
-from hunter.domain.discovery.location import Workplace
-from hunter.domain.discovery.posting import Employment
+from hunter.domain.discovery.location import Location, Workplace
+from hunter.domain.discovery.posting import Employment, Posting, SourceRef
 
 Pages = Callable[[Mapping[str, str]], str]
 BERLIN = Search(source="bundesagentur", query="Software Engineer", place="Berlin")
@@ -77,3 +77,29 @@ def test_an_answer_that_is_no_job_list_is_reported(web: WebClient, source_pages:
     api = source_pages({page_path(1): "lever-unzer.json"})
     with pytest.raises(SourceUnavailableError, match="isn't a job list"):
         BundesagenturSearch(web, BERLIN, api=api).fetch()
+
+
+BWI = "13509-00002111764001-S"
+DETAILS = "/pc/v4/jobdetails/MTM1MDktMDAwMDIxMTE3NjQwMDEtUw=="  # the reference, base64-encoded
+
+
+def job(reference: str) -> Posting:
+    return Posting(
+        title="Lead Expert Business Integration / DevSecOps Engineer (m/w/d)",
+        company="BWI GmbH",
+        location=Location(country="DE", city="Berlin"),
+        source=SourceRef(source="bundesagentur", native_id=reference),
+    )
+
+
+def test_a_job_s_whole_ad_is_read_from_its_details(web: WebClient, source_pages: Pages) -> None:
+    api = source_pages({DETAILS: "bundesagentur-jobdetails-bwi.json"})
+    ad = BundesagenturAds(web, api=api).read(job(BWI))
+    assert ad.startswith("Sorge gemeinsam mit uns")
+    assert len(ad) == 3801
+
+
+def test_a_job_the_bundesagentur_no_longer_has_is_gone(web: WebClient, source_pages: Pages) -> None:
+    with pytest.raises(SourceUnavailableError) as raised:
+        BundesagenturAds(web, api=source_pages({})).read(job(BWI))
+    assert raised.value.gone

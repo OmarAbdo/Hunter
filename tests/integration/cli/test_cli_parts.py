@@ -25,7 +25,7 @@ def test_the_report_shows_each_source_the_totals_and_the_reasons(tmp_path: Path)
         SourceReport("greenhouse:n26", fetched=3, new_jobs=3, taken={"berlin": 1}),
         SourceReport("ashby:enpal", error="ashby:enpal: HTTP 503"),
     ]
-    assert report_text(reports, [BERLIN], Matches(database)).splitlines() == [
+    assert report_text(reports, [BERLIN], database).splitlines() == [
         "source          fetched  new  berlin",
         "greenhouse:n26        3    3       1",
         "ashby:enpal           0    0       0",
@@ -36,7 +36,7 @@ def test_the_report_shows_each_source_the_totals_and_the_reasons(tmp_path: Path)
 
 
 def test_a_campaign_that_turned_nothing_down_says_so(tmp_path: Path) -> None:
-    text = report_text([], [BERLIN], Matches(Project(tmp_path).database()))
+    text = report_text([], [BERLIN], Project(tmp_path).database())
     assert text.splitlines() == [
         "source  fetched  new  berlin",
         "total         0    0       0",

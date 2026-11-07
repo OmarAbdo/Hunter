@@ -1,7 +1,8 @@
 """`discover [--campaign ID]...`: reads every source for the chosen campaigns, all of them when none
 is named: the registry's boards, and the searches the chosen campaigns name. It prints a line for
 each source as soon as it's read, then the report. Ctrl+C stops the run; everything read until
-then is kept.
+then is kept. Last, the taken jobs that lack their ad are read one at a time, where their source
+allows it.
 
 Each run's report is kept in the run log as it comes in, so it can be shown after the run; a run
 that was stopped keeps the sources it read, and no end time."""
@@ -9,11 +10,11 @@ that was stopped keeps the sources it read, and no end time."""
 from collections.abc import Iterator, Sequence
 from typing import TextIO
 
+from hunter.adapters.ad_reading import ads_line, read_taken_ads
 from hunter.adapters.campaign_files import CampaignFileError, load_campaigns
 from hunter.adapters.cli.project import Project, linked_jobs, stores_of
 from hunter.adapters.cli.report import progress_line, report_text
 from hunter.adapters.cli.sources import sources_of
-from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.run_log import DiscoveryRun, RunLog
 from hunter.adapters.cli.parallel_reading import RunControl, RunStoppedError, read_in_parallel
 from hunter.application.discover import SourceReport, take_each
@@ -51,7 +52,8 @@ def run_discovery(
     linked = linked_jobs(project.database())
     runs.finish(run.run_id, linked)
     out.write(f"{linked} job-board jobs linked to the employer's own posting\n")
-    out.write(report_text(reports, campaigns, Matches(project.database())))
+    out.write(ads_line(read_taken_ads(project, run.started_at)))
+    out.write(report_text(reports, campaigns, project.database()))
     return 0
 
 

@@ -1,0 +1,4 @@
+id = "101"
+title = "Read the Bundesagentur's ads in every discovery run"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/bundesagentur.py", "src/hunter/adapters/ad_reading.py", "src/hunter/adapters/cli/discover_command.py", "tests/integration/sources/test_bundesagentur.py", "tests/integration/cli/test_discover_command.py", "tests/fixtures/sources/bundesagentur-jobdetails-bwi.json", "tests/integration/test_ad_reading.py", "tests/integration/sources/test_ad_reading.py", "src/hunter/adapters/cli/report.py", "tests/integration/cli/test_cli_parts.py"]

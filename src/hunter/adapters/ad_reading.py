@@ -1,0 +1,37 @@
+"""Reading the ads of taken jobs that lack them, at the end of every discovery run: the sources
+Hunter can read one job at a time, paced like the rest of the run."""
+
+from collections import Counter
+from collections.abc import Mapping
+from datetime import datetime
+
+from hunter.adapters.cli.project import Project
+from hunter.adapters.sources.feed_table import PACE
+from hunter.adapters.sources.searches import bundesagentur
+from hunter.adapters.storage.holds import kept_pacing
+from hunter.adapters.storage.pool import Ads
+from hunter.adapters.web_client import WebClient
+from hunter.application.ports import AdReader
+from hunter.application.read_ads import read_ads
+
+OUTCOMES = ("read", "gone", "failed")
+
+
+def read_taken_ads(project: Project, now: datetime) -> dict[str, Counter[str]]:
+    """Each source's taken jobs that lacked their ad, counted as read, gone or failed."""
+    return read_ads(Ads(project.database()), readers_of(project), now)
+
+
+def readers_of(project: Project) -> dict[str, AdReader]:
+    web = WebClient(kept_pacing({}, PACE, project.database))
+    api = project.apis.get("bundesagentur", bundesagentur.API)
+    return {"bundesagentur": bundesagentur.BundesagenturAds(web, api=api)}
+
+
+def ads_line(outcomes: Mapping[str, Counter[str]]) -> str:
+    """Each source's outcomes, those that happened, in the order read, gone, failed."""
+    parts = (
+        f"{source} " + ", ".join(f"{counts[name]} {name}" for name in OUTCOMES if counts[name])
+        for source, counts in outcomes.items()
+    )
+    return f"Ads: {'; '.join(parts) or 'nothing to read'}\n"

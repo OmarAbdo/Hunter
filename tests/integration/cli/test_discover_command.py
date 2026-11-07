@@ -73,6 +73,7 @@ def test_a_campaign_with_an_unknown_search_source_is_refused(project: Path, run:
 def test_discover_says_how_many_job_board_jobs_it_linked(run: Run) -> None:
     _, out = run("discover")
     assert "0 job-board jobs linked to the employer's own posting" in out
+    assert "Ads: nothing to read" in out
 
 
 def test_a_discover_run_keeps_its_report_in_the_database(project: Path, run: Run) -> None:

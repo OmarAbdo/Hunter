@@ -1,9 +1,10 @@
 """The Bundesagentur für Arbeit's job search (docs/sources.md): the public search behind
 arbeitsagentur.de/jobsuche, read a page of 100 jobs at a time. A search for jobs in a place takes
 those within 25 km of it; one without a place covers Germany. Only jobs published in the last 30
-days are asked for. The list has no descriptions; most jobs link to the board or employer site
-they came from."""
+days are asked for. The list has no descriptions, so each taken job's ad is read from its details
+(`BundesagenturAds`); most jobs link to the board or employer site they came from."""
 
+import base64
 from datetime import UTC, date, datetime
 from typing import Any
 
@@ -67,6 +68,22 @@ class BundesagenturSearch:
             "size": str(PAGE_SIZE),
             "page": str(page),
         }
+
+
+class BundesagenturAds:
+    """A job's whole ad, from its details: the search's list has none. A job that was taken down
+    answers 404."""
+
+    def __init__(self, web: WebClient, api: str = API) -> None:
+        self.web = web
+        self.api = api
+
+    def read(self, posting: Posting) -> str:
+        reference = base64.b64encode(posting.source.native_id.encode()).decode()
+        details = read_json(self.web, f"{self.api}/pc/v4/jobdetails/{reference}", None, KEY)
+        if not isinstance(details, dict):
+            raise SourceUnavailableError(f"bundesagentur: details that aren't a job ({reference})")
+        return str(details.get("stellenangebotsBeschreibung") or "").strip()
 
 
 def posting_from(row: dict[str, Any]) -> Posting:
