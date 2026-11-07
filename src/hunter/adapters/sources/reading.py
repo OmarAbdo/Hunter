@@ -1,19 +1,25 @@
 """What every source adapter needs to read a source: its answer as JSON, with a failure of any kind
 turned into SourceUnavailableError; times, places and employment types as sources write them."""
 
+import json
 import re
 from collections.abc import Mapping
 from dataclasses import replace
 from datetime import datetime
 from typing import Any
 
+from hunter.adapters.html_text import plain_text
 from hunter.adapters.places import place_from_text
 from hunter.adapters.web_client import WebClient, WebError
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
-from hunter.domain.discovery.posting import Employment
+from hunter.domain.discovery.posting import Employment, Posting
 
 GONE_STATUSES = frozenset({404, 410})
+# A page's schema.org data, which job pages fill with a `JobPosting`.
+POSTING_DATA = re.compile(
+    r"""<script[^>]*application/ld\+json[^>]*>(.*?)</script>""", re.DOTALL | re.IGNORECASE
+)
 # Words in a source's employment type, checked in this order: "Intern (full-time)" is an internship.
 EMPLOYMENT_WORDS = (
     ("intern", Employment.INTERNSHIP),
@@ -94,3 +100,32 @@ def employment_from(text: str | None) -> Employment | None:
     """The employment type in words like "Full-time", "fulltime_permanent" or "Part time"."""
     letters = re.sub(r"[^a-z]", "", (text or "").lower())
     return next((kind for word, kind in EMPLOYMENT_WORDS if word in letters), None)
+
+
+def posting_data(page: str) -> dict[str, Any]:
+    """The page's schema.org `JobPosting`, or nothing when it has none."""
+    items = [item for block in POSTING_DATA.findall(page) for item in data_items(block)]
+    return next((item for item in items if item.get("@type") == "JobPosting"), {})
+
+
+def data_items(block: str) -> list[dict[str, Any]]:
+    try:
+        found = json.loads(block)
+    except ValueError:
+        return []
+    return [
+        item for item in (found if isinstance(found, list) else [found]) if isinstance(item, dict)
+    ]
+
+
+class JobPageAds:
+    """A job's whole ad from its own page's schema.org `JobPosting`, where its source's list gives
+    none (softgarden). A page that's gone answers 404; one without the data has no ad."""
+
+    def __init__(self, web: WebClient) -> None:
+        self.web = web
+
+    def read(self, posting: Posting) -> str:
+        if not posting.url:
+            return ""
+        return plain_text(posting_data(read_page(self.web, posting.url)).get("description"))

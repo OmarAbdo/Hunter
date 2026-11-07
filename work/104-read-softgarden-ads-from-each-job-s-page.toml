@@ -1,0 +1,4 @@
+id = "104"
+title = "Read softgarden ads from each job's page"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/reading.py", "src/hunter/adapters/sources/feeds/rexx.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_ad_reading.py", "tests/fixtures/sources/softgarden-job-hypoport.html"]

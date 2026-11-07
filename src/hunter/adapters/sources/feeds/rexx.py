@@ -4,14 +4,19 @@ company styles its list differently, but every job links to a page ending in `-j
 on the company's own career domain, and every job page carries schema.org `JobPosting` data. So
 the list gives the jobs, and each job's page its details: one request per job."""
 
-import json
 import re
 from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urljoin
 
 from hunter.adapters.html_text import plain_text
-from hunter.adapters.sources.reading import employment_from, parsed_time, place_at, read_page
+from hunter.adapters.sources.reading import (
+    employment_from,
+    parsed_time,
+    place_at,
+    posting_data,
+    read_page,
+)
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location
@@ -21,9 +26,6 @@ API = "https://{board}-portal.rexx-recruitment.com"
 PAGE_SIZE = 100
 MOST_PAGES = 5  # 500 jobs, each one more request
 JOB_LINK = re.compile(r"""href=["']([^"']*-j(\d+)\.html)[^"']*["']""")
-POSTING_DATA = re.compile(
-    r"""<script[^>]*application/ld\+json[^>]*>(.*?)</script>""", re.DOTALL | re.IGNORECASE
-)
 
 
 class RexxFeed:
@@ -75,22 +77,6 @@ class RexxFeed:
             description=plain_text(data.get("description")),
             posted_at=posted_on(data.get("datePosted")),
         )
-
-
-def posting_data(page: str) -> dict[str, Any]:
-    """The page's schema.org `JobPosting`, or nothing when it has none."""
-    items = [item for block in POSTING_DATA.findall(page) for item in data_items(block)]
-    return next((item for item in items if item.get("@type") == "JobPosting"), {})
-
-
-def data_items(block: str) -> list[dict[str, Any]]:
-    try:
-        found = json.loads(block)
-    except ValueError:
-        return []
-    return [
-        item for item in (found if isinstance(found, list) else [found]) if isinstance(item, dict)
-    ]
 
 
 def place_of(data: dict[str, Any]) -> Location:
