@@ -80,6 +80,24 @@ class CareersPages(Protocol):
         ...
 
 
+class AdReader(Protocol):
+    def read(self, posting: Posting) -> str:
+        """The job's whole ad, from the source that showed it. Raises SourceUnavailableError,
+        `gone` when the source doesn't have the job any more."""
+        ...
+
+
+class AdStore(Protocol):
+    def wanting(self) -> list[tuple[int, Posting]]:
+        """The jobs a campaign took that lack their whole ad and aren't known to be gone, by id,
+        the newest first."""
+        ...
+
+    def keep_ad(self, job_id: int, posting: Posting) -> None: ...
+
+    def mark_gone(self, job_id: int, gone_at: datetime) -> None: ...
+
+
 class WebSearch(Protocol):
     def links(self, query: str) -> list[str]:
         """The links a web search finds, best first. Raises SourceUnavailableError."""

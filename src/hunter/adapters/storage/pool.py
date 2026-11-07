@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from hunter.domain.ads.coverage import fuller
+from hunter.domain.ads.coverage import AdState, ad_state, fuller
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.pooled import Pooled
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -112,6 +112,36 @@ class Pool:
             "ON CONFLICT (source, native_id) DO UPDATE SET last_seen = excluded.last_seen",
             (job_id, source.source, source.native_id, seen_at.isoformat(), seen_at.isoformat()),
         )
+
+
+class Ads:
+    """The taken jobs' ads, as reading them needs: which jobs lack theirs, and what was found."""
+
+    def __init__(self, database: sqlite3.Connection) -> None:
+        self.database = database
+
+    def wanting(self) -> list[tuple[int, Posting]]:
+        """The taken jobs without their whole ad that aren't known to be gone, the newest first."""
+        rows = self.database.execute(
+            "SELECT id, posting FROM jobs WHERE id IN "
+            "(SELECT job_id FROM matches WHERE rejection IS NULL) "
+            "AND id NOT IN (SELECT job_id FROM gone) ORDER BY id DESC"
+        )
+        jobs = ((job_id, decoded(text)) for job_id, text in rows)
+        return [(job_id, posting) for job_id, posting in jobs if ad_state(posting) != AdState.WHOLE]
+
+    def keep_ad(self, job_id: int, posting: Posting) -> None:
+        with self.database:
+            self.database.execute(
+                "UPDATE jobs SET posting = ? WHERE id = ?", (encoded(posting), job_id)
+            )
+
+    def mark_gone(self, job_id: int, gone_at: datetime) -> None:
+        with self.database:
+            self.database.execute(
+                "INSERT OR IGNORE INTO gone (job_id, at) VALUES (?, ?)",
+                (job_id, gone_at.isoformat()),
+            )
 
 
 def plain(value: object) -> object:

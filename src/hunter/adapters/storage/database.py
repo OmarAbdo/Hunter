@@ -61,6 +61,11 @@ CREATE TABLE IF NOT EXISTS matches (
     PRIMARY KEY (job_id, campaign_id)
 );
 
+CREATE TABLE IF NOT EXISTS gone (
+    job_id INTEGER PRIMARY KEY REFERENCES jobs (id),
+    at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY,
     started_at TEXT NOT NULL,

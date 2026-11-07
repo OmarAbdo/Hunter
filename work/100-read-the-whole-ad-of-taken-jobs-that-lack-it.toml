@@ -1,0 +1,4 @@
+id = "100"
+title = "Read the whole ad of taken jobs that lack it"
+kind = "feature"
+scope = ["src/hunter/application/ports.py", "src/hunter/application/read_ads.py", "src/hunter/adapters/storage/pool.py", "src/hunter/adapters/storage/database.py", "tests/unit/test_read_ads.py", "tests/integration/test_pool.py"]

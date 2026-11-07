@@ -4,7 +4,7 @@ from pathlib import Path
 
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.matches import Matches
-from hunter.adapters.storage.pool import Pool
+from hunter.adapters.storage.pool import Ads, Pool
 from hunter.domain.discovery.campaign import Rejection
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -182,3 +182,30 @@ def test_a_job_board_s_ad_never_replaces_the_employer_s_posting(tmp_path: Path) 
     eures = replace(INDEED, source=SourceRef("eures", "MTAw"), description="Build the backend.")
     pool.add(eures, SEEN)
     assert pool.posting(job_id) == bare
+
+
+def test_the_jobs_wanting_their_ad_are_taken_lack_it_and_aren_t_gone(tmp_path: Path) -> None:
+    """The newest first: they're the likeliest to be open still."""
+    database = open_database(tmp_path / "hunter.db")
+    pool, matches = Pool(database), Matches(database)
+    bare = replace(INDEED, title="Java Developer", source=SourceRef("bundesagentur", "1"))
+    gone = replace(bare, title="Data Engineer", source=SourceRef("bundesagentur", "2"))
+    newer = replace(bare, title="Go Developer", source=SourceRef("bundesagentur", "3"))
+    turned_down = replace(bare, title="Sales Manager", source=SourceRef("bundesagentur", "4"))
+    ids = [pool.add(job, SEEN).job_id for job in (GREENHOUSE, bare, gone, newer, turned_down)]
+    for job_id in ids[:4]:
+        matches.record(job_id, "berlin", None, SEEN)
+    matches.record(ids[4], "berlin", Rejection.ROLE, SEEN)
+    Ads(database).mark_gone(ids[2], SEEN)
+    assert Ads(database).wanting() == [(ids[3], newer), (ids[1], bare)]
+
+
+def test_a_job_keeps_the_ad_read_for_it(tmp_path: Path) -> None:
+    database = open_database(tmp_path / "hunter.db")
+    pool = Pool(database)
+    bare = replace(INDEED, source=SourceRef("bundesagentur", "1"))
+    job_id = pool.add(bare, SEEN).job_id
+    Matches(database).record(job_id, "berlin", None, SEEN)
+    Ads(database).keep_ad(job_id, replace(bare, description="Build the backend."))
+    assert pool.posting(job_id).description == "Build the backend."
+    assert Ads(database).wanting() == []
