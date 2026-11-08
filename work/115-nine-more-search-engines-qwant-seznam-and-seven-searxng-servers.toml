@@ -1,0 +1,4 @@
+id = "115"
+title = "Nine more search engines: Qwant, Seznam and seven SearXNG servers"
+kind = "feature"
+scope = ["src/hunter/adapters/edge_search.py", "tests/integration/test_edge_search.py", "tests/fixtures/sources/edge-search-*-zalando.html", "docs/sources.md"]

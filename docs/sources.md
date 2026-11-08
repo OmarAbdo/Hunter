@@ -123,7 +123,7 @@ without a known board, Hunter looks in this order:
    SmartRecruiters. Workable isn't guessed.
 4. **A web search** (built), last, only when nothing else found a board: `"<company>" careers
    jobs`, searched like a person through Edge (headless, Hunter's own profile in
-   `var/edge-search`, an ordinary Edge user agent). Seven engines (2026-11-08): DuckDuckGo, Bing, Startpage, Brave, Ecosia, Yahoo and Swisscows; Mojeek, Qwant and Google turn headless Edge away. They take turns: each search goes to
+   `var/edge-search`, an ordinary Edge user agent). Thirteen engines (2026-11-08): DuckDuckGo, Bing, Startpage, Brave, Ecosia, Yahoo, Swisscows, Qwant (its lite site), Seznam and four public SearXNG servers (priv.au, etsi.me, darmarit.org, paulgo.io); Mojeek, Qwant's full site, Google and most other engines and SearXNG servers turn headless Edge away or answer longer queries with unrelated pages. They take turns: each search goes to
    the one used longest ago, so the load is spread before any engine grows suspicious; an engine at
    12 searches in the last hour waits, and one that showed a captcha rests an hour, twice as long
    after each more in a row, a day at most. Each result link that names a board is checked like a

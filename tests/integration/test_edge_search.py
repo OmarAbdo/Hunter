@@ -13,6 +13,7 @@ from hunter.adapters.edge_search import (
     EdgeSearch,
     Engine,
     Pace,
+    SEARXNG,
     yahoo_target,
 )
 from hunter.adapters.storage.database import open_database
@@ -38,15 +39,34 @@ def test_result_links_are_read_through_each_engines_redirects() -> None:
 
 @pytest.mark.parametrize("engine", ENGINES[2:], ids=lambda engine: engine.name)
 def test_every_engine_reads_its_own_results(engine: Engine) -> None:
-    outcome, links = engine.read(saved(f"{engine.name}-zalando"))
+    """The SearXNG servers share one page: every one of them is read from it."""
+    page = "searxng" if engine in SEARXNG else engine.name
+    outcome, links = engine.read(saved(f"{page}-zalando"))
     assert outcome == "links"
-    assert links[0].startswith("https://jobs.zalando.com/")
+    assert any(link.startswith("https://jobs.zalando.com/") for link in links[:2])
     assert len(links) == len(set(links))  # each result once
 
 
 def test_the_engines_take_turns_in_this_order_when_none_was_used() -> None:
     names = [engine.name for engine in ENGINES]
-    assert names == ["duckduckgo", "bing", "startpage", "brave", "ecosia", "yahoo", "swisscows"]
+    assert names[:9] == [
+        "duckduckgo",
+        "bing",
+        "startpage",
+        "brave",
+        "ecosia",
+        "yahoo",
+        "swisscows",
+        "qwant",
+        "seznam",
+    ]
+    assert names[9:] == [engine.name for engine in SEARXNG]
+    assert len(set(names)) == 13
+
+
+def test_each_searxng_server_is_searched_at_its_own_address() -> None:
+    darmarit = next(engine for engine in SEARXNG if engine.name == "darmarit.org")
+    assert darmarit.url('"N26" careers') == "https://darmarit.org/searx/search?q=%22N26%22+careers"
 
 
 def test_yahoo_s_redirect_carries_the_result_in_its_path() -> None:

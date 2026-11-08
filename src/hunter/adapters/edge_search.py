@@ -179,7 +179,45 @@ SWISSCOWS = Engine(
     (),
     same,
 )
-ENGINES = (DUCKDUCKGO, BING, STARTPAGE, BRAVE, ECOSIA, YAHOO, SWISSCOWS)
+# Qwant's lite site and Seznam mark only their results, so an empty answer reads as unreadable.
+QWANT = Engine(
+    "qwant",
+    "https://lite.qwant.com/?q={}",
+    re.compile(r'data-testid="webResult"[^>]*>.*?<a\b[^>]*\bhref="([^"]+)"', re.S),
+    'data-testid="webResult"',
+    (),
+    same,
+)
+SEZNAM = Engine(
+    "seznam",
+    "https://search.seznam.cz/?q={}",
+    re.compile(r'data-e-a="heading"\s+href="([^"]+)"'),
+    'data-e-a="heading"',
+    (),
+    same,
+)
+
+
+def searxng(server: str) -> Engine:
+    """A public SearXNG server: a metasearch engine many people run, each with its own address
+    and its own limits, all with the same results page."""
+    return Engine(
+        server.partition("/")[0],
+        f"https://{server}/search?q={{}}",
+        re.compile(r'<article class="result[^"]*"[^>]*>.*?<a\b[^>]*\bhref="([^"]+)"', re.S),
+        'id="urls"',
+        (),
+        same,
+    )
+
+
+# The public servers that answered headless Edge with results that fit the query (2026-11-08), of
+# 20 tried. search.inetol.net, search.rhscz.eu and searx.oloke.xyz answered short queries well but
+# longer quoted ones, an employer's ad's, with pages unrelated to them, so they're left out.
+SEARXNG = tuple(
+    searxng(server) for server in ("priv.au", "etsi.me", "darmarit.org/searx", "paulgo.io")
+)
+ENGINES = (DUCKDUCKGO, BING, STARTPAGE, BRAVE, ECOSIA, YAHOO, SWISSCOWS, QWANT, SEZNAM, *SEARXNG)
 
 
 def utc_now() -> datetime:
