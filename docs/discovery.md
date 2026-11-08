@@ -94,14 +94,15 @@ hunter discover --campaign de-swe-berlin
 
 A line for each source is printed as soon as it's read; a full run takes about a minute. Then
 comes the report: each source's fetched, new and taken counts, and each campaign's rejections by
-reason. Ctrl+C stops a run, and what was read until then is kept. The first run needs the
+reason. Last, the taken jobs' missing ads are read (docs/ads.md); `hunter ads` shows how many have
+theirs. Ctrl+C stops a run, and what was read until then is kept. The first run needs the
 project's environment: `doctrine check` builds it once.
 
 **Hunter's window.** `hunter shortcuts` puts a Hunter icon on the desktop and in the Start menu,
 once. The icon opens Hunter's window without a console; `hunter gui` does the same from a console.
 The window is an Edge app window on a page Hunter serves on this computer only. It shows the
 pool's size, each campaign's jobs (filtered as you type) with where they were seen, and the
-companies with their boards. Its Runs tab starts a discovery run, shows each source as it's read
+companies with their boards. Its Ads tab shows how many taken jobs have their whole ad, and a click on a job's ad state opens the ad (docs/ads.md). Its Runs tab starts a discovery run, shows each source as it's read
 (the same lines `hunter discover` prints), and lists the latest runs with what they brought and
 which sources failed; one run at a time. A run can be paused, resumed and stopped there: no new
 source starts while it's paused or once it's stopped, and the sources being read are read to their

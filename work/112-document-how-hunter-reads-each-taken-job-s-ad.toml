@@ -1,0 +1,4 @@
+id = "112"
+title = "Document how Hunter reads each taken job's ad"
+kind = "chore"
+scope = ["docs/ads.md", "docs/sources.md", "docs/discovery.md"]
