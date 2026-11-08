@@ -206,3 +206,10 @@ def test_a_site_s_addresses_take_their_turns_together() -> None:
     client = WebClient(Pacing({}, default=PaceRule(min_gap=timedelta(seconds=1))))
     assert client._turn_of("a.jobs.personio.de") is client._turn_of("b.jobs.personio.de")
     assert client._turn_of("a.jobs.personio.de") is not client._turn_of("api.ashbyhq.com")
+
+
+def test_an_address_with_letters_beyond_ascii_is_sent_encoded(client: WebClient, site: str) -> None:
+    """Search results link to such pages; a browser sends them percent-encoded, and so does
+    Hunter, rather than failing on them."""
+    answer = client.get_json(f"{site}/jobs/stellen-für-entwickler?ort=münchen")
+    assert answer["path"] == "/jobs/stellen-f%C3%BCr-entwickler?ort=m%C3%BCnchen"

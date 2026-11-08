@@ -1,4 +1,4 @@
 id = "117"
 title = "The employer search reads its candidates over plain HTTP and skips job aggregators"
 kind = "feature"
-scope = ["src/hunter/adapters/sources/searches/employer_search.py", "src/hunter/adapters/sources/alerts/alert_ads.py", "src/hunter/adapters/sources/reading.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_employer_search.py"]
+scope = ["src/hunter/adapters/sources/searches/employer_search.py", "src/hunter/adapters/sources/alerts/alert_ads.py", "src/hunter/adapters/sources/reading.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_employer_search.py", "src/hunter/adapters/web_client.py", "tests/integration/test_web_client.py"]

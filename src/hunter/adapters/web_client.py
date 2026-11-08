@@ -20,6 +20,7 @@ from hunter.adapters.web_answers import NO_ANSWER, decoded, retry_after
 from hunter.domain.pacing import CapReachedError, Moment, Pacing, site_of
 
 USER_AGENT = "Hunter/0.1 (personal job search)"
+URL_SAFE = "/%:@!$&'()*+,;=~?"  # what an address keeps as it is: its marks, and what's encoded
 TIMEOUT_SECONDS = 30
 TRIES = 3
 PAUSES_SECONDS = (5.0, 15.0)
@@ -52,6 +53,17 @@ class WebError(Exception):
 
 def when(moment: datetime) -> str:
     return f"{moment:%Y-%m-%d %H:%M} UTC"
+
+
+def as_sent(url: str) -> str:
+    """The address as a browser sends it: letters beyond ASCII percent-encoded, a host's in IDNA.
+    Search results link to such pages ("stellen-für-entwickler")."""
+    if url.isascii():
+        return url
+    parts = urllib.parse.urlsplit(url)
+    host = parts.netloc if parts.netloc.isascii() else parts.netloc.encode("idna").decode()
+    path, query = (urllib.parse.quote(part, safe=URL_SAFE) for part in (parts.path, parts.query))
+    return urllib.parse.urlunsplit((parts.scheme, host, path, query, parts.fragment))
 
 
 def moment_now() -> Moment:
@@ -120,7 +132,8 @@ class WebClient:
         return rules
 
     def _send(self, url: str, headers: Mapping[str, str], body: bytes | None = None) -> str:
-        request = urllib.request.Request(url, body, {"User-Agent": USER_AGENT, **headers})
+        agent = {"User-Agent": USER_AGENT, **headers}
+        request = urllib.request.Request(as_sent(url), body, agent)
         for attempt in range(1, TRIES):
             try:
                 return self._read(request)
