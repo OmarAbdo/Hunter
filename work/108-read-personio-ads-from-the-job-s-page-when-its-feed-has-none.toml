@@ -1,0 +1,4 @@
+id = "108"
+title = "Read Personio ads from the job's page when its feed has none"
+kind = "feature"
+scope = ["src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_ad_reading.py", "tests/fixtures/sources/personio-job-chrono24.html"]

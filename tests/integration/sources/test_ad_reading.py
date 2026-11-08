@@ -57,6 +57,7 @@ def test_the_sources_read_one_job_at_a_time(tmp_path: Path) -> None:
     assert sorted(readers_of(Project(tmp_path))) == [
         "adzuna",
         "bundesagentur",
+        "personio",
         "smartrecruiters",
         "softgarden",
         "stepstone-alert",
@@ -133,3 +134,13 @@ def test_a_page_that_was_not_found_is_gone() -> None:
     with pytest.raises(SourceUnavailableError) as raised:
         ad_on_page(page, ADZUNA.url or "")
     assert raised.value.gone
+
+
+def test_a_personio_job_s_whole_ad_is_read_from_its_page(
+    tmp_path: Path, source_pages: Callable[[Mapping[str, str]], str]
+) -> None:
+    """Some Personio boards publish their feed without the ads; the job's page has it."""
+    site = source_pages({"/job/2827202": "personio-job-chrono24.html"})
+    job = replace(FULLSTACK, source=SourceRef("personio", "2827202"), url=f"{site}/job/2827202")
+    ad = readers_of(Project(tmp_path))["personio"].read(job)
+    assert ad.startswith("About\n\nChrono24 is the world's leading marketplace")

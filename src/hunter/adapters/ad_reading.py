@@ -28,10 +28,14 @@ def readers_of(project: Project) -> dict[str, AdReader]:
     web = WebClient(kept_pacing({}, PACE, project.database))
     apis = {"bundesagentur": bundesagentur.API, "smartrecruiters": smartrecruiters.API}
     apis.update({source: api for source, api in project.apis.items() if source in apis})
+    # Job pages read over plain HTTP, where robots.txt allows: softgarden's list has no ads, and
+    # some Personio boards leave them out of their feed.
+    pages = reading.JobPageAds(lambda url: reading.read_page(web, url))
     return {
         "bundesagentur": bundesagentur.BundesagenturAds(web, api=apis["bundesagentur"]),
+        "personio": pages,
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
-        "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
+        "softgarden": pages,
         **edge_readers(project.root / "var" / "edge-ads"),
     }
 
