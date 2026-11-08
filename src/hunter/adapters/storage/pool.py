@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from hunter.domain.ads.coverage import AdState, ad_state, fuller
+from hunter.domain.ads.coverage import AdState, TakenJob, ad_state, fuller
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.pooled import Pooled
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -44,13 +44,15 @@ class Pool:
         )
         return [SourceRef(source=source, native_id=native_id) for source, native_id in rows]
 
-    def taken(self) -> list[tuple[Posting, bool]]:
-        """Every job at least one campaign took, once each, with whether it's gone."""
+    def taken(self) -> list[TakenJob]:
+        """Every job at least one campaign took, once each, with what reading its ad found."""
         rows = self.database.execute(
-            "SELECT posting, id IN (SELECT job_id FROM gone) FROM jobs WHERE id IN "
-            "(SELECT job_id FROM matches WHERE rejection IS NULL) ORDER BY id"
+            "SELECT posting, id IN (SELECT job_id FROM gone), id IN (SELECT job_id FROM whole_ads) "
+            "FROM jobs WHERE id IN (SELECT job_id FROM matches WHERE rejection IS NULL) ORDER BY id"
         )
-        return [(decoded(text), bool(gone)) for text, gone in rows]
+        return [
+            TakenJob(decoded(text), gone=bool(gone), read=bool(read)) for text, gone, read in rows
+        ]
 
     def job_count(self) -> int:
         return int(self.database.execute("SELECT count(*) FROM jobs").fetchone()[0])
@@ -125,15 +127,21 @@ class Ads:
         rows = self.database.execute(
             "SELECT id, posting FROM jobs WHERE id IN "
             "(SELECT job_id FROM matches WHERE rejection IS NULL) "
-            "AND id NOT IN (SELECT job_id FROM gone) ORDER BY id DESC"
+            "AND id NOT IN (SELECT job_id FROM gone) "
+            "AND id NOT IN (SELECT job_id FROM whole_ads) ORDER BY id DESC"
         )
         jobs = ((job_id, decoded(text)) for job_id, text in rows)
         return [(job_id, posting) for job_id, posting in jobs if ad_state(posting) != AdState.WHOLE]
 
-    def keep_ad(self, job_id: int, posting: Posting) -> None:
+    def keep_ad(self, job_id: int, posting: Posting, read_at: datetime) -> None:
+        """The ad read for the job is its whole ad, whatever its source shows in a search."""
         with self.database:
             self.database.execute(
                 "UPDATE jobs SET posting = ? WHERE id = ?", (encoded(posting), job_id)
+            )
+            self.database.execute(
+                "INSERT OR IGNORE INTO whole_ads (job_id, at) VALUES (?, ?)",
+                (job_id, read_at.isoformat()),
             )
 
     def mark_gone(self, job_id: int, gone_at: datetime) -> None:

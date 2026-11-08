@@ -36,5 +36,5 @@ def read_one(store: AdStore, reader: AdReader, job: tuple[int, Posting], now: da
         return "gone"
     if not text.strip():
         return "failed"
-    store.keep_ad(job_id, replace(posting, description=text))
+    store.keep_ad(job_id, replace(posting, description=text), now)
     return "read"

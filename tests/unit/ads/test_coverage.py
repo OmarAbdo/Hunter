@@ -1,6 +1,6 @@
 from collections import Counter
 
-from hunter.domain.ads.coverage import AdState, ad_state, coverage, fuller, open_jobs
+from hunter.domain.ads.coverage import AdState, TakenJob, ad_state, coverage, fuller, open_jobs
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting, SourceRef
 
@@ -36,17 +36,23 @@ def test_a_job_its_source_no_longer_has_is_gone_whatever_text_it_has() -> None:
     assert ad_state(posting("bundesagentur"), gone=True) == AdState.GONE
 
 
+def test_an_ad_read_from_the_job_s_own_page_is_whole_whatever_its_source() -> None:
+    assert ad_state(posting("adzuna", "The whole ad."), read=True) == AdState.WHOLE
+    assert ad_state(posting("adzuna", ""), read=True) == AdState.NONE
+
+
 def test_coverage_counts_each_source_s_jobs_by_state() -> None:
     jobs = [
-        (posting("greenhouse", "text"), False),
-        (posting("greenhouse", "text"), False),
-        (posting("adzuna", "a few lines"), False),
-        (posting("stepstone-alert"), False),
-        (posting("stepstone-alert"), True),
+        TakenJob(posting("greenhouse", "text")),
+        TakenJob(posting("greenhouse", "text")),
+        TakenJob(posting("adzuna", "a few lines")),
+        TakenJob(posting("adzuna", "the whole ad"), read=True),
+        TakenJob(posting("stepstone-alert")),
+        TakenJob(posting("stepstone-alert"), gone=True),
     ]
     assert coverage(jobs) == {
         "greenhouse": {AdState.WHOLE: 2},
-        "adzuna": {AdState.SNIPPET: 1},
+        "adzuna": {AdState.SNIPPET: 1, AdState.WHOLE: 1},
         "stepstone-alert": {AdState.NONE: 1, AdState.GONE: 1},
     }
 

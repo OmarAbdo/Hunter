@@ -24,12 +24,14 @@ class Store:
         self.jobs = dict(enumerate(jobs, start=1))
         self.kept: dict[int, Posting] = {}
         self.gone: dict[int, datetime] = {}
+        self.read_at: dict[int, datetime] = {}
 
     def wanting(self) -> list[tuple[int, Posting]]:
         return list(self.jobs.items())
 
-    def keep_ad(self, job_id: int, posting: Posting) -> None:
+    def keep_ad(self, job_id: int, posting: Posting, read_at: datetime) -> None:
         self.kept[job_id] = posting
+        self.read_at[job_id] = read_at
 
     def mark_gone(self, job_id: int, gone_at: datetime) -> None:
         self.gone[job_id] = gone_at
@@ -56,6 +58,7 @@ def test_a_job_s_ad_is_read_from_its_source_and_kept() -> None:
     store = Store(job)
     counts = read_ads(store, {"bundesagentur": Reader({"1": "Wir suchen Dich."})}, NOW)
     assert store.kept == {1: replace(job, description="Wir suchen Dich.")}
+    assert store.read_at == {1: NOW}
     assert counts == {"bundesagentur": Counter(read=1)}
 
 

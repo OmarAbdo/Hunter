@@ -5,6 +5,7 @@ from pathlib import Path
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.storage.pool import Ads, Pool
+from hunter.domain.ads.coverage import TakenJob
 from hunter.domain.discovery.campaign import Rejection
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -142,9 +143,9 @@ def test_the_taken_jobs_are_those_a_campaign_took_each_once(tmp_path: Path) -> N
     matches.record(taken, "berlin", None, SEEN)
     matches.record(taken, "remote", None, SEEN)
     matches.record(turned_down, "berlin", Rejection.PLACE, SEEN)
-    assert pool.taken() == [(GREENHOUSE, False)]
+    assert pool.taken() == [TakenJob(GREENHOUSE)]
     Ads(database).mark_gone(taken, SEEN)
-    assert pool.taken() == [(GREENHOUSE, True)]
+    assert pool.taken() == [TakenJob(GREENHOUSE, gone=True)]
 
 
 def test_a_job_without_its_ad_takes_the_ad_another_source_shows(tmp_path: Path) -> None:
@@ -208,6 +209,19 @@ def test_a_job_keeps_the_ad_read_for_it(tmp_path: Path) -> None:
     bare = replace(INDEED, source=SourceRef("bundesagentur", "1"))
     job_id = pool.add(bare, SEEN).job_id
     Matches(database).record(job_id, "berlin", None, SEEN)
-    Ads(database).keep_ad(job_id, replace(bare, description="Build the backend."))
+    Ads(database).keep_ad(job_id, replace(bare, description="Build the backend."), SEEN)
     assert pool.posting(job_id).description == "Build the backend."
+    assert Ads(database).wanting() == []
+
+
+def test_a_snippet_source_s_job_whose_ad_was_read_is_whole_and_not_wanted(tmp_path: Path) -> None:
+    """Adzuna's search shows a few lines; the ad read from its page is the whole ad."""
+    database = open_database(tmp_path / "hunter.db")
+    pool = Pool(database)
+    snippet = replace(INDEED, description="Build the...")
+    job_id = pool.add(snippet, SEEN).job_id
+    Matches(database).record(job_id, "berlin", None, SEEN)
+    whole = replace(snippet, description="Build the backend, all of it.")
+    Ads(database).keep_ad(job_id, whole, SEEN)
+    assert pool.taken() == [TakenJob(whole, read=True)]
     assert Ads(database).wanting() == []
