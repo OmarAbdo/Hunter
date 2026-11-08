@@ -40,7 +40,11 @@ def readers_of(project: Project) -> dict[str, AdReader]:
         "personio": personio.PersonioAds(web),
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
         "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
-        **alert_ads.edge_readers(project.root / "var" / "edge-ads", project.database()),
+        **alert_ads.edge_readers(
+            project.root / "var" / "edge-ads",
+            project.database(),
+            lambda url: reading.read_text(web, url, None, reading.BROWSER),
+        ),
         "linkedin-alert": linkedin_ads.LinkedInAds(web),
     }
 

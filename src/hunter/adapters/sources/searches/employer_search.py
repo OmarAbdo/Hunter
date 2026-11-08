@@ -23,8 +23,9 @@ from hunter.domain.ads.employer_ad import fits, search_query
 from hunter.domain.discovery.posting import Posting
 
 SEARCHED_FOR = ("careerjet", "indeed-alert")
-CANDIDATES = 3  # result pages read for one job, at most
+CANDIDATES = 5  # result pages read for one job, at most
 LATELY = timedelta(days=7)  # a query searched since isn't searched again
+Page = Callable[[str], str]
 # Job boards and aggregators: their copies are what Hunter has already, or can't be read.
 JOB_BOARDS = (
     "linkedin.",
@@ -45,6 +46,25 @@ JOB_BOARDS = (
     "talent.com",
     "simplyhired.",
     "ziprecruiter.",
+    "bebee.",
+    "jobleads.",
+    "fuchsjobs.",
+    "arbeitnow.",
+    "jobrobot.",
+    "devjobs.",
+    "jobs.golem.",
+    "jobs.heise.",
+    "remotely.",
+    "qarera.",
+    "rejobs.",
+    "meinestadt.",
+    "kimeta.",
+    "jobted.",
+    "builtin.",
+    "get-in-it.",
+    "jobsora.",
+    "jooble.",
+    "careerbuilder.",
 )
 
 
@@ -86,12 +106,29 @@ def job_board(link: str) -> bool:
     return any(board in host for board in JOB_BOARDS)
 
 
-def employer_readers(edge: Edge, database: sqlite3.Connection) -> dict[str, AdReader]:
+def plain_first(plain: Page, browser: Page) -> Page:
+    """Reads a page over plain HTTP, in a fraction of a second, and through the browser only when
+    the site refuses that; a page that's gone is gone either way."""
+
+    def page(url: str) -> str:
+        try:
+            return plain(url)
+        except SourceUnavailableError as error:
+            if error.gone:
+                raise
+            return browser(url)
+
+    return page
+
+
+def employer_readers(edge: Edge, database: sqlite3.Connection, plain: Page) -> dict[str, AdReader]:
     """One reader for every source whose own pages can't be read, searching through `edge` at
-    the pace the search log keeps."""
+    the pace the search log keeps, and reading the results with `plain` first."""
     log = SearchLog(database)
     week_ago = datetime.now(UTC) - LATELY
     reader = EmployerAds(
-        EdgeSearch(edge.dom, log), edge.dom, lambda query: log.searched(query, week_ago)
+        EdgeSearch(edge.dom, log),
+        plain_first(plain, edge.dom),
+        lambda query: log.searched(query, week_ago),
     )
     return dict.fromkeys(SEARCHED_FOR, reader)

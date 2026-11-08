@@ -74,15 +74,18 @@ class AlertPageAds:
         return ad_on_page(self.page(target), target)
 
 
-def edge_readers(profile: Path, database: sqlite3.Connection) -> dict[str, AdReader]:
+def edge_readers(
+    profile: Path, database: sqlite3.Connection, plain: Callable[[str], str]
+) -> dict[str, AdReader]:
     """The sources whose pages only Edge can read, with a profile of their own: the alert jobs,
     Adzuna's details pages, which answer plain requests with 403, and the employer's own ad for
-    the jobs whose board can't be read at all (searches/employer_search.py)."""
+    the jobs whose board can't be read at all (searches/employer_search.py), whose candidate
+    pages are read with `plain` first."""
     edge = Edge(profile)
     alerts = AlertPageAds(first_hop, edge.dom)
     return {
         "stepstone-alert": alerts,
         "xing-alert": alerts,
         "adzuna": JobPageAds(edge.dom),
-        **employer_readers(edge, database),
+        **employer_readers(edge, database, plain),
     }

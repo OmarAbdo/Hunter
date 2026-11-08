@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from hunter.adapters.sources.searches.employer_search import EmployerAds
+from hunter.adapters.sources.searches.employer_search import EmployerAds, plain_first
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting, SourceRef
@@ -72,7 +72,48 @@ def test_only_the_first_few_results_are_read() -> None:
     pages = Pages({EUROPACE_AD: "softgarden-job-hypoport.html"})
     with pytest.raises(SourceUnavailableError):
         reader(Search(links), pages).read(JOB)
-    assert len(pages.asked) == 3
+    assert len(pages.asked) == 5
+
+
+def test_job_aggregators_copies_are_passed_over() -> None:
+    aggregators = [
+        "https://bebee.com/de/jobs/senior-fullstack-developer-europace",
+        "https://www.jobleads.com/de/job/senior-fullstack-developer",
+        "https://fuchsjobs.de/de-de/company/europace",
+        "https://www.arbeitnow.com/jobs/companies/europace/fullstack",
+        "https://jobs.heise.de/softwareentwicklung/jobs/fullstack",
+    ]
+    pages = Pages({EUROPACE_AD: "softgarden-job-hypoport.html"})
+    assert reader(Search([*aggregators, EUROPACE_AD]), pages).read(JOB).startswith("Wer sind wir?")
+    assert pages.asked == [EUROPACE_AD]
+
+
+def test_a_page_is_read_over_plain_http_and_through_a_browser_only_when_refused() -> None:
+    asked: list[str] = []
+
+    def plain(url: str) -> str:
+        asked.append(f"plain {url}")
+        if "refusing" in url:
+            raise SourceUnavailableError(f"{url}: HTTP 403")
+        if "gone" in url:
+            raise SourceUnavailableError(f"{url}: HTTP 404", gone=True)
+        return "plain page"
+
+    def browser(url: str) -> str:
+        asked.append(f"browser {url}")
+        return "browser page"
+
+    page = plain_first(plain, browser)
+    assert page("https://open.example") == "plain page"
+    assert page("https://refusing.example") == "browser page"
+    with pytest.raises(SourceUnavailableError):
+        page("https://gone.example")
+    assert asked == [
+        "plain https://open.example",
+        "plain https://refusing.example",
+        "browser https://refusing.example",
+        "plain https://gone.example",
+    ]
 
 
 def test_a_query_searched_lately_isn_t_searched_again() -> None:

@@ -16,6 +16,11 @@ from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.posting import Employment, Posting
 
 GONE_STATUSES = frozenset({404, 410})
+# A browser's identity, for sites that turn bots away (docs/sources.md, the bot rule).
+BROWSER = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0",
+}
 # A page's schema.org data, which job pages fill with a `JobPosting`.
 POSTING_DATA = re.compile(
     r"""<script[^>]*application/ld\+json[^>]*>(.*?)</script>""", re.DOTALL | re.IGNORECASE
