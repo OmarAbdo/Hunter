@@ -16,7 +16,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from urllib.parse import parse_qs, quote_plus, urlsplit
+from urllib.parse import parse_qs, quote_plus, unquote, urlsplit
 
 from hunter.adapters.storage.search_log import Outcome, Searched, SearchLog
 from hunter.application.ports import SourceUnavailableError
@@ -28,6 +28,7 @@ EDGE = (
 )
 TIMEOUT = 60  # seconds for one page; Edge took 3 to 15
 VERSION = re.compile(r"(\d+)\.\d+\.\d+\.\d+")  # the folders beside msedge.exe
+YAHOO_REDIRECT = re.compile(r"/RU=([^/]+)/R[KS]=")
 AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/{0}.0.0.0 Safari/537.36 Edg/{0}.0.0.0"
@@ -80,6 +81,19 @@ def bing_target(link: str) -> str | None:
     return None if parts.netloc.endswith("bing.com") else link
 
 
+def yahoo_target(link: str) -> str | None:
+    """Where a result leads: Yahoo's redirect carries it in its path, between `/RU=` and `/RK=`."""
+    if not urlsplit(link).netloc.endswith("r.search.yahoo.com"):
+        return link
+    found = YAHOO_REDIRECT.search(link)
+    return unquote(found[1]) if found else None
+
+
+def same(link: str) -> str | None:
+    """The engines whose result links lead to the result itself."""
+    return link
+
+
 @dataclass(frozen=True)
 class Engine:
     name: str
@@ -97,7 +111,7 @@ class Engine:
         if any(challenge in page for challenge in self.challenges):
             return "captcha", []
         found = (self.target(link.replace("&amp;", "&")) for link in self.result.findall(page))
-        if links := [link for link in found if link]:
+        if links := list(dict.fromkeys(link for link in found if link)):
             return "links", links
         return ("nothing" if self.results in page else "failed"), []
 
@@ -118,7 +132,54 @@ BING = Engine(
     ("/turing/captcha", "turingChallenge"),
     bing_target,
 )
-ENGINES = (DUCKDUCKGO, BING)
+# The engines found to answer headless Edge with results (2026-11-08). Mojeek asks for a
+# challenge at once, Qwant's full site answers 403 and Google a captcha, so they're left out. None
+# of these is known by its challenge page yet: an answer without results is "failed", and the
+# engine rests (domain/search_turns.py).
+STARTPAGE = Engine(
+    "startpage",
+    "https://www.startpage.com/do/search?q={}",
+    re.compile(r'<a\b[^>]*\bhref="([^"]+)"[^>]*\bclass="wgl-site-title'),
+    'class="w-gl',
+    (),
+    same,
+)
+BRAVE = Engine(
+    "brave",
+    "https://search.brave.com/search?q={}",
+    re.compile(r'data-type="web"[^>]*>.*?<a\b[^>]*\bhref="([^"]+)"', re.S),
+    'id="mixed-main"',
+    (),
+    same,
+)
+ECOSIA = Engine(
+    "ecosia",
+    "https://www.ecosia.org/search?q={}",
+    re.compile(r'<a\b[^>]*\bdata-test-id="result-link"[^>]*\bhref="([^"]+)"'),
+    'data-test-id="mainline"',
+    (),
+    same,
+)
+YAHOO = Engine(
+    "yahoo",
+    "https://search.yahoo.com/search?p={}",
+    re.compile(r'<div class="compTitle[^"]*">\s*<a\b[^>]*\bhref="([^"]+)"'),
+    'id="web"',
+    (),
+    yahoo_target,
+)
+SWISSCOWS = Engine(
+    "swisscows",
+    "https://swisscows.com/en/web?query={}",
+    re.compile(
+        r'<article\b[^>]*class="item web-page"[^>]*>\s*<header>\s*'
+        r'<a\b[^>]*\bhref="([^"]+)"'
+    ),
+    'class="web-results',
+    (),
+    same,
+)
+ENGINES = (DUCKDUCKGO, BING, STARTPAGE, BRAVE, ECOSIA, YAHOO, SWISSCOWS)
 
 
 def utc_now() -> datetime:

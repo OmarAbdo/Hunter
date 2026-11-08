@@ -1,0 +1,4 @@
+id = "114"
+title = "Five more search engines take turns: Startpage, Brave, Ecosia, Yahoo, Swisscows"
+kind = "feature"
+scope = ["src/hunter/adapters/edge_search.py", "src/hunter/domain/search_turns.py", "tests/unit/test_search_turns.py", "tests/integration/test_edge_search.py", "tests/fixtures/sources/edge-search-*-zalando.html", "docs/sources.md"]

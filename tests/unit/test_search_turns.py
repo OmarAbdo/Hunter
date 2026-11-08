@@ -45,3 +45,9 @@ def test_a_rest_never_lasts_longer_than_the_longest() -> None:
 def test_an_answer_after_a_captcha_ends_the_rest() -> None:
     answered = used("bing", (100, "captcha"), (20, "links"))
     assert next_engines([answered], NOW, TURNS) == ["bing"]
+
+
+def test_an_engine_whose_answer_was_unreadable_rests_too() -> None:
+    """A page with neither results nor a challenge it's known by is most often one in disguise."""
+    unreadable = used("swisscows", (90, "links"), (30, "failed"))
+    assert next_engines([unreadable], NOW, TURNS) == []

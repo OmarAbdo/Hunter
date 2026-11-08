@@ -5,7 +5,16 @@ from urllib.parse import urlsplit
 
 import pytest
 
-from hunter.adapters.edge_search import BING, DUCKDUCKGO, Edge, EdgeSearch, Pace
+from hunter.adapters.edge_search import (
+    BING,
+    DUCKDUCKGO,
+    ENGINES,
+    Edge,
+    EdgeSearch,
+    Engine,
+    Pace,
+    yahoo_target,
+)
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.search_log import Searched, SearchLog
 from hunter.application.ports import SourceUnavailableError
@@ -25,6 +34,28 @@ def test_result_links_are_read_through_each_engines_redirects() -> None:
     assert DUCKDUCKGO.read(saved("duckduckgo-zalando")) == ("links", ddg)
     bing = [f"{zalando}en/jobs", "https://www.linkedin.com/company/zalando/jobs", ZALANDO_BOARD]
     assert BING.read(saved("bing-zalando")) == ("links", bing)  # the ad isn't a result
+
+
+@pytest.mark.parametrize("engine", ENGINES[2:], ids=lambda engine: engine.name)
+def test_every_engine_reads_its_own_results(engine: Engine) -> None:
+    outcome, links = engine.read(saved(f"{engine.name}-zalando"))
+    assert outcome == "links"
+    assert links[0].startswith("https://jobs.zalando.com/")
+    assert len(links) == len(set(links))  # each result once
+
+
+def test_the_engines_take_turns_in_this_order_when_none_was_used() -> None:
+    names = [engine.name for engine in ENGINES]
+    assert names == ["duckduckgo", "bing", "startpage", "brave", "ecosia", "yahoo", "swisscows"]
+
+
+def test_yahoo_s_redirect_carries_the_result_in_its_path() -> None:
+    redirect = (
+        "https://r.search.yahoo.com/_ylt=Awr/RV=2/RE=1794/RO=10"
+        "/RU=https%3a%2f%2fjobs.zalando.com%2fen%2fjobs/RK=2/RS=abc-"
+    )
+    assert yahoo_target(redirect) == "https://jobs.zalando.com/en/jobs"
+    assert yahoo_target("https://jobs.zalando.com/en") == "https://jobs.zalando.com/en"
 
 
 def test_a_page_without_results_says_whether_it_is_empty_a_challenge_or_unknown() -> None:
@@ -59,7 +90,8 @@ def searching(tmp_path: Path, **pages: str | None) -> tuple[EdgeSearch, SearchLo
         return saved(page)
 
     log, clock = SearchLog(open_database(tmp_path / "hunter.db")), Clock()
-    return EdgeSearch(browse, log, Pace(now=clock.now, sleep=clock.sleep)), log, clock
+    pace = Pace(now=clock.now, sleep=clock.sleep)
+    return EdgeSearch(browse, log, pace, engines=(DUCKDUCKGO, BING)), log, clock
 
 
 def test_a_challenge_moves_the_search_on_to_the_next_engine(tmp_path: Path) -> None:
