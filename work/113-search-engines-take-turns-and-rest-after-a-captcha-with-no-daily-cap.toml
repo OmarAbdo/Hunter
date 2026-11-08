@@ -1,0 +1,4 @@
+id = "113"
+title = "Search engines take turns and rest after a captcha, with no daily cap"
+kind = "feature"
+scope = ["src/hunter/domain/search_turns.py", "tests/unit/test_search_turns.py", "src/hunter/adapters/edge_search.py", "src/hunter/adapters/storage/search_log.py", "tests/integration/test_edge_search.py", "tests/integration/test_search_log.py", "src/hunter/adapters/sources/searches/employer_search.py", "docs/sources.md", "docs/ads.md", "tests/integration/test_probing.py"]

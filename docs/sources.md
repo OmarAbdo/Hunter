@@ -123,9 +123,12 @@ without a known board, Hunter looks in this order:
    SmartRecruiters. Workable isn't guessed.
 4. **A web search** (built), last, only when nothing else found a board: `"<company>" careers
    jobs`, searched like a person through Edge (headless, Hunter's own profile in
-   `var/edge-search`, an ordinary Edge user agent). DuckDuckGo's HTML results first, then Bing;
-   each result link that names a board is checked like a guess. One search every 5 seconds, at
-   most 50 per engine a day, shared with the search for employers' own ads (docs/ads.md), both read from the search log so they hold across runs. Every search
+   `var/edge-search`, an ordinary Edge user agent). The engines take turns: each search goes to
+   the one used longest ago, so the load is spread before any engine grows suspicious; an engine at
+   12 searches in the last hour waits, and one that showed a captcha rests an hour, twice as long
+   after each more in a row, a day at most. Each result link that names a board is checked like a
+   guess. One search every 5 seconds across the engines, shared with the search for employers' own
+   ads (docs/ads.md); the turns are read from the search log, so they hold across runs. Every search
    is logged with how it went (links, nothing, captcha, failed), so whether captchas make this
    worthwhile is decided on numbers: `boards probe` prints them, and the window's Companies tab
    shows the last 30 days. No paid search API (Brave's needs a card; Google's is closed).

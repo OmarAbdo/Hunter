@@ -1,9 +1,11 @@
-"""Web search through Microsoft Edge, probing's last way to find a company's board: Hunter searches
-like a person, in a real browser and politely paced, not through a paid API. Edge runs headless
-with a profile of its own and hands back the page it rendered; only the result links are read,
-through the engines' redirects. DuckDuckGo's plain-HTML results come first, then Bing's; an engine
-answering with a challenge (a captcha) or not at all is passed over for the next. Every search is
-logged with its outcome. Edge names itself as an ordinary Edge: DuckDuckGo met headless Edge's own
+"""Web search through Microsoft Edge, for finding a company's board and an employer's own ad: Hunter
+searches like a person, in a real browser and politely paced, not through a paid API. Edge runs
+headless with a profile of its own and hands back the page it rendered; only the result links are
+read, through the engines' redirects. The engines take turns (domain/search_turns.py): each search
+goes to the one used longest ago, an engine at its share of the last hour waits, and one that
+showed a challenge (a captcha) rests; an engine answering with a challenge or not at all is passed
+over for the next. Every search is logged with its outcome, and the turns are read from the log,
+so they hold across runs. Edge names itself as an ordinary Edge: DuckDuckGo met headless Edge's own
 name with a captcha at once (2026-10-27)."""
 
 import base64
@@ -18,6 +20,7 @@ from urllib.parse import parse_qs, quote_plus, urlsplit
 
 from hunter.adapters.storage.search_log import Outcome, Searched, SearchLog
 from hunter.application.ports import SourceUnavailableError
+from hunter.domain.search_turns import Turns, next_engines
 
 EDGE = (
     Path("C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"),
@@ -115,6 +118,7 @@ BING = Engine(
     ("/turing/captcha", "turingChallenge"),
     bing_target,
 )
+ENGINES = (DUCKDUCKGO, BING)
 
 
 def utc_now() -> datetime:
@@ -124,7 +128,7 @@ def utc_now() -> datetime:
 @dataclass(frozen=True)
 class Pace:
     gap: timedelta = timedelta(seconds=5)  # between any two searches, on any engine
-    per_day: int = 50  # per engine and UTC day, about what a busy person searches
+    turns: Turns = Turns()
     now: Callable[[], datetime] = utc_now
     sleep: Callable[[float], None] = time.sleep
 
@@ -133,24 +137,33 @@ class EdgeSearch:
     """Hunter's web search (application/ports.py). Its pace is read from the log, so it holds
     across runs and processes sharing the database."""
 
-    def __init__(self, browse: Callable[[str], str], log: SearchLog, pace: Pace | None = None):
+    def __init__(
+        self,
+        browse: Callable[[str], str],
+        log: SearchLog,
+        pace: Pace | None = None,
+        engines: Sequence[Engine] = ENGINES,
+    ):
         """`browse` gives a page as a browser shows it: `Edge(profile).dom`."""
         self.browse, self.log, self.pace = browse, log, pace or Pace()
+        self.engines = {engine.name: engine for engine in engines}
 
     def links(self, query: str) -> list[str]:
         """The first answer's result links, best first. Raises SourceUnavailableError."""
+        now = self.pace.now()
+        uses = self.log.uses(list(self.engines), now - self.pace.turns.longest_rest)
+        turn = next_engines(uses, now, self.pace.turns)
+        if not turn:
+            raise SourceUnavailableError("web search: every engine is resting or at its share")
         failures = []
-        for engine in (DUCKDUCKGO, BING):
-            outcome, links = self.search(engine, query)
+        for name in turn:
+            outcome, links = self.search(self.engines[name], query)
             if outcome in ("links", "nothing"):
                 return links
-            failures.append(f"{engine.name}: {outcome}")
+            failures.append(f"{name}: {outcome}")
         raise SourceUnavailableError("web search: " + ", ".join(failures))
 
     def search(self, engine: Engine, query: str) -> tuple[str, list[str]]:
-        today = self.pace.now().astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-        if self.log.count(engine.name, today) >= self.pace.per_day:
-            return "daily cap reached", []
         last = self.log.last()
         if last and (wait := self.pace.gap - (self.pace.now() - last)) > timedelta(0):
             self.pace.sleep(wait.total_seconds())

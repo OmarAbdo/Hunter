@@ -8,15 +8,17 @@ from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.search_log import SearchLog, Searched
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-ZALANDO = (REPOSITORY / "tests/fixtures/sources/edge-search-duckduckgo-zalando.html").read_text(
-    encoding="utf-8"
-)
+SAVED = REPOSITORY / "tests/fixtures/sources"
+ZALANDO = {
+    engine: (SAVED / f"edge-search-{engine}-zalando.html").read_text(encoding="utf-8")
+    for engine in ("duckduckgo", "bing")
+}
 NOW = datetime(2026, 10, 27, 12, 0, tzinfo=UTC)
 
 
 def test_probing_threads_search_one_at_a_time_and_every_search_is_logged(tmp_path: Path) -> None:
     """Probing runs on several threads; each search is made alone and logged on a connection of
-    its own, since a connection belongs to the thread that opened it."""
+    its own, since a connection belongs to the thread that opened it. The engines take turns."""
     at_once: list[int] = []
     searching = [0]
 
@@ -24,7 +26,7 @@ def test_probing_threads_search_one_at_a_time_and_every_search_is_logged(tmp_pat
         searching[0] += 1
         at_once.append(searching[0])
         searching[0] -= 1
-        return ZALANDO
+        return ZALANDO["bing" if "bing.com" in url else "duckduckgo"]
 
     path = tmp_path / "hunter.db"
     search = OneSearchAtATime(browse, lambda: open_database(path), Pace(sleep=lambda _: None))
@@ -37,7 +39,8 @@ def test_probing_threads_search_one_at_a_time_and_every_search_is_logged(tmp_pat
     assert at_once == [1, 1]
     assert [len(links) > 0 for links in found] == [True, True]
     assert SearchLog(open_database(path)).summary(NOW - timedelta(days=1)) == {
-        "duckduckgo": {"links": 2}
+        "duckduckgo": {"links": 1},
+        "bing": {"links": 1},
     }
 
 

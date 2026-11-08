@@ -65,5 +65,6 @@ three results that aren't job boards are read, and the first whose `JobPosting` 
 title and company (Hunter's identity keys: gender markers and legal forms don't count) is its ad
 (`domain/ads/employer_ad.py`). A near miss is no ad: the wrong ad is worse than none.
 
-Searches are scarce: 50 an engine a day, shared with probing for boards. A query that got an answer
-in the last week isn't searched again, and at the day's cap the job waits for a later run.
+Searches are shared with probing for boards and spread over the engines, which take turns (see
+docs/sources.md). A query that got an answer in the last week isn't searched again, and while every
+engine rests the job waits for a later run.

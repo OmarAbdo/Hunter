@@ -4,9 +4,9 @@ opened. A web search for the company and the title, through Edge, names the cand
 few that aren't job boards are read, and the first whose schema.org `JobPosting` names the job's
 title and company is its ad (domain/ads/employer_ad.py).
 
-Searches are few (edge_search.py: 50 an engine a day, shared with probing), so a query answered
-in the last week isn't searched again, and a search that can't be made, at the
-day's cap say, leaves the job for a later run without a page read."""
+Searches are shared with probing and spread over the engines (edge_search.py), so a query answered
+in the last week isn't searched again, and a search that can't be made, with every engine resting
+say, leaves the job for a later run without a page read."""
 
 import sqlite3
 from collections.abc import Callable

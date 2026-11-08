@@ -3,9 +3,12 @@ engine answers and how often it asks for a captcha instead. The log also keeps t
 across runs: the last search and each engine's searches today are read from it."""
 
 import sqlite3
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Literal
+
+from hunter.domain.search_turns import EngineUse
 
 Outcome = Literal["links", "nothing", "captcha", "failed"]
 
@@ -54,6 +57,18 @@ class SearchLog:
             "AND outcome IN ('links', 'nothing') LIMIT 1"
         )
         return self.database.execute(found, (query, stamp(since))).fetchone() is not None
+
+    def uses(self, engines: Sequence[str], since: datetime) -> list[EngineUse]:
+        """Each engine's searches since `since`, the oldest first, in the engines' order."""
+        rows = self.database.execute(
+            "SELECT engine, at, outcome FROM searches WHERE at >= ? ORDER BY at, id",
+            (stamp(since),),
+        )
+        searches: dict[str, list[tuple[datetime, str]]] = {engine: [] for engine in engines}
+        for engine, when, outcome in rows:
+            if engine in searches:
+                searches[engine].append((datetime.fromisoformat(when), outcome))
+        return [EngineUse(engine, tuple(found)) for engine, found in searches.items()]
 
     def last(self) -> datetime | None:
         """When the latest search was made, by any engine."""

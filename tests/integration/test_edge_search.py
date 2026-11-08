@@ -85,19 +85,21 @@ def test_when_every_engine_fails_the_search_is_unavailable(tmp_path: Path) -> No
     assert log.summary(NOON) == {"duckduckgo": {"captcha": 1}, "bing": {"failed": 1}}
 
 
-def test_searches_keep_their_pace_and_daily_cap_across_runs(tmp_path: Path) -> None:
+def test_the_engine_used_longest_ago_searches_first_across_runs(tmp_path: Path) -> None:
     search, log, clock = searching(tmp_path, bing="bing-zalando")
-    log.record(Searched("duckduckgo", "q", "links", 1, NOON - timedelta(days=1)))
-    for minute in range(1, 51):
-        log.record(Searched("duckduckgo", "q", "links", 1, NOON - timedelta(minutes=minute)))
-    log.record(Searched("bing", "q", "links", 1, NOON - timedelta(seconds=2)))
-    assert search.links("q") == search.links("q")  # duckduckgo's 50 for today are used
-    assert clock.slept == [3.0, 5.0]
-    for _ in range(47):
-        log.record(Searched("bing", "q", "links", 1, NOON))
-    with pytest.raises(SourceUnavailableError, match="daily cap"):
+    log.record(Searched("duckduckgo", "q", "links", 1, NOON - timedelta(minutes=1)))
+    log.record(Searched("bing", "q", "links", 1, NOON - timedelta(minutes=40)))
+    assert search.links("q")[-1] == ZALANDO_BOARD
+    assert log.summary(NOON)["bing"] == {"links": 1}
+    assert clock.slept == []  # the last search was a minute ago, beyond the 5 seconds
+
+
+def test_with_every_engine_resting_the_search_is_unavailable(tmp_path: Path) -> None:
+    search, log, _ = searching(tmp_path)
+    for engine in ("duckduckgo", "bing"):
+        log.record(Searched(engine, "q", "captcha", 0, NOON - timedelta(minutes=10)))
+    with pytest.raises(SourceUnavailableError, match="every engine is resting"):
         search.links("q")
-    assert log.summary(NOON)["bing"] == {"links": 49}
 
 
 class EdgeRun:

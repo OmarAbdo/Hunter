@@ -3,6 +3,7 @@ from pathlib import Path
 
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.search_log import Searched, SearchLog
+from hunter.domain.search_turns import EngineUse
 
 NOON = datetime(2026, 10, 27, 12, 0, tzinfo=UTC)
 HOUR = timedelta(hours=1)
@@ -41,3 +42,15 @@ def test_a_query_is_known_as_searched_since_a_time(tmp_path: Path) -> None:
     assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
     log.record(Searched("bing", '"Europace" Backend Developer', "captcha", 0, NOON))
     assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
+
+
+def test_each_engine_s_searches_since_a_time_come_oldest_first(tmp_path: Path) -> None:
+    log = SearchLog(open_database(tmp_path / "hunter.db"))
+    log.record(Searched("bing", "q", "captcha", 0, NOON))
+    log.record(Searched("bing", "q", "links", 3, NOON - HOUR))
+    log.record(Searched("duckduckgo", "q", "links", 3, NOON - 3 * HOUR))
+    assert log.uses(["duckduckgo", "bing", "mojeek"], NOON - 2 * HOUR) == [
+        EngineUse("duckduckgo"),
+        EngineUse("bing", ((NOON - HOUR, "links"), (NOON, "captcha"))),
+        EngineUse("mojeek"),
+    ]
