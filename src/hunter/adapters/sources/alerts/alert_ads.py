@@ -10,6 +10,7 @@ a page that says the job is no longer there makes it gone. Alert jobs are taken 
 so they're read in the run their mail arrives in. Adzuna's details pages are read the same way."""
 
 import re
+import sqlite3
 import urllib.error
 import urllib.request
 from collections.abc import Callable
@@ -18,6 +19,7 @@ from urllib.parse import parse_qs, urljoin, urlsplit
 
 from hunter.adapters.edge_search import Edge
 from hunter.adapters.sources.reading import JobPageAds, ad_on_page
+from hunter.adapters.sources.searches.employer_search import employer_readers
 from hunter.application.ports import AdReader, SourceUnavailableError
 from hunter.domain.discovery.posting import Posting
 
@@ -72,9 +74,15 @@ class AlertPageAds:
         return ad_on_page(self.page(target), target)
 
 
-def edge_readers(profile: Path) -> dict[str, AdReader]:
-    """The sources whose job pages only Edge can read, with a profile of their own: the alert
-    jobs, and Adzuna's details pages, which answer plain requests with 403."""
+def edge_readers(profile: Path, database: sqlite3.Connection) -> dict[str, AdReader]:
+    """The sources whose pages only Edge can read, with a profile of their own: the alert jobs,
+    Adzuna's details pages, which answer plain requests with 403, and the employer's own ad for
+    the jobs whose board can't be read at all (searches/employer_search.py)."""
     edge = Edge(profile)
     alerts = AlertPageAds(first_hop, edge.dom)
-    return {"stepstone-alert": alerts, "xing-alert": alerts, "adzuna": JobPageAds(edge.dom)}
+    return {
+        "stepstone-alert": alerts,
+        "xing-alert": alerts,
+        "adzuna": JobPageAds(edge.dom),
+        **employer_readers(edge, database),
+    }

@@ -46,6 +46,15 @@ class SearchLog:
         query = "SELECT count(*) FROM searches WHERE engine = ? AND at >= ?"
         return int(self.database.execute(query, (engine, stamp(since))).fetchone()[0])
 
+    def searched(self, query: str, since: datetime) -> bool:
+        """Whether this very query got an answer since `since`, from any engine: links, or none.
+        A captcha or a failure isn't an answer."""
+        found = (
+            "SELECT 1 FROM searches WHERE query = ? AND at >= ? "
+            "AND outcome IN ('links', 'nothing') LIMIT 1"
+        )
+        return self.database.execute(found, (query, stamp(since))).fetchone() is not None
+
     def last(self) -> datetime | None:
         """When the latest search was made, by any engine."""
         (latest,) = self.database.execute("SELECT max(at) FROM searches").fetchone()

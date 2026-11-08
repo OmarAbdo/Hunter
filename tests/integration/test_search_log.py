@@ -31,3 +31,13 @@ def test_the_last_search_is_known_whichever_engine_made_it(tmp_path: Path) -> No
     assert log.last() == NOON + HOUR
     found = log.database.execute("SELECT query, links FROM searches WHERE engine = 'duckduckgo'")
     assert found.fetchall() == [("b", 3)]
+
+
+def test_a_query_is_known_as_searched_since_a_time(tmp_path: Path) -> None:
+    log = SearchLog(open_database(tmp_path / "hunter.db"))
+    log.record(Searched("duckduckgo", '"Europace" Fullstack Developer', "links", 10, NOON))
+    assert log.searched('"Europace" Fullstack Developer', NOON - HOUR)
+    assert not log.searched('"Europace" Fullstack Developer', NOON + HOUR)
+    assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
+    log.record(Searched("bing", '"Europace" Backend Developer', "captcha", 0, NOON))
+    assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
