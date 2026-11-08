@@ -1,0 +1,4 @@
+id = "107"
+title = "A job keeps its whole ad when the employer's posting arrives without one"
+kind = "fix"
+scope = ["src/hunter/adapters/storage/pool.py", "src/hunter/adapters/storage/database.py", "tests/integration/test_pool.py"]

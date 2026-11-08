@@ -225,3 +225,44 @@ def test_a_snippet_source_s_job_whose_ad_was_read_is_whole_and_not_wanted(tmp_pa
     Ads(database).keep_ad(job_id, whole, SEEN)
     assert pool.taken() == [TakenJob(whole, read=True)]
     assert Ads(database).wanting() == []
+
+
+def test_a_job_keeps_its_whole_ad_when_the_employer_s_posting_has_none(tmp_path: Path) -> None:
+    """SmartRecruiters' feed has no ads: the job keeps the one read from Adzuna until its own is
+    read, and becomes the employer's job all the same."""
+    database = open_database(tmp_path / "hunter.db")
+    pool = Pool(database)
+    board = replace(INDEED, source=SourceRef("adzuna", "5911"), description="Build the...")
+    job_id = pool.add(board, SEEN).job_id
+    Matches(database).record(job_id, "berlin", None, SEEN)
+    whole = replace(board, description="Build the backend, all of it.")
+    Ads(database).keep_ad(job_id, whole, SEEN)
+    pool.add(replace(GREENHOUSE, description=""), SEEN)
+    kept = pool.posting(job_id)
+    assert (kept.employer, kept.description) == (GREENHOUSE.employer, whole.description)
+    assert pool.taken() == [TakenJob(kept, read=True)]
+
+
+def test_an_employer_posting_with_its_own_ad_replaces_the_one_read_elsewhere(
+    tmp_path: Path,
+) -> None:
+    database = open_database(tmp_path / "hunter.db")
+    pool = Pool(database)
+    board = replace(INDEED, source=SourceRef("adzuna", "5911"), description="Build the...")
+    job_id = pool.add(board, SEEN).job_id
+    Matches(database).record(job_id, "berlin", None, SEEN)
+    Ads(database).keep_ad(job_id, replace(board, description="Build it all."), SEEN)
+    pool.add(GREENHOUSE, SEEN)
+    assert pool.taken() == [TakenJob(GREENHOUSE)]
+
+
+def test_an_empty_ad_never_counts_as_read(tmp_path: Path) -> None:
+    """A job that lost its text before this rule held is read again."""
+    path = tmp_path / "hunter.db"
+    database = open_database(path)
+    pool = Pool(database)
+    bare = replace(INDEED, source=SourceRef("bundesagentur", "1"))
+    job_id = pool.add(bare, SEEN).job_id
+    Matches(database).record(job_id, "berlin", None, SEEN)
+    Ads(database).keep_ad(job_id, bare, SEEN)
+    assert Ads(open_database(path)).wanting() == [(job_id, bare)]

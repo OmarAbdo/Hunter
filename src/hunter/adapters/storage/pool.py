@@ -6,7 +6,7 @@ company, title and place match a job that doesn't have a different employer key.
 
 import json
 import sqlite3
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import datetime
 from enum import Enum
 from typing import Any
@@ -88,12 +88,25 @@ class Pool:
         return int(cursor.lastrowid or 0)
 
     def _learn_employer(self, job_id: int, posting: Posting) -> None:
-        """A job first seen on a job board takes the employer's own posting once it shows up."""
-        if posting.exact_key:
-            self.database.execute(
-                "UPDATE jobs SET exact_key = ?, posting = ? WHERE id = ? AND exact_key IS NULL",
-                (posting.exact_key, encoded(posting), job_id),
-            )
+        """A job first seen on a job board takes the employer's own posting once it shows up. It
+        keeps the whole ad it has when the employer's feed carries none (SmartRecruiters' and
+        softgarden's don't); otherwise the employer's ad replaces it."""
+        row = self.database.execute(
+            "SELECT posting, id IN (SELECT job_id FROM whole_ads) FROM jobs "
+            "WHERE id = ? AND exact_key IS NULL",
+            (job_id,),
+        ).fetchone()
+        if not posting.exact_key or row is None:
+            return
+        held = TakenJob(decoded(row[0]), read=bool(row[1]))
+        keeps = held.state == AdState.WHOLE and not posting.description.strip()
+        learned = replace(posting, description=held.posting.description) if keeps else posting
+        self.database.execute(
+            "UPDATE jobs SET exact_key = ?, posting = ? WHERE id = ?",
+            (posting.exact_key, encoded(learned), job_id),
+        )
+        if not keeps:
+            self.database.execute("DELETE FROM whole_ads WHERE job_id = ?", (job_id,))
 
     def _learn_ad(self, job_id: int, posting: Posting) -> None:
         """A job without its whole ad takes a fuller one from any source, unless that would cost it

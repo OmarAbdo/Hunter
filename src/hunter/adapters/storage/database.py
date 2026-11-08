@@ -70,6 +70,9 @@ CREATE TABLE IF NOT EXISTS whole_ads (
     job_id INTEGER PRIMARY KEY REFERENCES jobs (id),
     at TEXT NOT NULL
 );
+-- An empty ad is never a whole one: a job that lost its text is read again.
+DELETE FROM whole_ads
+WHERE job_id IN (SELECT id FROM jobs WHERE json_extract(posting, '$.description') = '');
 
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY,
