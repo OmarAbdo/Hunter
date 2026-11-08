@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 
 from hunter.adapters.cli.project import Project
-from hunter.adapters.sources.feed_table import PACE
+from hunter.adapters.sources.feed_table import PACE, PARTIAL
 from hunter.adapters.sources import personio, reading, smartrecruiters
 from hunter.adapters.sources.alerts.alert_ads import edge_readers
 from hunter.adapters.sources.searches import bundesagentur
@@ -19,9 +19,15 @@ from hunter.application.read_ads import read_ads
 OUTCOMES = ("read", "gone", "failed")
 
 
-def read_taken_ads(project: Project, now: datetime) -> dict[str, Counter[str]]:
-    """Each source's taken jobs that lacked their ad, counted as read, gone or failed."""
-    return read_ads(Ads(project.database()), readers_of(project), now)
+def read_taken_ads(
+    project: Project, now: datetime, run_id: int | None = None
+) -> dict[str, Counter[str]]:
+    """Each source's taken jobs that lacked their ad, counted as read, gone or failed. After a
+    run (`run_id`), first the jobs its boards no longer list are gone, counted as "boards"."""
+    ads = Ads(project.database())
+    dropped = ads.mark_dropped(run_id, PARTIAL, now) if run_id is not None else 0
+    outcomes = read_ads(ads, readers_of(project), now)
+    return {"boards": Counter(gone=dropped), **outcomes} if dropped else outcomes
 
 
 def readers_of(project: Project) -> dict[str, AdReader]:

@@ -1,0 +1,4 @@
+id = "111"
+title = "A job that drops off its employer's board is gone"
+kind = "feature"
+scope = ["src/hunter/adapters/storage/pool.py", "src/hunter/adapters/ad_reading.py", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/cli/discover_command.py", "tests/integration/test_pool.py", "tests/integration/sources/test_ad_reading.py", "tests/integration/test_dropped_jobs.py"]

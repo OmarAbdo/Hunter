@@ -52,7 +52,7 @@ def run_discovery(
     linked = linked_jobs(project.database())
     runs.finish(run.run_id, linked)
     out.write(f"{linked} job-board jobs linked to the employer's own posting\n")
-    out.write(ads_line(read_taken_ads(project, run.started_at)))
+    out.write(ads_line(read_taken_ads(project, run.started_at, run.run_id)))
     out.write(report_text(reports, campaigns, project.database()))
     return 0
 

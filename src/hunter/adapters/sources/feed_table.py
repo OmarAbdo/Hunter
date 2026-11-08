@@ -63,4 +63,13 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "workday": workday.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}
+# Systems whose list of a board can stop short of all its jobs: at how many jobs the feed stops,
+# or 0 where any one job can be missed (rexx reads a page per job). A board read below its cut-off
+# lists every job it has, so a job missing from it is gone.
+PARTIAL: dict[str, int] = {
+    "onlyfy": onlyfy.PAGE_SIZE * onlyfy.MOST_PAGES,
+    "rexx": 0,
+    "smartrecruiters": smartrecruiters.MOST,
+    "workday": workday.PAGE * workday.MOST_PAGES,
+}
 PACE = PaceRule(min_gap=timedelta(seconds=1))  # every other site's

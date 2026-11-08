@@ -2,7 +2,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 from functools import partial
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -12,10 +12,12 @@ from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.matches import Matches
 from hunter.adapters.sources.reading import JobPageAds, ad_on_page, read_page
 from hunter.adapters.storage.pool import Ads, Pool
+from hunter.adapters.storage.run_log import RunLog
 from hunter.adapters.web_client import WebClient
+from hunter.application.discover import SourceReport
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location
-from hunter.domain.discovery.posting import Posting, SourceRef
+from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef
 
 NOW = datetime(2026, 11, 7, 12, 0, tzinfo=UTC)
 DETAILS = "/pc/v4/jobdetails/MTM1MDktMDAwMDIxMTE3NjQwMDEtUw=="
@@ -147,3 +149,16 @@ def test_a_personio_job_s_whole_ad_is_read_from_its_page(
     job = replace(FULLSTACK, source=SourceRef("personio", "2827202"), url=f"{site}/job/2827202")
     ad = readers_of(Project(tmp_path))["personio"].read(job)
     assert ad.startswith("About\n\nChrono24 is the world's leading marketplace")
+
+
+def test_after_a_run_the_jobs_its_boards_dropped_are_counted_gone(tmp_path: Path) -> None:
+    project = Project(tmp_path)
+    database = project.database()
+    job = replace(FULLSTACK, source=SourceRef("greenhouse", "7"), description="We build.")
+    job = replace(job, employer=EmployerRef("greenhouse", "europace", "7"))
+    job_id = Pool(database).add(job, NOW - timedelta(days=1)).job_id
+    Matches(database).record(job_id, "berlin", None, NOW)
+    log = RunLog(database, clock=lambda: NOW)
+    run = log.start(["berlin"])
+    log.record(run.run_id, SourceReport("greenhouse:europace", fetched=4))
+    assert read_taken_ads(project, NOW, run.run_id) == {"boards": Counter(gone=1)}

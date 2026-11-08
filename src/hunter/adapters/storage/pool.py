@@ -6,12 +6,14 @@ company, title and place match a job that doesn't have a different employer key.
 
 import json
 import sqlite3
+from collections.abc import Mapping
 from dataclasses import asdict, replace
 from datetime import datetime
 from enum import Enum
 from typing import Any
 
 from hunter.domain.ads.coverage import AdState, TakenJob, ad_state, fuller
+from hunter.domain.discovery.boards import Board, board_from_key
 from hunter.domain.discovery.location import Location, Workplace
 from hunter.domain.discovery.pooled import Pooled
 from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
@@ -31,6 +33,8 @@ class Pool:
                 job_id = known
                 self._learn_employer(job_id, posting)
                 self._learn_ad(job_id, posting)
+                if posting.employer:  # its own board lists it: it's open again
+                    self.database.execute("DELETE FROM gone WHERE job_id = ?", (job_id,))
             self._record_sighting(job_id, posting.source, seen_at)
         return Pooled(job_id=job_id, is_new=known is None)
 
@@ -163,6 +167,42 @@ class Ads:
                 "INSERT OR IGNORE INTO gone (job_id, at) VALUES (?, ?)",
                 (job_id, gone_at.isoformat()),
             )
+
+    def mark_dropped(self, run_id: int, partial: Mapping[str, int], gone_at: datetime) -> int:
+        """Marks gone the jobs of every board the run read in full that its list no longer has;
+        how many. A board read in full answered with at least one job, and below its system's
+        cut-off in `partial` (0: its list can always miss a job); a job its list has was seen
+        when the run started."""
+        (started,) = self.database.execute(
+            "SELECT started_at FROM runs WHERE id = ?", (run_id,)
+        ).fetchone()
+        rows = self.database.execute(
+            "SELECT source, fetched FROM run_sources "
+            "WHERE run_id = ? AND error IS NULL AND fetched > 0",
+            (run_id,),
+        ).fetchall()
+        dropped = 0
+        with self.database:
+            for board in (
+                board for name, fetched in rows if (board := read_in_full(name, fetched, partial))
+            ):
+                cursor = self.database.execute(
+                    "INSERT OR IGNORE INTO gone (job_id, at) SELECT jobs.id, ? FROM jobs "
+                    "JOIN sightings ON sightings.job_id = jobs.id AND sightings.source = ? "
+                    "WHERE substr(jobs.exact_key, 1, length(?) + 1) = ? || ':' "
+                    "AND sightings.last_seen < ?",
+                    (gone_at.isoformat(), board.ats, board.key, board.key, started),
+                )
+                dropped += cursor.rowcount
+        return dropped
+
+
+def read_in_full(name: str, fetched: int, partial: Mapping[str, int]) -> Board | None:
+    """The board a run's source is, when it read the board's whole list."""
+    board = board_from_key(name)
+    if board is None or partial.get(board.ats) == 0:
+        return None
+    return board if fetched < partial.get(board.ats, fetched + 1) else None
 
 
 def plain(value: object) -> object:
