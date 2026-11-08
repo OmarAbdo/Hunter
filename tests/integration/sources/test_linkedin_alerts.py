@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -5,9 +6,11 @@ import pytest
 
 from hunter.adapters.mail.mailbox import Mail
 from hunter.adapters.sources.alerts.linkedin import SENDER, LinkedInAlerts, postings_from_alert
+from hunter.adapters.sources.alerts.linkedin_ads import LinkedInAds
+from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
-from hunter.domain.discovery.posting import SourceRef
+from hunter.domain.discovery.posting import Posting, SourceRef
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "sources"
 WITH_A_COUNT = (FIXTURES / "linkedin-alert-a.txt").read_text(encoding="utf-8")
@@ -214,3 +217,39 @@ def test_the_workplace_is_read_from_real_mails_through_the_source() -> None:
 
     [posting] = LinkedInAlerts([OneMail()]).fetch()
     assert posting.location.workplace is Workplace.HYBRID
+
+
+GUEST = "/jobs-guest/jobs/api/jobPosting/4484669674"
+
+
+SourceApi = Callable[[str, str | None], str]
+
+
+def guest_reader(source_api: SourceApi, web: WebClient, saved: str | None) -> LinkedInAds:
+    return LinkedInAds(web, api=source_api(GUEST, saved))
+
+
+def delta_job() -> Posting:
+    return Posting(
+        title="Senior AI Product Engineer (Berlin)",
+        company="The Delta",
+        location=Location(country="DE", city="Berlin"),
+        source=SourceRef(source="linkedin-alert", native_id="4484669674"),
+    )
+
+
+def test_a_job_s_ad_is_read_from_linkedin_s_public_guest_page(
+    source_api: SourceApi, web: WebClient
+) -> None:
+    ad = guest_reader(source_api, web, "linkedin-guest-live.html").read(delta_job())
+    assert ad.startswith("Are you an engineer who loves owning the product")
+    assert ad.endswith("Ready? Hit apply and get the full Job Profile")
+
+
+@pytest.mark.parametrize("saved", ["linkedin-guest-closed.html", None])
+def test_a_job_no_longer_accepting_applications_or_not_found_is_gone(
+    source_api: SourceApi, web: WebClient, saved: str | None
+) -> None:
+    with pytest.raises(SourceUnavailableError) as raised:
+        guest_reader(source_api, web, saved).read(delta_job())
+    assert raised.value.gone

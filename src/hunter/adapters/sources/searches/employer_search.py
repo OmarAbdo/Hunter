@@ -1,8 +1,9 @@
 """The employer's own ad for a job only job boards showed, where the board's own page can't be read:
-Careerjet's links are billed clicks, Indeed asks for a sign-in or a captcha, and LinkedIn is never
-opened. A web search for the company and the title, through Edge, names the candidates; the first
-few that aren't job boards are read, and the first whose schema.org `JobPosting` names the job's
-title and company is its ad (domain/ads/employer_ad.py).
+Careerjet's links are billed clicks, and Indeed asks for a sign-in or a captcha. (LinkedIn's jobs
+are read from its public guest pages instead: alerts/linkedin_ads.py.) A web search for the
+company and the title, through Edge, names the candidates; the first few that aren't job boards
+are read, and the first whose schema.org `JobPosting` names the job's title and company is its ad
+(domain/ads/employer_ad.py).
 
 Searches are shared with probing and spread over the engines (edge_search.py), so a query answered
 in the last week isn't searched again, and a search that can't be made, with every engine resting
@@ -21,7 +22,7 @@ from hunter.application.ports import AdReader, SourceUnavailableError, WebSearch
 from hunter.domain.ads.employer_ad import fits, search_query
 from hunter.domain.discovery.posting import Posting
 
-SEARCHED_FOR = ("careerjet", "indeed-alert", "linkedin-alert")
+SEARCHED_FOR = ("careerjet", "indeed-alert")
 CANDIDATES = 3  # result pages read for one job, at most
 LATELY = timedelta(days=7)  # a query searched since isn't searched again
 # Job boards and aggregators: their copies are what Hunter has already, or can't be read.

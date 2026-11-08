@@ -8,7 +8,7 @@ from datetime import datetime
 from hunter.adapters.cli.project import Project
 from hunter.adapters.sources.feed_table import PACE, PARTIAL
 from hunter.adapters.sources import personio, reading, smartrecruiters
-from hunter.adapters.sources.alerts.alert_ads import edge_readers
+from hunter.adapters.sources.alerts import alert_ads, linkedin_ads
 from hunter.adapters.sources.searches import bundesagentur
 from hunter.adapters.storage.holds import kept_pacing
 from hunter.adapters.storage.pool import Ads
@@ -31,7 +31,8 @@ def read_taken_ads(
 
 
 def readers_of(project: Project) -> dict[str, AdReader]:
-    web = WebClient(kept_pacing({}, PACE, project.database))
+    paces = {linkedin_ads.HOST: linkedin_ads.PACE}
+    web = WebClient(kept_pacing(paces, PACE, project.database))
     apis = {"bundesagentur": bundesagentur.API, "smartrecruiters": smartrecruiters.API}
     apis.update({source: api for source, api in project.apis.items() if source in apis})
     return {
@@ -39,7 +40,8 @@ def readers_of(project: Project) -> dict[str, AdReader]:
         "personio": personio.PersonioAds(web),
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
         "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
-        **edge_readers(project.root / "var" / "edge-ads", project.database()),
+        **alert_ads.edge_readers(project.root / "var" / "edge-ads", project.database()),
+        "linkedin-alert": linkedin_ads.LinkedInAds(web),
     }
 
 

@@ -1,0 +1,4 @@
+id = "116"
+title = "Read LinkedIn jobs' ads from LinkedIn's public guest page"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/alerts/linkedin.py", "src/hunter/adapters/ad_reading.py", "src/hunter/adapters/sources/searches/employer_search.py", "tests/integration/sources/test_linkedin_alerts.py", "tests/integration/sources/test_ad_reading.py", "tests/fixtures/sources/linkedin-guest-*.html", "docs/ads.md", "docs/sources.md", "src/hunter/adapters/sources/alerts/linkedin_ads.py"]

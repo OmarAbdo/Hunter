@@ -10,6 +10,7 @@ import pytest
 from hunter.adapters.ad_reading import ads_line, read_taken_ads, readers_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.matches import Matches
+from hunter.adapters.sources.alerts.linkedin_ads import LinkedInAds
 from hunter.adapters.sources.reading import JobPageAds, ad_on_page, read_page
 from hunter.adapters.storage.pool import Ads, Pool
 from hunter.adapters.storage.run_log import RunLog
@@ -162,3 +163,9 @@ def test_after_a_run_the_jobs_its_boards_dropped_are_counted_gone(tmp_path: Path
     run = log.start(["berlin"])
     log.record(run.run_id, SourceReport("greenhouse:europace", fetched=4))
     assert read_taken_ads(project, NOW, run.run_id) == {"boards": Counter(gone=1)}
+
+
+def test_linkedin_jobs_are_read_from_linkedin_s_guest_page_not_searched_for(
+    tmp_path: Path,
+) -> None:
+    assert isinstance(readers_of(Project(tmp_path))["linkedin-alert"], LinkedInAds)

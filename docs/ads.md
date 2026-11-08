@@ -38,7 +38,8 @@ longer list are marked gone. Each source has its own reader:
 | Personio | The job's page: its `JobPosting`, or else its ad sections (`jb-description-item`), for boards whose feed leaves the ads out |
 | StepStone and XING alerts | The alert link's first hop, read without following it, names the job's public page: inside StepStone's magic link (`returnUrl`) or XING's login hop (`dest_url`). The sign-in hop is never opened. Headless Edge reads the public page logged out |
 | Adzuna | Its details page (`adzuna.de/details/<id>`) through headless Edge, since plain requests get 403 |
-| Careerjet, Indeed and LinkedIn alerts | The employer's own ad, by web search (below), because their own pages can't be read: Careerjet's links are billed clicks, Indeed asks for a sign-in, LinkedIn is never opened |
+| LinkedIn alerts | LinkedIn's public guest page, `linkedin.com/jobs-guest/jobs/api/jobPosting/<job id>`, read logged out with a browser's identity, one every 8 seconds. Only the job id comes from the mail, whose links are never opened. "No longer accepting applications" or a 404 means gone |
+| Careerjet and Indeed alerts | The employer's own ad, by web search (below), because their own pages can't be read: Careerjet's links are billed clicks, Indeed asks for a sign-in |
 | EURES and the employers' feeds | Their jobs come with the whole ad already |
 
 A job read again from any source takes the fuller ad: a snippet over nothing, the whole ad over a
@@ -59,7 +60,7 @@ lists again is open again.
 
 ## The employer's own ad, by web search
 
-For Careerjet, Indeed and LinkedIn jobs (`adapters/sources/searches/employer_search.py`): a search
+For Careerjet and Indeed jobs (`adapters/sources/searches/employer_search.py`): a search
 for `"<company>" <title>` through Edge, on DuckDuckGo then Bing, as for finding boards. The first
 three results that aren't job boards are read, and the first whose `JobPosting` names the job's
 title and company (Hunter's identity keys: gender markers and legal forms don't count) is its ad
