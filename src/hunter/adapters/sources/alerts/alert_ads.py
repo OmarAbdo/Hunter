@@ -7,7 +7,7 @@ the login page; both carry the job's address inside (`returnUrl`, `dest_url`), w
 there. The sign-in hop itself is never opened. The public page is read logged out, through
 headless Edge, since both sites turn plain requests away. Its schema.org `JobPosting` holds the ad;
 a page that says the job is no longer there makes it gone. Alert jobs are taken down within days,
-so they're read in the run their mail arrives in."""
+so they're read in the run their mail arrives in. Adzuna's details pages are read the same way."""
 
 import re
 import urllib.error
@@ -17,13 +17,11 @@ from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlsplit
 
 from hunter.adapters.edge_search import Edge
-from hunter.adapters.html_text import plain_text
-from hunter.adapters.sources.reading import posting_data
+from hunter.adapters.sources.reading import JobPageAds, ad_on_page
 from hunter.application.ports import AdReader, SourceUnavailableError
 from hunter.domain.discovery.posting import Posting
 
 STEPSTONE_JOB = re.compile(r"/stellenangebote-[^/]*--(\d{6,9})-inline\.html$")
-GONE = re.compile(r"isn.t available|nicht mehr verfügbar|page not found", re.IGNORECASE)
 AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
 TIMEOUT = 30
 
@@ -71,14 +69,12 @@ class AlertPageAds:
         target = job_page(self.hop(posting.url or ""))
         if target is None:
             raise SourceUnavailableError(f"{posting.source.source}: the link names no job page")
-        dom = self.page(target)
-        data = posting_data(dom)
-        if not data.get("description") and GONE.search(dom):
-            raise SourceUnavailableError(f"{target}: the job is no longer there", gone=True)
-        return plain_text(data.get("description"))
+        return ad_on_page(self.page(target), target)
 
 
-def alert_readers(profile: Path) -> dict[str, AdReader]:
-    """One reader for both alert sources, with an Edge profile of its own."""
-    reader = AlertPageAds(first_hop, Edge(profile).dom)
-    return {"stepstone-alert": reader, "xing-alert": reader}
+def edge_readers(profile: Path) -> dict[str, AdReader]:
+    """The sources whose job pages only Edge can read, with a profile of their own: the alert
+    jobs, and Adzuna's details pages, which answer plain requests with 403."""
+    edge = Edge(profile)
+    alerts = AlertPageAds(first_hop, edge.dom)
+    return {"stepstone-alert": alerts, "xing-alert": alerts, "adzuna": JobPageAds(edge.dom)}

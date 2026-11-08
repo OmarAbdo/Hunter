@@ -1,6 +1,6 @@
 """Reading the ads of taken jobs that lack them, at the end of every discovery run: the sources
-Hunter can read one job at a time, paced like the rest of the run. Job-alert jobs are read through
-headless Edge, with its own profile in var/."""
+Hunter can read one job at a time, paced like the rest of the run. Job-alert jobs and Adzuna's are
+read through headless Edge, with its own profile in var/."""
 
 from collections import Counter
 from datetime import datetime
@@ -8,7 +8,7 @@ from datetime import datetime
 from hunter.adapters.cli.project import Project
 from hunter.adapters.sources.feed_table import PACE
 from hunter.adapters.sources import reading, smartrecruiters
-from hunter.adapters.sources.alerts.alert_ads import alert_readers
+from hunter.adapters.sources.alerts.alert_ads import edge_readers
 from hunter.adapters.sources.searches import bundesagentur
 from hunter.adapters.storage.holds import kept_pacing
 from hunter.adapters.storage.pool import Ads
@@ -31,8 +31,8 @@ def readers_of(project: Project) -> dict[str, AdReader]:
     return {
         "bundesagentur": bundesagentur.BundesagenturAds(web, api=apis["bundesagentur"]),
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
-        "softgarden": reading.JobPageAds(web),
-        **alert_readers(project.root / "var" / "edge-ads"),
+        "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
+        **edge_readers(project.root / "var" / "edge-ads"),
     }
 
 

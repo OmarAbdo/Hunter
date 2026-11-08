@@ -1,6 +1,7 @@
 from collections import Counter
 from collections.abc import Callable, Mapping
 from dataclasses import replace
+from functools import partial
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -9,7 +10,7 @@ import pytest
 from hunter.adapters.ad_reading import ads_line, read_taken_ads, readers_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.matches import Matches
-from hunter.adapters.sources.reading import JobPageAds
+from hunter.adapters.sources.reading import JobPageAds, read_page
 from hunter.adapters.storage.pool import Ads, Pool
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
@@ -54,6 +55,7 @@ def test_the_line_says_what_each_source_s_ads_came_to() -> None:
 
 def test_the_sources_read_one_job_at_a_time(tmp_path: Path) -> None:
     assert sorted(readers_of(Project(tmp_path))) == [
+        "adzuna",
         "bundesagentur",
         "smartrecruiters",
         "softgarden",
@@ -74,7 +76,7 @@ def test_a_job_s_whole_ad_is_read_from_its_page_s_job_data(
     web: WebClient, source_pages: Callable[[Mapping[str, str]], str]
 ) -> None:
     site = source_pages({"/job/68122636": "softgarden-job-hypoport.html"})
-    ad = JobPageAds(web).read(replace(FULLSTACK, url=f"{site}/job/68122636"))
+    ad = JobPageAds(partial(read_page, web)).read(replace(FULLSTACK, url=f"{site}/job/68122636"))
     assert ad.startswith("Wer sind wir?")
     assert ad.endswith("www.hypoport.de | www.europace.de")
 
@@ -83,7 +85,10 @@ def test_a_page_without_job_data_has_no_ad(
     web: WebClient, source_pages: Callable[[Mapping[str, str]], str]
 ) -> None:
     site = source_pages({"/de/vacancies": "softgarden-hypoport.html"})
-    assert JobPageAds(web).read(replace(FULLSTACK, url=f"{site}/de/vacancies")) == ""
+    assert (
+        JobPageAds(partial(read_page, web)).read(replace(FULLSTACK, url=f"{site}/de/vacancies"))
+        == ""
+    )
 
 
 def test_a_job_page_that_was_taken_down_is_gone(
@@ -91,5 +96,33 @@ def test_a_job_page_that_was_taken_down_is_gone(
 ) -> None:
     job = replace(FULLSTACK, url=f"{source_pages({})}/job/68122636")
     with pytest.raises(SourceUnavailableError) as raised:
-        JobPageAds(web).read(job)
+        JobPageAds(partial(read_page, web)).read(job)
     assert raised.value.gone
+
+
+SAVED = Path(__file__).resolve().parents[2] / "fixtures" / "sources"
+ADZUNA = Posting(
+    title="DevOps Engineer - On Premises Cloud (m/w/d)",
+    company="Bundesdruckerei-Gruppe",
+    location=Location(country="DE", city="Berlin"),
+    source=SourceRef(source="adzuna", native_id="5911828849"),
+    url="https://www.adzuna.de/details/5911828849",
+)
+
+
+def edge_page(saved: str) -> Callable[[str], str]:
+    """Edge as the reader sees it: the saved page, for the job's own address only."""
+    return {ADZUNA.url: (SAVED / saved).read_text(encoding="utf-8")}.__getitem__
+
+
+def test_an_adzuna_job_s_whole_ad_is_read_from_its_details_page() -> None:
+    ad = JobPageAds(edge_page("adzuna-page-live.html")).read(ADZUNA)
+    assert ad.startswith("DevOps Engineer - On Premises Cloud (m/w/d)\n\nGestalten Sie")
+    assert len(ad) > 3000
+
+
+def test_an_adzuna_job_that_is_out_of_date_or_not_found_is_gone() -> None:
+    for saved in ("adzuna-page-outdated.html", "adzuna-page-not-found.html"):
+        with pytest.raises(SourceUnavailableError) as raised:
+            JobPageAds(edge_page(saved)).read(ADZUNA)
+        assert raised.value.gone

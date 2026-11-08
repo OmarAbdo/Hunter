@@ -1,0 +1,4 @@
+id = "106"
+title = "Read Adzuna's whole ads through Edge"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/reading.py", "src/hunter/adapters/sources/alerts/alert_ads.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_ad_reading.py", "tests/integration/sources/test_alert_ads.py", "tests/fixtures/sources/adzuna-page-*.html"]

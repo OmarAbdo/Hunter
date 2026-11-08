@@ -3,7 +3,7 @@ turned into SourceUnavailableError; times, places and employment types as source
 
 import json
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import replace
 from datetime import datetime
 from typing import Any
@@ -19,6 +19,12 @@ GONE_STATUSES = frozenset({404, 410})
 # A page's schema.org data, which job pages fill with a `JobPosting`.
 POSTING_DATA = re.compile(
     r"""<script[^>]*application/ld\+json[^>]*>(.*?)</script>""", re.DOTALL | re.IGNORECASE
+)
+# What job sites write on the page of a job they took down, as pages read through Edge show it
+# (their status isn't known): XING, StepStone, Adzuna.
+GONE_PAGE = re.compile(
+    r"isn.t available|nicht mehr (?:verfügbar|aktuell)|page not found|seite nicht gefunden",
+    re.IGNORECASE,
 )
 # Words in a source's employment type, checked in this order: "Intern (full-time)" is an internship.
 EMPLOYMENT_WORDS = (
@@ -120,12 +126,20 @@ def data_items(block: str) -> list[dict[str, Any]]:
 
 class JobPageAds:
     """A job's whole ad from its own page's schema.org `JobPosting`, where its source's list gives
-    none (softgarden). A page that's gone answers 404; one without the data has no ad."""
+    none or only a few lines: softgarden's pages read over plain HTTP, Adzuna's through Edge.
+    `page` reads a page and raises SourceUnavailableError."""
 
-    def __init__(self, web: WebClient) -> None:
-        self.web = web
+    def __init__(self, page: Callable[[str], str]) -> None:
+        self.page = page
 
     def read(self, posting: Posting) -> str:
-        if not posting.url:
-            return ""
-        return plain_text(posting_data(read_page(self.web, posting.url)).get("description"))
+        return ad_on_page(self.page(posting.url), posting.url) if posting.url else ""
+
+
+def ad_on_page(page: str, url: str) -> str:
+    """The page's job ad. A page without one that says the job was taken down makes it gone; a
+    page without one that doesn't has no ad."""
+    description = posting_data(page).get("description")
+    if not description and GONE_PAGE.search(page):
+        raise SourceUnavailableError(f"{url}: the job is no longer there", gone=True)
+    return plain_text(description)
