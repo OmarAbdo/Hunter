@@ -2,11 +2,19 @@
 is the subdomain with its domain, like `zvoove.de`. Offices read "DE | München"; an office called
 "Remote" makes the job remote in the other offices' countries."""
 
+import html
 from dataclasses import replace
+from html.parser import HTMLParser
 from xml.etree import ElementTree
 
 from hunter.adapters.html_text import plain_text
-from hunter.adapters.sources.reading import parsed_time, place_at, read_text
+from hunter.adapters.sources.reading import (
+    parsed_time,
+    place_at,
+    posting_data,
+    read_page,
+    read_text,
+)
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.identity import text_key
@@ -23,6 +31,7 @@ TYPES = {
 }
 # "full-or-part-time" says neither, so it stays unknown.
 SCHEDULES = {"full-time": Employment.FULL_TIME, "part-time": Employment.PART_TIME}
+SECTION = "jb-description-item"  # the class of each section of a job page's ad
 
 
 class PersonioFeed:
@@ -85,3 +94,46 @@ def description_of(position: ElementTree.Element) -> str:
         for section in sections
     )
     return "\n\n".join(part.strip() for part in parts)
+
+
+class PersonioAds:
+    """A job's whole ad from its own page, for boards whose feed leaves the ads out: the page's
+    schema.org `JobPosting` where it has one, else the page's ad sections. A page that's gone
+    answers 404."""
+
+    def __init__(self, web: WebClient) -> None:
+        self.web = web
+
+    def read(self, posting: Posting) -> str:
+        if not posting.url:
+            return ""
+        page = read_page(self.web, posting.url)
+        sections = AdSections()
+        sections.feed(page)
+        return plain_text(posting_data(page).get("description") or "".join(sections.html))
+
+
+class AdSections(HTMLParser):
+    """The HTML of a Personio job page's ad: every `jb-description-item`, its title and its text."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.html: list[str] = []
+        self.depth = 0  # how deep inside an ad section's <div>s; 0 outside them
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        classes = (dict(attrs).get("class") or "").split()
+        if tag == "div" and (self.depth or SECTION in classes):
+            self.depth += 1
+        if self.depth:
+            self.html.append(f"<{tag}>")
+
+    def handle_endtag(self, tag: str) -> None:
+        if self.depth:
+            self.html.append(f"</{tag}>")
+        if tag == "div" and self.depth:
+            self.depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if self.depth:
+            self.html.append(html.escape(data))

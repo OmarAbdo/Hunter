@@ -3,11 +3,11 @@ from datetime import UTC, datetime
 
 import pytest
 
-from hunter.adapters.sources.personio import PersonioFeed
+from hunter.adapters.sources.personio import PersonioAds, PersonioFeed
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
 from hunter.domain.discovery.location import Location, Workplace
-from hunter.domain.discovery.posting import EmployerRef, Employment, Posting
+from hunter.domain.discovery.posting import EmployerRef, Employment, Posting, SourceRef
 
 POSITIONS = "/xml"
 SourceApi = Callable[[str, str | None], str]
@@ -71,3 +71,35 @@ def test_a_german_ad_is_read_in_german(source_pages: Callable[..., str], web: We
     graduate = PersonioFeed(web, "zollsoft.de", "zollsoft", api=api).fetch()[0]
     assert graduate.description.startswith("Wo Du mit anpacken kannst")
     assert "Du verwandelst Dein theoretisches Wissen" in graduate.description
+
+
+def personio_job(url: str) -> Posting:
+    return Posting(
+        title="Product Engineer",
+        company="juna.ai GmbH",
+        location=Location(country="DE", city="Berlin"),
+        source=SourceRef(source="personio", native_id="1824115"),
+        url=url,
+    )
+
+
+def test_a_job_s_ad_is_read_from_its_page_s_job_data(source_api: SourceApi, web: WebClient) -> None:
+    site = source_api("/job/2827202", "personio-job-chrono24.html")
+    ad = PersonioAds(web).read(personio_job(f"{site}/job/2827202"))
+    assert ad.startswith("About\n\nChrono24 is the world's leading marketplace")
+
+
+def test_a_page_without_job_data_gives_the_ad_from_its_sections(
+    source_api: SourceApi, web: WebClient
+) -> None:
+    site = source_api("/job/1824115", "personio-job-juna.html")
+    ad = PersonioAds(web).read(personio_job(f"{site}/job/1824115"))
+    assert ad.startswith("About Juna AI\n\nWe bring cutting-edge AI to the physical world.")
+    assert ad.endswith("Other languages are a plus, not a requirement.")
+    assert "Product Engineer" not in ad.splitlines()  # the page's heading isn't part of the ad
+
+
+def test_a_job_page_that_is_gone_makes_the_job_gone(source_api: SourceApi, web: WebClient) -> None:
+    with pytest.raises(SourceUnavailableError) as raised:
+        PersonioAds(web).read(personio_job(f"{source_api('/job/1824115', None)}/job/1824115"))
+    assert raised.value.gone

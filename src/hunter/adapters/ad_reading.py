@@ -7,7 +7,7 @@ from datetime import datetime
 
 from hunter.adapters.cli.project import Project
 from hunter.adapters.sources.feed_table import PACE
-from hunter.adapters.sources import reading, smartrecruiters
+from hunter.adapters.sources import personio, reading, smartrecruiters
 from hunter.adapters.sources.alerts.alert_ads import edge_readers
 from hunter.adapters.sources.searches import bundesagentur
 from hunter.adapters.storage.holds import kept_pacing
@@ -28,14 +28,11 @@ def readers_of(project: Project) -> dict[str, AdReader]:
     web = WebClient(kept_pacing({}, PACE, project.database))
     apis = {"bundesagentur": bundesagentur.API, "smartrecruiters": smartrecruiters.API}
     apis.update({source: api for source, api in project.apis.items() if source in apis})
-    # Job pages read over plain HTTP, where robots.txt allows: softgarden's list has no ads, and
-    # some Personio boards leave them out of their feed.
-    pages = reading.JobPageAds(lambda url: reading.read_page(web, url))
     return {
         "bundesagentur": bundesagentur.BundesagenturAds(web, api=apis["bundesagentur"]),
-        "personio": pages,
+        "personio": personio.PersonioAds(web),
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
-        "softgarden": pages,
+        "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
         **edge_readers(project.root / "var" / "edge-ads"),
     }
 
