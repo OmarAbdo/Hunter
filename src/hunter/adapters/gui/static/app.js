@@ -55,11 +55,32 @@ function showJobs() {
     cell([job.workplace, job.employment].filter(Boolean).join(", ")),
     cell(job.sources.join(", ")),
     cell(job.employer_system ?? "", job.employer_system ? job.apply_url : null),
-    cell(job.ad),
+    adCell(job),
   )));
   byId("job-count").textContent = filter.trim()
     ? `${counted(shown.length)} of these ${counted(jobs.length)} match the filter`
     : "";
+}
+
+function adCell(job) {
+  // How much of the ad Hunter has; a click shows the ad above the list.
+  const td = document.createElement("td");
+  const button = document.createElement("button");
+  button.className = "link";
+  button.textContent = job.ad;
+  button.addEventListener("click", () => showAd(job.id));
+  td.append(button);
+  return td;
+}
+
+async function showAd(id) {
+  const ad = await getJson(`/api/ad?job=${encodeURIComponent(id)}`);
+  if (!ad) return;
+  byId("ad-title").textContent = `${ad.title} at ${ad.company}`;
+  byId("ad-meta").textContent = `${ad.ad} ad` + (isWebLink(ad.url) ? ` · ${ad.url}` : "");
+  byId("ad-text").textContent = ad.text || "Hunter has no text of this ad yet.";
+  byId("ad-view").hidden = false;
+  byId("ad-view").scrollIntoView();
 }
 
 function showCompanies() {
@@ -217,6 +238,7 @@ function showTab(name) {
 byId("show-jobs").addEventListener("click", () => showTab("jobs"));
 byId("show-companies").addEventListener("click", () => showTab("companies"));
 byId("show-ads").addEventListener("click", () => showTab("ads"));
+byId("ad-close").addEventListener("click", () => { byId("ad-view").hidden = true; });
 byId("show-runs").addEventListener("click", () => showTab("runs"));
 byId("run").addEventListener("click", startRun);
 byId("pause").addEventListener("click", () => runAction("pause"));

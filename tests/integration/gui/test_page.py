@@ -45,6 +45,11 @@ def test_the_ads_tab_says_how_many_taken_jobs_have_their_whole_ad() -> None:
     assert "of the open ones" in SCRIPT
 
 
+def test_a_job_s_ad_opens_from_its_row() -> None:
+    assert "/api/ad?job=" in SCRIPT
+    assert 'id="ad-text"' in PAGE
+
+
 def test_a_run_can_be_paused_resumed_and_stopped_from_the_page() -> None:
     for action in ("pause", "resume", "stop"):
         assert f'runAction("{action}")' in SCRIPT

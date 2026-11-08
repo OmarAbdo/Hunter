@@ -60,6 +60,11 @@ def test_a_campaign_s_jobs_and_the_companies_and_the_pool_come_as_json(address: 
     assert json.loads(read(f"{address}/api/ads")[2]) == {"sources": [], "total": nothing}
 
 
+def test_a_job_s_ad_comes_as_json(address: str) -> None:
+    status, kind, body = read(f"{address}/api/ad?job=1")
+    assert (status, kind, json.loads(body)) == (200, "application/json", None)
+
+
 def test_anything_else_is_not_found(address: str) -> None:
     assert read(f"{address}/api/nothing")[0] == 404
     assert read(f"{address}/../var/accounts.toml")[0] == 404

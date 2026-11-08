@@ -1,9 +1,11 @@
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from hunter.adapters.gui.views import (
+    ad_view,
     ads_view,
     campaigns_view,
     companies_view,
@@ -17,7 +19,7 @@ from hunter.adapters.storage.run_log import RunLog
 from hunter.application.discover import SourceReport
 from hunter.adapters.storage.database import open_database
 from hunter.adapters.storage.matches import Matches
-from hunter.adapters.storage.pool import Pool
+from hunter.adapters.storage.pool import Ads, Pool
 from hunter.adapters.storage.registry import Registry
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.campaign import Campaign, Rejection
@@ -102,8 +104,27 @@ def test_companies_show_their_boards_and_website(database_path: Path) -> None:
 
 
 def test_a_campaign_s_jobs_say_how_much_of_their_ad_hunter_has(database_path: Path) -> None:
-    [job] = jobs_view(open_database(database_path), "berlin")
+    database = open_database(database_path)
+    [job] = jobs_view(database, "berlin")
     assert job["ad"] == "none"
+    Ads(database).mark_gone(job["id"], NOW)
+    assert jobs_view(database, "berlin")[0]["ad"] == "gone"
+
+
+def test_a_job_s_ad_comes_with_how_much_of_it_hunter_has(database_path: Path) -> None:
+    database = open_database(database_path)
+    [job] = jobs_view(database, "berlin")
+    whole = replace(Pool(database).posting(job["id"]), description="We build a bank.")
+    Ads(database).keep_ad(job["id"], whole, NOW)
+    assert ad_view(database, job["id"]) == {
+        "id": job["id"],
+        "title": "Senior Backend Engineer",
+        "company": "N26",
+        "url": "https://job-boards.greenhouse.io/n26/jobs/1",
+        "ad": "whole",
+        "text": "We build a bank.",
+    }
+    assert ad_view(database, 999) is None
 
 
 def test_the_taken_jobs_are_counted_by_how_much_of_their_ad_hunter_has(

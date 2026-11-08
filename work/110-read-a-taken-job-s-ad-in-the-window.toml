@@ -1,0 +1,4 @@
+id = "110"
+title = "Read a taken job's ad in the window"
+kind = "feature"
+scope = ["src/hunter/adapters/gui/views.py", "src/hunter/adapters/gui/server.py", "src/hunter/adapters/gui/static/**", "tests/integration/gui/test_views.py", "tests/integration/gui/test_server.py", "tests/integration/gui/test_page.py"]
