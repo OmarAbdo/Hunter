@@ -10,7 +10,7 @@ import pytest
 from hunter.adapters.ad_reading import ads_line, read_taken_ads, readers_of
 from hunter.adapters.cli.project import Project
 from hunter.adapters.storage.matches import Matches
-from hunter.adapters.sources.reading import JobPageAds, read_page
+from hunter.adapters.sources.reading import JobPageAds, ad_on_page, read_page
 from hunter.adapters.storage.pool import Ads, Pool
 from hunter.adapters.web_client import WebClient
 from hunter.application.ports import SourceUnavailableError
@@ -121,8 +121,15 @@ def test_an_adzuna_job_s_whole_ad_is_read_from_its_details_page() -> None:
     assert len(ad) > 3000
 
 
-def test_an_adzuna_job_that_is_out_of_date_or_not_found_is_gone() -> None:
-    for saved in ("adzuna-page-outdated.html", "adzuna-page-not-found.html"):
-        with pytest.raises(SourceUnavailableError) as raised:
-            JobPageAds(edge_page(saved)).read(ADZUNA)
-        assert raised.value.gone
+def test_an_adzuna_job_that_is_out_of_date_is_gone() -> None:
+    with pytest.raises(SourceUnavailableError) as raised:
+        JobPageAds(edge_page("adzuna-page-outdated.html")).read(ADZUNA)
+    assert raised.value.gone
+
+
+def test_a_page_that_was_not_found_is_gone() -> None:
+    """Adzuna's page for an id it no longer knows: the page, as Edge shows it, has only this."""
+    page = "<title>Seite nicht gefunden - adzuna.de</title><h1>Seite nicht gefunden</h1>"
+    with pytest.raises(SourceUnavailableError) as raised:
+        ad_on_page(page, ADZUNA.url or "")
+    assert raised.value.gone
