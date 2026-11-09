@@ -17,7 +17,7 @@ RESTING = frozenset({"captcha", "failed"})
 
 @dataclass(frozen=True)
 class Turns:
-    per_hour: int = 12  # an engine's searches in any hour: one every five minutes
+    per_hour: int = 25  # an engine's searches in any hour (Omar, 2026-11-09)
     rest: timedelta = HOUR
     longest_rest: timedelta = timedelta(hours=24)
 

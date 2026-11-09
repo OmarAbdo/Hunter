@@ -49,14 +49,14 @@ class SearchLog:
         query = "SELECT count(*) FROM searches WHERE engine = ? AND at >= ?"
         return int(self.database.execute(query, (engine, stamp(since))).fetchone()[0])
 
-    def searched(self, query: str, since: datetime) -> bool:
-        """Whether this very query got an answer since `since`, from any engine: links, or none.
-        A captcha or a failure isn't an answer."""
+    def answers(self, query: str, since: datetime) -> int:
+        """How many searches for this very query got an answer since `since`, on any engine:
+        links, or none. A captcha or a failure isn't an answer."""
         found = (
-            "SELECT 1 FROM searches WHERE query = ? AND at >= ? "
-            "AND outcome IN ('links', 'nothing') LIMIT 1"
+            "SELECT count(*) FROM searches WHERE query = ? AND at >= ? "
+            "AND outcome IN ('links', 'nothing')"
         )
-        return self.database.execute(found, (query, stamp(since))).fetchone() is not None
+        return int(self.database.execute(found, (query, stamp(since))).fetchone()[0])
 
     def uses(self, engines: Sequence[str], since: datetime) -> list[EngineUse]:
         """Each engine's searches since `since`, the oldest first, in the engines' order."""

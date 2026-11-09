@@ -34,14 +34,15 @@ def test_the_last_search_is_known_whichever_engine_made_it(tmp_path: Path) -> No
     assert found.fetchall() == [("b", 3)]
 
 
-def test_a_query_is_known_as_searched_since_a_time(tmp_path: Path) -> None:
+def test_a_query_s_answers_since_a_time_are_counted(tmp_path: Path) -> None:
+    """A captcha or a failure isn't an answer."""
     log = SearchLog(open_database(tmp_path / "hunter.db"))
     log.record(Searched("duckduckgo", '"Europace" Fullstack Developer', "links", 10, NOON))
-    assert log.searched('"Europace" Fullstack Developer', NOON - HOUR)
-    assert not log.searched('"Europace" Fullstack Developer', NOON + HOUR)
-    assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
-    log.record(Searched("bing", '"Europace" Backend Developer', "captcha", 0, NOON))
-    assert not log.searched('"Europace" Backend Developer', NOON - HOUR)
+    log.record(Searched("bing", '"Europace" Fullstack Developer', "nothing", 0, NOON + HOUR))
+    log.record(Searched("brave", '"Europace" Fullstack Developer', "captcha", 0, NOON + HOUR))
+    assert log.answers('"Europace" Fullstack Developer', NOON - HOUR) == 2
+    assert log.answers('"Europace" Fullstack Developer', NOON + HOUR) == 1
+    assert log.answers('"Europace" Backend Developer', NOON - HOUR) == 0
 
 
 def test_each_engine_s_searches_since_a_time_come_oldest_first(tmp_path: Path) -> None:

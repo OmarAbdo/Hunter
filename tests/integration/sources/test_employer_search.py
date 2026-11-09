@@ -18,17 +18,18 @@ JOB = Posting(
 
 
 class Search:
-    """The web search as the reader sees it: the same links for every query, each query kept."""
+    """The web search as the reader sees it: each search's answer in turn, the last one again
+    after them; each query kept."""
 
-    def __init__(self, links: list[str], *, down: bool = False) -> None:
-        self.found, self.down = links, down
+    def __init__(self, *answers: list[str], down: bool = False) -> None:
+        self.answers, self.down = answers, down
         self.queries: list[str] = []
 
     def links(self, query: str) -> list[str]:
         self.queries.append(query)
         if self.down:
-            raise SourceUnavailableError("web search: duckduckgo: daily cap reached")
-        return self.found
+            raise SourceUnavailableError("web search: every engine is resting or at its share")
+        return self.answers[min(len(self.queries), len(self.answers)) - 1]
 
 
 class Pages:
@@ -45,8 +46,9 @@ class Pages:
         return (SAVED / self.pages[url]).read_text(encoding="utf-8")
 
 
-def reader(search: Search, pages: Pages, searched: frozenset[str] = frozenset()) -> EmployerAds:
-    return EmployerAds(search, pages.dom, lambda query: query in searched)
+def reader(search: Search, pages: Pages, lately: int = 0) -> EmployerAds:
+    """`lately`: how many searches for the job got an answer this week."""
+    return EmployerAds(search, pages.dom, lambda _: lately)
 
 
 def test_the_employer_s_own_ad_is_found_by_its_title_and_company() -> None:
@@ -67,12 +69,35 @@ def test_a_job_whose_ad_isn_t_found_is_left_for_later() -> None:
     assert not raised.value.gone
 
 
-def test_only_the_first_few_results_are_read() -> None:
-    links = [f"https://example.com/{number}" for number in range(6)] + [EUROPACE_AD]
+def test_only_an_answer_s_first_results_are_read() -> None:
+    links = [f"https://example.com/{number}" for number in range(9)] + [EUROPACE_AD]
     pages = Pages({EUROPACE_AD: "softgarden-job-hypoport.html"})
     with pytest.raises(SourceUnavailableError):
-        reader(Search(links), pages).read(JOB)
-    assert len(pages.asked) == 5
+        reader(Search(links, []), pages).read(JOB)
+    assert len(pages.asked) == 8
+
+
+def test_a_miss_is_searched_again_at_once_on_the_next_engine() -> None:
+    other = "https://example.com/careers"
+    search = Search([other], [other, EUROPACE_AD])
+    pages = Pages(
+        {other: "personio-job-chrono24.html", EUROPACE_AD: "softgarden-job-hypoport.html"}
+    )
+    assert reader(search, pages).read(JOB).startswith("Wer sind wir?")
+    assert len(search.queries) == 2
+    assert pages.asked == [other, EUROPACE_AD]  # a page read for one answer isn't read again
+
+
+def test_a_job_gets_three_answered_searches_a_week_at_most() -> None:
+    other = "https://example.com/careers"
+    once = Search([other])
+    with pytest.raises(SourceUnavailableError):
+        reader(once, Pages({}), lately=1).read(JOB)
+    assert len(once.queries) == 2
+    thrice = Search([other])
+    with pytest.raises(SourceUnavailableError):
+        reader(thrice, Pages({}), lately=3).read(JOB)
+    assert thrice.queries == []
 
 
 def test_job_aggregators_copies_are_passed_over() -> None:
@@ -116,15 +141,7 @@ def test_a_page_is_read_over_plain_http_and_through_a_browser_only_when_refused(
     ]
 
 
-def test_a_query_searched_lately_isn_t_searched_again() -> None:
-    search = Search([EUROPACE_AD])
-    query = '"Europace" Senior Fullstack Developer (remote)'
-    with pytest.raises(SourceUnavailableError):
-        reader(search, Pages({}), frozenset({query})).read(JOB)
-    assert search.queries == []
-
-
 def test_a_search_that_can_t_be_made_leaves_the_job_for_later() -> None:
     with pytest.raises(SourceUnavailableError) as raised:
-        reader(Search([], down=True), Pages({})).read(JOB)
+        reader(Search(down=True), Pages({})).read(JOB)
     assert not raised.value.gone

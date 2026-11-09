@@ -61,11 +61,14 @@ lists again is open again.
 ## The employer's own ad, by web search
 
 For Careerjet and Indeed jobs (`adapters/sources/searches/employer_search.py`): a search
-for `"<company>" <title>` through Edge, on DuckDuckGo then Bing, as for finding boards. The first
-three results that aren't job boards are read, and the first whose `JobPosting` names the job's
-title and company (Hunter's identity keys: gender markers and legal forms don't count) is its ad
-(`domain/ads/employer_ad.py`). A near miss is no ad: the wrong ad is worse than none.
+for `"<company>" <title>` through Edge, on the engine whose turn it is (see docs/sources.md). The
+results that aren't job boards or job aggregators are read, the first eight of each answer, over
+plain HTTP with a browser's identity (through Edge only where a site refuses), and the first whose
+`JobPosting` names the job's title and company (Hunter's identity keys: gender markers and legal
+forms don't count) is its ad (`domain/ads/employer_ad.py`). A near miss is no ad: the wrong ad is
+worse than none. Many of the ads found are copies on job-copy sites, which publish the employer's
+ad under the employer's name.
 
-Searches are shared with probing for boards and spread over the engines, which take turns (see
-docs/sources.md). A query that got an answer in the last week isn't searched again, and while every
-engine rests the job waits for a later run.
+An answer without a fitting ad is followed at once by another search, which goes to the next
+engine and brings other results; a job gets three answered searches a week at most, then waits.
+While every engine rests, the job waits for a later run.

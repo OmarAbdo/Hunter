@@ -5,9 +5,10 @@ company and the title, through Edge, names the candidates; the first few that ar
 are read, and the first whose schema.org `JobPosting` names the job's title and company is its ad
 (domain/ads/employer_ad.py).
 
-Searches are shared with probing and spread over the engines (edge_search.py), so a query answered
-in the last week isn't searched again, and a search that can't be made, with every engine resting
-say, leaves the job for a later run without a page read."""
+Searches are shared with probing and spread over the engines (edge_search.py). An answer without a
+fitting ad is followed by another search at once, on the next engine, whose results differ; after
+three answers in a week the job waits. A search that can't be made, with every engine resting say,
+leaves the job for a later run."""
 
 import sqlite3
 from collections.abc import Callable
@@ -23,8 +24,9 @@ from hunter.domain.ads.employer_ad import fits, search_query
 from hunter.domain.discovery.posting import Posting
 
 SEARCHED_FOR = ("careerjet", "indeed-alert")
-CANDIDATES = 5  # result pages read for one job, at most
-LATELY = timedelta(days=7)  # a query searched since isn't searched again
+CANDIDATES = 8  # result pages read for one answer, at most
+ANSWERS = 3  # answered searches for one job in a week, each on another engine
+LATELY = timedelta(days=7)
 Page = Callable[[str], str]
 # Job boards and aggregators: their copies are what Hunter has already, or can't be read.
 JOB_BOARDS = (
@@ -73,22 +75,36 @@ class EmployerAds:
         self,
         search: WebSearch,
         page: Callable[[str], str],
-        searched_lately: Callable[[str], bool],
+        answers_lately: Callable[[str], int],
     ) -> None:
+        """`answers_lately`: how many searches for a query got an answer in the last week."""
         self.search = search
         self.page = page
-        self.searched_lately = searched_lately
+        self.answers_lately = answers_lately
 
     def read(self, posting: Posting) -> str:
+        """Searches again at once when an answer holds no fitting ad: the engines take turns, so
+        the next answer is another engine's, with other results."""
         query = search_query(posting)
-        if self.searched_lately(query):
-            raise SourceUnavailableError(f"{query}: searched lately, no ad found")
-        links = [link for link in self.search.links(query) if not job_board(link)]
-        for link in links[:CANDIDATES]:
-            found = self._ad_at(link, posting)
+        tries = ANSWERS - self.answers_lately(query)
+        if tries <= 0:
+            raise SourceUnavailableError(f"{query}: searched {ANSWERS} times lately, no ad found")
+        read: set[str] = set()
+        for _ in range(tries):
+            found = self._first_fit(self.search.links(query), posting, read)
             if found:
                 return found
         raise SourceUnavailableError(f"{query}: no ad of the employer's found")
+
+    def _first_fit(self, links: list[str], posting: Posting, read: set[str]) -> str:
+        """The first fitting ad among an answer's first results not read before; `read` grows."""
+        fresh = [link for link in links if link not in read and not job_board(link)]
+        for link in fresh[:CANDIDATES]:
+            read.add(link)
+            found = self._ad_at(link, posting)
+            if found:
+                return found
+        return ""
 
     def _ad_at(self, link: str, posting: Posting) -> str:
         try:
@@ -129,6 +145,6 @@ def employer_readers(edge: Edge, database: sqlite3.Connection, plain: Page) -> d
     reader = EmployerAds(
         EdgeSearch(edge.dom, log),
         plain_first(plain, edge.dom),
-        lambda query: log.searched(query, week_ago),
+        lambda query: log.answers(query, week_ago),
     )
     return dict.fromkeys(SEARCHED_FOR, reader)

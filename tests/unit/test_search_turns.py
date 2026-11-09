@@ -51,3 +51,8 @@ def test_an_engine_whose_answer_was_unreadable_rests_too() -> None:
     """A page with neither results nor a challenge it's known by is most often one in disguise."""
     unreadable = used("swisscows", (90, "links"), (30, "failed"))
     assert next_engines([unreadable], NOW, TURNS) == []
+
+
+def test_an_engine_s_share_is_25_searches_an_hour() -> None:
+    """Omar's call (2026-11-09): enough for a session's new jobs, well under the engines' limits."""
+    assert Turns().per_hour == 25

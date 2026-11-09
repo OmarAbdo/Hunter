@@ -1,0 +1,4 @@
+id = "118"
+title = "A missed employer search is retried on other engines at once, at 25 searches an engine an hour"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/searches/employer_search.py", "src/hunter/adapters/storage/search_log.py", "src/hunter/domain/search_turns.py", "tests/integration/sources/test_employer_search.py", "tests/integration/test_search_log.py", "tests/unit/test_search_turns.py", "docs/sources.md", "docs/ads.md"]
