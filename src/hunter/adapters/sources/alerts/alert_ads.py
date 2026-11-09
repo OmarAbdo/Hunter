@@ -11,7 +11,6 @@ so they're read in the run their mail arrives in. Adzuna's details pages are rea
 
 import re
 import sqlite3
-import urllib.error
 import urllib.request
 from collections.abc import Callable
 from pathlib import Path
@@ -20,6 +19,7 @@ from urllib.parse import parse_qs, urljoin, urlsplit
 from hunter.adapters.edge_search import Edge
 from hunter.adapters.sources.reading import JobPageAds, ad_on_page
 from hunter.adapters.sources.searches.employer_search import employer_readers
+from hunter.adapters.storage import registry, search_log
 from hunter.application.ports import AdReader, SourceUnavailableError
 from hunter.domain.discovery.posting import Posting
 
@@ -38,7 +38,7 @@ def first_hop(url: str) -> str | None:
     request = urllib.request.Request(url, headers={"User-Agent": AGENT})
     try:
         urllib.request.build_opener(NotFollowed).open(request, timeout=TIMEOUT).close()
-    except urllib.error.HTTPError as error:
+    except urllib.request.HTTPError as error:
         return error.headers.get("Location")
     except OSError:
         return None
@@ -87,5 +87,7 @@ def edge_readers(
         "stepstone-alert": alerts,
         "xing-alert": alerts,
         "adzuna": JobPageAds(edge.dom),
-        **employer_readers(edge, database, plain),
+        **employer_readers(
+            edge, search_log.SearchLog(database), registry.Registry(database).adopt, plain
+        ),
     }

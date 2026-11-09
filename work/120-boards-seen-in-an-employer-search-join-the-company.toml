@@ -1,0 +1,4 @@
+id = "120"
+title = "Boards seen in an employer search join the company"
+kind = "feature"
+scope = ["src/hunter/domain/ads/employer_ad.py", "tests/unit/ads/test_employer_ad.py", "src/hunter/adapters/sources/searches/employer_search.py", "tests/integration/sources/test_employer_search.py", "src/hunter/adapters/sources/alerts/alert_ads.py", "src/hunter/adapters/storage/registry.py", "tests/integration/test_registry.py", "docs/ads.md"]

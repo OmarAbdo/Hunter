@@ -72,3 +72,8 @@ ad under the employer's name.
 An answer without a fitting ad is followed at once by another search, which goes to the next
 engine and brings other results; a job gets three answered searches a week at most, then waits.
 While every engine rests, the job waits for a later run.
+
+A board of the company's seen in the results (its name holds one of the company's words of four
+letters or more) joins the company in the registry, unless another company owns it. The next run
+reads that board, the job becomes the employer's job with its whole ad, and the company's later jobs
+come with no search at all.

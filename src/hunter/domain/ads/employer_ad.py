@@ -4,10 +4,18 @@ Hunter's keys see them. A near miss is no ad: the wrong ad is worse than none.""
 
 import re
 
-from hunter.domain.discovery.identity import GENDER_MARKER, company_key, title_key
+from hunter.domain.discovery.boards import Board
+from hunter.domain.discovery.identity import (
+    GENDER_MARKER,
+    company_key,
+    company_words,
+    text_key,
+    title_key,
+)
 from hunter.domain.discovery.posting import Posting
 
 SPACES = re.compile(r"\s+")
+SHORTEST_NAME_WORD = 4  # a shorter word of a company's name names too many boards
 
 
 def fits(job: Posting, title: str, company: str) -> bool:
@@ -24,3 +32,10 @@ def search_query(job: Posting) -> str:
     """The company by its name, then the title without its gender marker."""
     title = SPACES.sub(" ", GENDER_MARKER.sub(" ", job.title)).strip()
     return f'"{job.company}" {title}'
+
+
+def names_company(board: Board, company: str) -> bool:
+    """Whether a board seen in a search for the company's job is the company's own: its name holds
+    one of the company's words of four letters or more ("careers.nexus-ag.de" for Nexus)."""
+    words = set(text_key(board.slug).split())
+    return any(word in words for word in company_words(company) if len(word) >= SHORTEST_NAME_WORD)

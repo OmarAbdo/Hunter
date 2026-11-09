@@ -5,6 +5,7 @@ import pytest
 
 from hunter.adapters.sources.searches.employer_search import EmployerAds, plain_first
 from hunter.application.ports import SourceUnavailableError
+from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import Posting, SourceRef
 
@@ -47,9 +48,15 @@ class Pages:
         return (SAVED / self.pages[url]).read_text(encoding="utf-8")
 
 
-def reader(search: Search, pages: Pages, lately: int = 0) -> EmployerAds:
-    """`lately`: how many searches for the job got an answer this week."""
-    return EmployerAds(search, pages.dom, lambda _: lately)
+def reader(
+    search: Search, pages: Pages, lately: int = 0, adopted: list[tuple[str, Board]] | None = None
+) -> EmployerAds:
+    """`lately`: how many searches for the job got an answer this week; `adopted` keeps the boards
+    offered to the job's company."""
+    found = adopted if adopted is not None else []
+    return EmployerAds(
+        search, pages.dom, lambda _: lately, lambda company, board: found.append((company, board))
+    )
 
 
 def test_the_employer_s_own_ad_is_found_by_its_title_and_company() -> None:
@@ -155,7 +162,8 @@ def test_an_ad_whose_job_data_names_its_company_as_plain_text_is_read() -> None:
         '"title": "Senior Fullstack Developer (remote) (w/m/d)", "hiringOrganization": "Europace", '
         '"description": "<p>Build the platform.</p>"}</script>'
     )
-    found = EmployerAds(Search([EUROPACE_AD]), lambda _: page, lambda _: 0).read(JOB)
+    search = Search([EUROPACE_AD])
+    found = EmployerAds(search, lambda _: page, lambda _: 0, lambda *_: None).read(JOB)
     assert found == "Build the platform."
 
 
@@ -165,3 +173,13 @@ def test_a_job_without_a_company_isn_t_searched_for() -> None:
     with pytest.raises(SourceUnavailableError):
         reader(search, Pages({})).read(replace(JOB, company=" "))
     assert search.queries == []
+
+
+def test_a_board_of_the_company_seen_in_the_results_is_offered_to_it() -> None:
+    """Its feed brings the job's ad in the next run, and the company's later jobs with no search."""
+    board_link = "https://jobs.ashbyhq.com/europace/4711"
+    other_board = "https://boards.greenhouse.io/hypoport/jobs/1"
+    adopted: list[tuple[str, Board]] = []
+    with pytest.raises(SourceUnavailableError):
+        reader(Search([board_link, other_board]), Pages({}), adopted=adopted).read(JOB)
+    assert adopted == [("Europace", Board(ats="ashby", slug="europace"))]

@@ -10,7 +10,6 @@ fitting ad is followed by another search at once, on the next engine, whose resu
 three answers in a week the job waits. A search that can't be made, with every engine resting say,
 leaves the job for a later run."""
 
-import sqlite3
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlsplit
@@ -20,7 +19,8 @@ from hunter.adapters.html_text import plain_text
 from hunter.adapters.sources.reading import posting_data
 from hunter.adapters.storage.search_log import SearchLog
 from hunter.application.ports import AdReader, SourceUnavailableError, WebSearch
-from hunter.domain.ads.employer_ad import fits, search_query
+from hunter.domain.ads.employer_ad import fits, names_company, search_query
+from hunter.domain.discovery.boards import Board, board_from_link
 from hunter.domain.discovery.posting import Posting
 
 SEARCHED_FOR = ("careerjet", "indeed-alert")
@@ -76,11 +76,14 @@ class EmployerAds:
         search: WebSearch,
         page: Callable[[str], str],
         answers_lately: Callable[[str], int],
+        adopt: Callable[[str, Board], None],
     ) -> None:
-        """`answers_lately`: how many searches for a query got an answer in the last week."""
+        """`answers_lately`: how many searches for a query got an answer in the last week;
+        `adopt` is offered every board of the job's company seen in the results."""
         self.search = search
         self.page = page
         self.answers_lately = answers_lately
+        self.adopt = adopt
 
     def read(self, posting: Posting) -> str:
         """Searches again at once when an answer holds no fitting ad: the engines take turns, so
@@ -92,11 +95,23 @@ class EmployerAds:
         if tries <= 0:
             raise SourceUnavailableError(f"{query}: searched {ANSWERS} times lately, no ad found")
         read: set[str] = set()
+        offered: set[Board] = set()
         for _ in range(tries):
-            found = self._first_fit(self.search.links(query), posting, read)
+            links = self.search.links(query)
+            self._offer_boards(links, posting, offered)
+            found = self._first_fit(links, posting, read)
             if found:
                 return found
         raise SourceUnavailableError(f"{query}: no ad of the employer's found")
+
+    def _offer_boards(self, links: list[str], posting: Posting, offered: set[Board]) -> None:
+        """A board of the company's in the results, once: its feed brings the job's ad next run.
+        `offered` grows."""
+        boards = {board for link in links if (board := board_from_link(link))} - offered
+        for board in sorted(boards, key=lambda board: board.key):
+            offered.add(board)
+            if names_company(board, posting.company):
+                self.adopt(posting.company, board)
 
     def _first_fit(self, links: list[str], posting: Posting, read: set[str]) -> str:
         """The first fitting ad among an answer's first results not read before; `read` grows."""
@@ -140,14 +155,16 @@ def plain_first(plain: Page, browser: Page) -> Page:
     return page
 
 
-def employer_readers(edge: Edge, database: sqlite3.Connection, plain: Page) -> dict[str, AdReader]:
+def employer_readers(
+    edge: Edge, log: SearchLog, adopt: Callable[[str, Board], None], plain: Page
+) -> dict[str, AdReader]:
     """One reader for every source whose own pages can't be read, searching through `edge` at
     the pace the search log keeps, and reading the results with `plain` first."""
-    log = SearchLog(database)
     week_ago = datetime.now(UTC) - LATELY
     reader = EmployerAds(
         EdgeSearch(edge.dom, log),
         plain_first(plain, edge.dom),
         lambda query: log.answers(query, week_ago),
+        adopt,
     )
     return dict.fromkeys(SEARCHED_FOR, reader)

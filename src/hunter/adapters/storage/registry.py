@@ -5,6 +5,7 @@ import sqlite3
 
 from hunter.domain.discovery.boards import Board
 from hunter.domain.discovery.company import Company, FeedStatus
+from hunter.domain.discovery.identity import company_key
 
 SELECT = (
     "SELECT name, feeds, website FROM companies "
@@ -43,6 +44,12 @@ class Registry:
             "SELECT company_key FROM boards WHERE board = ?", (board.key,)
         ).fetchone()
         return self.get(row[0]) if row else None
+
+    def adopt(self, name: str, board: Board) -> None:
+        """A board found for the company named joins it, unless another company owns it already."""
+        if self.owner_of(board) is None:
+            known = self.get(company_key(name)) or Company(name=name)
+            self.save(known.with_board(board))
 
     def all(self) -> list[Company]:
         rows = self.database.execute(f"{SELECT} ORDER BY name")
