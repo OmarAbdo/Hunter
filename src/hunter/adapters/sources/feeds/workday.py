@@ -1,12 +1,14 @@
 """One company's Workday career site (docs/sources.md), searched with a JSON body. The board is
 `tenant/wdN/site`, as in `nvidia/wd5/NVIDIAExternalCareerSite`. Large companies list thousands of
-jobs, newest first; a run reads the newest 200. The list holds no descriptions."""
+jobs, newest first; a run reads the newest 200. The list holds no descriptions; a taken job's ad
+comes from its details (`WorkdayAds`)."""
 
 import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from hunter.adapters.sources.reading import place_at, read_posted_json
+from hunter.adapters.html_text import plain_text
+from hunter.adapters.sources.reading import place_at, read_json, read_posted_json
 from hunter.adapters.web_client import WebClient
 from hunter.domain.discovery.location import Location
 from hunter.domain.discovery.posting import EmployerRef, Posting, SourceRef
@@ -91,3 +93,22 @@ def posted_at(text: str, now: datetime) -> datetime | None:
         return None
     days = 0 if age["today"] else 1 if age["yesterday"] else int(age["days"])
     return now - timedelta(days=days)
+
+
+class WorkdayAds:
+    """A job's whole ad, from its details: the address the board's own job page is filled from.
+    A job the board took down answers 404."""
+
+    def __init__(self, web: WebClient, api: str = API) -> None:
+        self.web = web
+        self.api = api
+
+    def read(self, posting: Posting) -> str:
+        employer = posting.employer
+        if employer is None or not posting.url:
+            return ""
+        tenant, instance, site = employer.board.split("/")
+        path = posting.url.partition(f"/{site}")[2]
+        url = self.api.format(tenant=tenant, instance=instance) + f"/wday/cxs/{tenant}/{site}{path}"
+        details = read_json(self.web, url, None, {"Accept": "application/json"})
+        return plain_text((details.get("jobPostingInfo") or {}).get("jobDescription"))

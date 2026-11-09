@@ -67,6 +67,7 @@ def test_the_sources_read_one_job_at_a_time(tmp_path: Path) -> None:
         "smartrecruiters",
         "softgarden",
         "stepstone-alert",
+        "workday",
         "xing-alert",
     ]
 

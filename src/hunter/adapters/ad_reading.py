@@ -6,8 +6,8 @@ from collections import Counter
 from datetime import datetime
 
 from hunter.adapters.cli.project import Project
-from hunter.adapters.sources.feed_table import PACE, PARTIAL
-from hunter.adapters.sources import personio, reading, smartrecruiters
+from hunter.adapters.sources.feed_table import ADS, PACE, PARTIAL
+from hunter.adapters.sources import reading, smartrecruiters
 from hunter.adapters.sources.alerts import alert_ads, linkedin_ads
 from hunter.adapters.sources.searches import bundesagentur
 from hunter.adapters.storage.holds import kept_pacing
@@ -37,9 +37,8 @@ def readers_of(project: Project) -> dict[str, AdReader]:
     apis.update({source: api for source, api in project.apis.items() if source in apis})
     return {
         "bundesagentur": bundesagentur.BundesagenturAds(web, api=apis["bundesagentur"]),
-        "personio": personio.PersonioAds(web),
         "smartrecruiters": smartrecruiters.SmartRecruitersAds(web, api=apis["smartrecruiters"]),
-        "softgarden": reading.JobPageAds(lambda url: reading.read_page(web, url)),
+        **{system: reader(web) for system, reader in ADS.items()},
         **alert_ads.edge_readers(
             project.root / "var" / "edge-ads",
             project.database(),

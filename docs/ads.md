@@ -35,6 +35,7 @@ longer list are marked gone. Each source has its own reader:
 | Bundesagentur | Its details API, `pc/v4/jobdetails/<base64 reference>`; 404 means gone |
 | SmartRecruiters | The posting's details, `/v1/companies/<board>/postings/<id>`, section by section; 404 means gone |
 | softgarden | The job's page, its `JobPosting`, over plain HTTP where robots.txt allows; 404 means gone |
+| Workday | The job's details, `/wday/cxs/<tenant>/<site>/job/...`, the address its own job page is filled from; 404 means gone |
 | Personio | The job's page: its `JobPosting`, or else its ad sections (`jb-description-item`), for boards whose feed leaves the ads out |
 | StepStone and XING alerts | The alert link's first hop, read without following it, names the job's public page: inside StepStone's magic link (`returnUrl`) or XING's login hop (`dest_url`). The sign-in hop is never opened. Headless Edge reads the public page logged out |
 | Adzuna | Its details page (`adzuna.de/details/<id>`) through headless Edge, since plain requests get 403 |

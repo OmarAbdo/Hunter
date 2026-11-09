@@ -1,0 +1,4 @@
+id = "122"
+title = "Read Workday ads from each job's details"
+kind = "feature"
+scope = ["src/hunter/adapters/sources/feeds/workday.py", "src/hunter/adapters/sources/feed_table.py", "src/hunter/adapters/ad_reading.py", "tests/integration/sources/test_workday.py", "tests/integration/sources/test_ad_reading.py", "tests/fixtures/sources/workday-job-zalando.json", "docs/ads.md"]

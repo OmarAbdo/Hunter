@@ -25,7 +25,9 @@ from hunter.adapters.sources.feeds import (
     teamtailor,
     workday,
 )
-from hunter.application.ports import JobSource
+from hunter.adapters.sources.reading import JobPageAds, read_page
+from hunter.adapters.web_client import WebClient
+from hunter.application.ports import AdReader, JobSource
 from hunter.domain.pacing import PaceRule
 
 FEEDS: dict[str, Callable[..., JobSource]] = {
@@ -63,6 +65,12 @@ APIS: dict[str, str | tuple[str, ...]] = {
     "workday": workday.API,
 }
 PACES: dict[str, PaceRule] = {workable.HOST: workable.PACE}
+# The systems whose list leaves a job's ad out, and the reader that fetches it, job by job.
+ADS: dict[str, Callable[[WebClient], AdReader]] = {
+    "personio": personio.PersonioAds,
+    "softgarden": lambda web: JobPageAds(lambda url: read_page(web, url)),
+    "workday": workday.WorkdayAds,
+}
 # Systems whose list of a board can stop short of all its jobs: at how many jobs the feed stops,
 # or 0 where any one job can be missed (rexx reads a page per job). A board read below its cut-off
 # lists every job it has, so a job missing from it is gone.
