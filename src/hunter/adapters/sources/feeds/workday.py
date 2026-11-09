@@ -42,7 +42,8 @@ class WorkdayFeed:
         for page in range(MOST_PAGES):
             body = {"appliedFacets": {}, "limit": PAGE, "offset": page * PAGE, "searchText": ""}
             answer = read_posted_json(self.web, self.search, body)
-            postings += [self._posting(job, now) for job in answer["jobPostings"]]
+            jobs = answer["jobPostings"]
+            postings += [self._posting(job, now) for job in jobs if job.get("title")]
             total = answer.get("total") or total  # Workday gives the total on the first page only
             if (page + 1) * PAGE >= total:
                 break

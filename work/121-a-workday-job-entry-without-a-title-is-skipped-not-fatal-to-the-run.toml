@@ -1,0 +1,4 @@
+id = "121"
+title = "A Workday job entry without a title is skipped, not fatal to the run"
+kind = "fix"
+scope = ["src/hunter/adapters/sources/feeds/workday.py", "tests/integration/sources/test_workday.py", "tests/fixtures/sources/workday-untitled.json"]

@@ -66,3 +66,10 @@ def test_a_board_that_is_gone_makes_the_source_unavailable(
 
 def test_the_feed_is_named_after_its_board(web: WebClient) -> None:
     assert WorkdayFeed(web, BOARD, "NVIDIA").name == f"workday:{BOARD}"
+
+
+def test_a_job_entry_without_a_title_is_skipped(source_api: SourceApi, web: WebClient) -> None:
+    """A board answered with one; it ended the whole discovery run (2026-11-09)."""
+    api = source_api(JOBS, "workday-untitled.json")
+    found = WorkdayFeed(web, BOARD, "NVIDIA", api=api).fetch()
+    assert [posting.title for posting in found] == ["RTL Design Engineer, DFT"]
