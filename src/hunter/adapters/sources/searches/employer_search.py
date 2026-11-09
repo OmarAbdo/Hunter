@@ -111,7 +111,8 @@ class EmployerAds:
             data = posting_data(self.page(link))
         except SourceUnavailableError:
             return ""
-        company = (data.get("hiringOrganization") or {}).get("name") or ""
+        organization = data.get("hiringOrganization") or ""  # an object, or at times just a name
+        company = organization.get("name") or "" if isinstance(organization, dict) else organization
         if not fits(posting, str(data.get("title") or ""), str(company)):
             return ""
         return plain_text(data.get("description"))

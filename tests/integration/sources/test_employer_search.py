@@ -145,3 +145,14 @@ def test_a_search_that_can_t_be_made_leaves_the_job_for_later() -> None:
     with pytest.raises(SourceUnavailableError) as raised:
         reader(Search(down=True), Pages({})).read(JOB)
     assert not raised.value.gone
+
+
+def test_an_ad_whose_job_data_names_its_company_as_plain_text_is_read() -> None:
+    """Some sites give `hiringOrganization` as the company's name instead of an object."""
+    page = (
+        '<script type="application/ld+json">{"@type": "JobPosting", '
+        '"title": "Senior Fullstack Developer (remote) (w/m/d)", "hiringOrganization": "Europace", '
+        '"description": "<p>Build the platform.</p>"}</script>'
+    )
+    found = EmployerAds(Search([EUROPACE_AD]), lambda _: page, lambda _: 0).read(JOB)
+    assert found == "Build the platform."
