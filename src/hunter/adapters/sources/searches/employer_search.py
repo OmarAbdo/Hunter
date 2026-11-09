@@ -85,6 +85,8 @@ class EmployerAds:
     def read(self, posting: Posting) -> str:
         """Searches again at once when an answer holds no fitting ad: the engines take turns, so
         the next answer is another engine's, with other results."""
+        if not posting.company.strip():
+            raise SourceUnavailableError("a job without a company: its ad can't be told apart")
         query = search_query(posting)
         tries = ANSWERS - self.answers_lately(query)
         if tries <= 0:

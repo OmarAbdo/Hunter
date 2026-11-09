@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -156,3 +157,11 @@ def test_an_ad_whose_job_data_names_its_company_as_plain_text_is_read() -> None:
     )
     found = EmployerAds(Search([EUROPACE_AD]), lambda _: page, lambda _: 0).read(JOB)
     assert found == "Build the platform."
+
+
+def test_a_job_without_a_company_isn_t_searched_for() -> None:
+    """Its ad could never be told from another company's."""
+    search = Search([EUROPACE_AD])
+    with pytest.raises(SourceUnavailableError):
+        reader(search, Pages({})).read(replace(JOB, company=" "))
+    assert search.queries == []
